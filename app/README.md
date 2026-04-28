@@ -1,4 +1,4 @@
-# Pro Wrestling Researcher — local browser
+# Wrestling Researcher — local browser
 
 A lo-fi Flask web app for browsing the bibliography, periodicals,
 territories, and wrestler data. Single-file server, vanilla HTML/CSS,

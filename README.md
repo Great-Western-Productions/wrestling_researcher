@@ -1,4 +1,4 @@
-# Pro Wrestling Researcher
+# Wrestling Researcher
 
 A personal pro-wrestling research archive — bibliography, periodicals,
 territories, wrestler/territory runs, ranking lists, plus a local Flask UI
