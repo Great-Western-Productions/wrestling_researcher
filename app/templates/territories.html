@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Territories — Pro Wrestling Bibliography{% endblock %}
+{% block content %}
+
+<h1>Territories</h1>
+<p class="subtitle">Promotions and territorial circuits — NWA members, independent operators, and major national companies.</p>
+
+<form class="filters" action="{{ url_for('territories') }}" method="get">
+  <input type="text" name="q" value="{{ filters.q }}" placeholder="Search by name, short name, or city">
+
+  <select name="region">
+    <option value="">All regions</option>
+    {% for r in regions %}
+      <option value="{{ r }}" {% if filters.region == r %}selected{% endif %}>{{ r }}</option>
+    {% endfor %}
+  </select>
+
+  <select name="nwa">
+    <option value="">All affiliations</option>
+    <option value="1" {% if filters.nwa == '1' %}selected{% endif %}>NWA member</option>
+    <option value="0" {% if filters.nwa == '0' %}selected{% endif %}>Non-NWA</option>
+  </select>
+
+  <button type="submit">Filter</button>
+  <a class="clear" href="{{ url_for('territories') }}">Clear</a>
+</form>
+
+<p class="result-count">{{ total }} territor{{ 'ies' if total != 1 else 'y' }}</p>
+
+{% for region, items in grouped.items() %}
+<section>
+  <h2>{{ region }}</h2>
+  <table class="books territories-table">
+    <thead>
+      <tr>
+        <th>Promotion</th>
+        <th>Short</th>
+        <th>HQ</th>
+        <th>Years</th>
+        <th>NWA</th>
+        <th>Wrestler runs</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in items %}
+      <tr>
+        <td class="title">
+          <a href="{{ url_for('territory_detail', territory_id=t['id']) }}">{{ t['name'] }}</a>
+          {% if t['promoter_lineage'] %}<div class="dim small">{{ t['promoter_lineage'] }}</div>{% endif %}
+        </td>
+        <td>{{ t['short_name'] | ifnull }}</td>
+        <td>
+          {{ t['headquarters_city'] | ifnull }}{% if t['headquarters_state'] %}, {{ t['headquarters_state'] }}{% endif %}
+        </td>
+        <td>
+          {% if t['year_founded'] %}{{ t['year_founded'] }}–{{ t['year_closed'] or 'present' }}{% else %}—{% endif %}
+        </td>
+        <td>{% if t['nwa_member'] %}<span class="tag archive">NWA</span>{% else %}<span class="dim">—</span>{% endif %}</td>
+        <td>{{ t['run_count'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endfor %}
+
+{% endblock %}

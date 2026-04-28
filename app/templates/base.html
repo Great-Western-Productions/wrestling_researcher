@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Pro Wrestling Researcher{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rye&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <header class="masthead">
+    <div class="masthead-rule">
+      <div class="brand">
+        <span class="brand-mark">PWR</span>
+        <span class="brand-sub">Pro Wrestling Researcher · Data Archive</span>
+      </div>
+      <nav class="topnav">
+        <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}>Home</a>
+        <a href="{{ url_for('books') }}" {% if request.endpoint in ('books','book_detail') %}class="active"{% endif %}>Books</a>
+        <a href="{{ url_for('periodicals') }}" {% if request.endpoint == 'periodicals' %}class="active"{% endif %}>Periodicals</a>
+        <a href="{{ url_for('territories') }}" {% if request.endpoint in ('territories','territory_detail') %}class="active"{% endif %}>Territories</a>
+        <a href="{{ url_for('wrestlers') }}" {% if request.endpoint in ('wrestlers','wrestler_detail') %}class="active"{% endif %}>Wrestlers</a>
+        <a href="{{ url_for('pending_list') }}" {% if request.endpoint and request.endpoint.startswith('pending_') %}class="active"{% endif %}>Pending</a>
+        <a class="add-link" href="{{ url_for('add_index') }}" {% if request.endpoint and request.endpoint.startswith('add_') %}class="active add-link"{% endif %}>+ Add</a>
+        <a href="{{ url_for('about') }}" {% if request.endpoint == 'about' %}class="active"{% endif %}>About</a>
+      </nav>
+
+      <div class="rule-flourish" aria-hidden="true">
+        <svg fill="none" height="15" viewBox="0 0 60 15" width="60" xmlns="http://www.w3.org/2000/svg">
+          <path d="M30 7.5L25 2L20 7.5L25 13L30 7.5Z" fill="#1a1a1a"/>
+          <path d="M30 7.5L35 2L40 7.5L35 13L30 7.5Z" fill="#1a1a1a"/>
+          <circle cx="14" cy="7.5" fill="#1a1a1a" r="2"/>
+          <circle cx="46" cy="7.5" fill="#1a1a1a" r="2"/>
+          <path d="M0 7.5H10M50 7.5H60" stroke="#1a1a1a" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <span class="rule-dot rule-dot-l"></span>
+      <span class="rule-dot rule-dot-r"></span>
+    </div>
+  </header>
+
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for cat, msg in messages %}
+            <div class="flash flash-{{ cat }}">{{ msg }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <small>Pro Wrestling Researcher · Local Postgres Archive</small>
+  </footer>
+</body>
+</html>

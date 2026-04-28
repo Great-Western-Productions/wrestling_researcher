@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Pending wrestlers — Pro Wrestling Bibliography{% endblock %}
+{% block content %}
+
+<h1>Pending wrestlers</h1>
+<p class="subtitle">Names from PWI rankings (and other ingested sources) not yet linked to a curated wrestler. Merge into an existing record or promote to a new one.</p>
+
+<div class="filters" style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
+  <form action="{{ url_for('pending_list') }}" method="get" style="display:flex;gap:.5rem;align-items:center;flex:1;">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search printed name…" style="flex:1;min-width:18rem;">
+    <input type="hidden" name="show" value="{{ show }}">
+    <button type="submit">Search</button>
+    {% if q %}<a class="clear" href="{{ url_for('pending_list', show=show) }}">Clear</a>{% endif %}
+  </form>
+
+  <div style="display:flex;gap:.25rem;">
+    <a href="{{ url_for('pending_list', show='open',   q=q) }}" class="btn-pill {% if show == 'open' %}active{% endif %}">Open <span class="dim small">({{ counts.open }})</span></a>
+    <a href="{{ url_for('pending_list', show='merged', q=q) }}" class="btn-pill {% if show == 'merged' %}active{% endif %}">Merged <span class="dim small">({{ counts.merged }})</span></a>
+    <a href="{{ url_for('pending_list', show='all',    q=q) }}" class="btn-pill {% if show == 'all' %}active{% endif %}">All</a>
+  </div>
+</div>
+
+<p class="result-count">{{ total }} pending wrestler{{ 's' if total != 1 else '' }}</p>
+
+<table class="books">
+  <thead>
+    <tr>
+      <th>Printed name</th>
+      <th>PFDB</th>
+      <th>Count</th>
+      <th>Range</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+    <tr {% if r['merged'] %}class="dim"{% endif %}>
+      <td class="title">
+        <a href="{{ url_for('pending_detail', pid=r['id']) }}">{{ r['printed_name'] }}</a>
+        {% if r['other_printed_names'] %}<div class="dim small">also: {{ r['other_printed_names'].replace('|', ' · ') }}</div>{% endif %}
+      </td>
+      <td>
+        {% if r['profightdb_id'] %}
+          <a href="http://www.profightdb.com/wrestlers/{{ r['profightdb_slug'] }}.html" target="_blank" rel="noopener">{{ r['profightdb_id'] }}</a>
+        {% else %}<span class="dim">—</span>{% endif %}
+      </td>
+      <td>{{ r['occurrence_count'] }}</td>
+      <td>
+        {% if r['first_seen_date'] == r['last_seen_date'] %}{{ r['first_seen_date'] }}
+        {% else %}<span class="small">{{ r['first_seen_date'] }} → {{ r['last_seen_date'] }}</span>{% endif %}
+      </td>
+      <td>
+        {% if r['merged'] %}
+          <span class="conf high">merged</span>
+          <div class="dim small">→ {{ r['resolved_name'] }}</div>
+        {% else %}
+          <span class="conf low">open</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if not r['merged'] %}
+          <a class="btn-pill" href="{{ url_for('pending_detail', pid=r['id']) }}">review</a>
+        {% else %}
+          <a class="btn-pill" href="{{ url_for('wrestler_detail', wrestler_id=r['resolved_wrestler_id']) }}">view</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if total > per_page %}
+<div class="pagination">
+  {% if page > 1 %}<a href="{{ url_for('pending_list', q=q, show=show, page=page-1) }}">« prev</a>{% endif %}
+  <span class="dim small">page {{ page }} of {{ ((total - 1) // per_page) + 1 }}</span>
+  {% if page * per_page < total %}<a href="{{ url_for('pending_list', q=q, show=show, page=page+1) }}">next »</a>{% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

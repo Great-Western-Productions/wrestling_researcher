@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="hero">
+  <h1>Pro Wrestling Researcher</h1>
+  <p class="subtitle">Books, periodicals, territories, and the workers who filled them — across eras and continents.</p>
+</section>
+
+<section class="cards">
+  <a class="card" href="{{ url_for('books') }}">
+    <div class="card-count">{{ n_books }}</div>
+    <div class="card-label">Books</div>
+  </a>
+  <a class="card alt" href="{{ url_for('periodicals') }}">
+    <div class="card-count">{{ n_per }}</div>
+    <div class="card-label">Periodicals</div>
+  </a>
+  <a class="card terr" href="{{ url_for('territories') }}">
+    <div class="card-count">{{ n_terr }}</div>
+    <div class="card-label">Territories</div>
+  </a>
+  <a class="card wr" href="{{ url_for('wrestlers') }}">
+    <div class="card-count">{{ n_wrest }}</div>
+    <div class="card-label">Wrestlers</div>
+  </a>
+</section>
+
+<section>
+  <h2>Browse books by category</h2>
+  <div class="cards subcards">
+    {% for code, label in categories %}
+    <a class="card mini" href="{{ url_for('books', cat=code) }}">
+      <div class="card-count small">{{ counts.get(code, 0) }}</div>
+      <div class="card-label">{{ label }}</div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="row">
+  <div class="col">
+    <h2>Featured territories</h2>
+    {% if featured_terr %}
+    <ul class="terr-list">
+      {% for t in featured_terr %}
+      <li>
+        <a href="{{ url_for('territory_detail', territory_id=t['id']) }}">{{ t['name'] }}</a>
+        {% if t['short_name'] %}<span class="dim small">— {{ t['short_name'] }}</span>{% endif %}
+        <div class="dim small">
+          {{ t['region'] | ifnull }}
+          {% if t['year_founded'] %} · {{ t['year_founded'] }}{% if t['year_closed'] %}–{{ t['year_closed'] }}{% else %}–present{% endif %}{% endif %}
+          · {{ t['run_count'] }} run{{ 's' if t['run_count'] != 1 else '' }}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    <p><a href="{{ url_for('territories') }}">All territories &raquo;</a></p>
+    {% else %}
+    <p class="dim">No territories yet.</p>
+    {% endif %}
+  </div>
+  <div class="col">
+    <h2>By decade (books)</h2>
+    {% if by_decade %}
+    {% set max_n = (by_decade | map(attribute='n') | max) %}
+    <div class="bars">
+      {% for row in by_decade %}
+      <div class="bar-row">
+        <span class="bar-label">{{ row['decade'] }}s</span>
+        <span class="bar"><span class="bar-fill" style="width: {{ (row['n'] / max_n * 100) | round(1) }}%"></span></span>
+        <span class="bar-n">{{ row['n'] }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="row">
+  <div class="col">
+    <h2>Confidence breakdown</h2>
+    <table class="mini">
+      <tr><th>Level</th><th>Count</th><th>What it means</th></tr>
+      <tr><td><span class="conf high">high</span></td><td>{{ confidence.get('high', 0) }}</td><td>Hand-curated; verified author/year/publisher.</td></tr>
+      <tr><td><span class="conf medium">medium</span></td><td>{{ confidence.get('medium', 0) }}</td><td>API-sourced (Open Library / Google Books).</td></tr>
+      <tr><td><span class="conf low">low</span></td><td>{{ confidence.get('low', 0) }}</td><td>Title-only; needs enrichment.</td></tr>
+      <tr><td><span class="conf low_searched">low_searched</span></td><td>{{ confidence.get('low_searched', 0) }}</td><td>API matched nothing wrestling-related.</td></tr>
+    </table>
+  </div>
+  <div class="col">
+    <h2>Top authors by book count</h2>
+    <ul class="author-list compact">
+      {% for a in top_authors[:12] %}
+      <li>
+        <a href="{{ url_for('author_detail', author_id=a['id']) }}">{{ a['name'] }}</a>
+        {% if a['is_wrestler'] %}<span class="tag wr">wrestler</span>{% endif %}
+        <span class="dim">— {{ a['n'] }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<p class="meta">{{ n_auth }} authors ({{ n_wr }} wrestlers) · {{ n_terr }} territories · {{ n_wrest }} wrestler dossiers</p>
+
+{% endblock %}

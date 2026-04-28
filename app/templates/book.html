@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}{{ b['title'] }} — Pro Wrestling Bibliography{% endblock %}
+{% block content %}
+
+<p class="breadcrumbs"><a href="{{ url_for('books') }}">&laquo; All books</a></p>
+
+<article class="book-detail">
+  <img class="book-cover"
+       src="{{ url_for('book_cover', book_id=b['id']) }}"
+       alt="Cover of {{ b['title'] }}"
+       loading="lazy">
+
+
+  <h1>{{ b['title'] }}</h1>
+  {% if b['subtitle'] %}<p class="subtitle">{{ b['subtitle'] }}</p>{% endif %}
+
+  <div class="badges">
+    <span class="cat-tag {{ b['category_code'] }}">{{ b['category_code'] | category_label }}</span>
+    <span class="conf {{ b['confidence'] }}">{{ b['confidence'] }}</span>
+  </div>
+
+  {% if authors %}
+  <p class="authors">
+    <strong>By:</strong>
+    {% for a in authors %}
+      <a href="{{ url_for('author_detail', author_id=a['id']) }}">{{ a['name'] }}</a>{% if a['is_wrestler'] %} <span class="tag wr">wrestler</span>{% endif %}{% if a['role'] != 'author' %} <span class="dim">({{ a['role'] }})</span>{% endif %}{% if not loop.last %}, {% endif %}
+    {% endfor %}
+  </p>
+  {% endif %}
+
+  <table class="meta-table">
+    <tr><th>Year</th><td>{{ b['year_published'] | ifnull }}</td></tr>
+    <tr><th>Publisher</th><td>{{ b['publisher'] | ifnull }}</td></tr>
+    <tr><th>ISBN-13</th><td>{{ b['isbn13'] | ifnull }}</td></tr>
+    <tr><th>ISBN-10</th><td>{{ b['isbn10'] | ifnull }}</td></tr>
+    <tr><th>Pages</th><td>{{ b['pages'] | ifnull }}</td></tr>
+    <tr><th>Format</th><td>{{ b['format'] | ifnull }}</td></tr>
+    <tr><th>Country</th><td>{{ b['country'] | ifnull }}</td></tr>
+    <tr><th>Language</th><td>{{ b['language'] | ifnull }}</td></tr>
+    <tr><th>Era</th><td>{{ b['era'] | ifnull }}</td></tr>
+    <tr><th>Territory / promotion</th><td>{{ b['territory_or_promotion'] | ifnull }}</td></tr>
+    <tr><th>Subject (wrestler)</th><td>{{ b['subject_wrestler'] | ifnull }}</td></tr>
+  </table>
+
+  {% if b['synopsis'] %}
+  <section class="synopsis">
+    <h2>Synopsis</h2>
+    <p>{{ b['synopsis'] }}</p>
+  </section>
+  {% endif %}
+
+  {% if b['source_url'] %}
+  <p class="source"><a href="{{ b['source_url'] }}" target="_blank" rel="noopener">Source &rarr;</a></p>
+  {% endif %}
+
+  {% if b['isbn13'] or b['isbn10'] %}
+  <p class="lookup">
+    Find a copy:
+    {% if b['isbn13'] %}
+      <a target="_blank" href="https://www.worldcat.org/isbn/{{ b['isbn13'] }}">WorldCat</a> ·
+      <a target="_blank" href="https://www.abebooks.com/servlet/SearchResults?isbn={{ b['isbn13'] }}">AbeBooks</a> ·
+      <a target="_blank" href="https://www.amazon.com/s?k={{ b['isbn13'] }}">Amazon</a> ·
+      <a target="_blank" href="https://archive.org/search?query=%22{{ b['isbn13'] }}%22">Internet Archive</a>
+    {% elif b['isbn10'] %}
+      <a target="_blank" href="https://www.worldcat.org/isbn/{{ b['isbn10'] }}">WorldCat</a> ·
+      <a target="_blank" href="https://www.abebooks.com/servlet/SearchResults?isbn={{ b['isbn10'] }}">AbeBooks</a>
+    {% endif %}
+  </p>
+  {% endif %}
+</article>
+
+{% endblock %}

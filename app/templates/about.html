@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}About — Pro Wrestling Researcher{% endblock %}
+{% block content %}
+
+<h1>About</h1>
+
+<p>Pro Wrestling Researcher is a local browser over a Postgres-backed archive of
+pro wrestling literature, periodicals, territories, wrestlers, factions, and
+ranking lists. Records are seeded from curated sources, then enriched against
+public catalogs (Open Library, Google Books, Library of Congress, the Internet
+Archive, and Cagematch).</p>
+
+<h2>Archive contents</h2>
+<table class="meta-table">
+  <tr><th>Books</th>                  <td>{{ nb | ifnull }}</td></tr>
+  <tr><th>Periodicals</th>            <td>{{ np | ifnull }}</td></tr>
+  <tr><th>Periodical issues</th>      <td>{{ ni | ifnull }}</td></tr>
+  <tr><th>Authors</th>                <td>{{ na | ifnull }}</td></tr>
+  <tr><th>Territories / promotions</th><td>{{ nt | ifnull }}</td></tr>
+  <tr><th>Wrestlers</th>              <td>{{ nw | ifnull }}</td></tr>
+  <tr><th>Wrestler-territory runs</th><td>{{ nr | ifnull }}</td></tr>
+  <tr><th>Factions / stables</th>     <td>{{ nf | ifnull }}</td></tr>
+  <tr><th>Ranking lists</th>          <td>{{ nrk | ifnull }} ({{ nre | ifnull }} entries)</td></tr>
+  <tr><th>Database</th>               <td><code>{{ db_path }}</code></td></tr>
+</table>
+
+<h2>Book categories</h2>
+<dl>
+  <dt><strong>About wrestling</strong></dt>
+  <dd>Histories, business and cultural studies, encyclopedias, photo books, reference works.</dd>
+  <dt><strong>About wrestlers</strong></dt>
+  <dd>Third-party biographies, retrospectives, posthumous tributes.</dd>
+  <dt><strong>By wrestlers</strong></dt>
+  <dd>Autobiographies, memoirs, instructionals, books written or co-written by wrestlers.</dd>
+  <dt><strong>Fiction</strong></dt>
+  <dd>Novels, short stories, comics, manga, children's books with wrestling as theme.</dd>
+</dl>
+
+<h2>Confidence levels</h2>
+<dl>
+  <dt><span class="conf high">high</span> &nbsp; {{ confidence.get('high', 0) }} books</dt>
+  <dd>Hand-curated; verified author, year, publisher, and synopsis.</dd>
+  <dt><span class="conf medium">medium</span> &nbsp; {{ confidence.get('medium', 0) }} books</dt>
+  <dd>Single-source attribution from Open Library or Google Books — generally trustworthy.</dd>
+  <dt><span class="conf medium_search">medium_search</span> &nbsp; {{ confidence.get('medium_search', 0) }} books</dt>
+  <dd>Resolved through Exa neural search or Internet Archive fallback; the match looked plausible
+      but warrants a human glance.</dd>
+  <dt><span class="conf low">low</span> &nbsp; {{ confidence.get('low', 0) }} books</dt>
+  <dd>Title-only entries — confirmed real books but author / year / ISBN need enrichment.</dd>
+  <dt><span class="conf low_searched">low_searched</span> &nbsp; {{ confidence.get('low_searched', 0) }} books</dt>
+  <dd>Searched all sources and matched nothing wrestling-related; needs manual review.</dd>
+</dl>
+
+<h2>Enrichment pipeline</h2>
+<p>Books with <code>low</code> or <code>medium</code> confidence are run through
+<code>enrich_metadata.py</code>, which queries Open Library, Google Books, the Library of
+Congress, the Internet Archive, and (optionally) Exa neural search in turn.</p>
+<pre><code>cd bibliography/
+python3 enrich_metadata.py --limit 50            # try a small batch first
+python3 enrich_metadata.py --reset-failed        # retry low_searched rows
+python3 enrich_metadata.py --book-id 123         # work a single book
+python3 enrich_metadata.py --google-key KEY      # higher Google Books rate limits
+python3 enrich_metadata.py --exa-key KEY         # enable Exa neural fallback
+python3 enrich_metadata.py --workers 16          # parallel API requests
+python3 enrich_metadata.py --dry-run --verbose   # preview without writing</code></pre>
+<p>Faster variants for large batches: <code>enrich_chunk.py</code> (chunked) and
+<code>enrich_parallel.py</code> (worker pool).</p>
+
+<h2>Schema</h2>
+<pre><code>books(id, title, subtitle, category_code, publisher, year_published,
+      isbn10, isbn13, pages, format, language, country, subject_wrestler,
+      era, territory_or_promotion, synopsis, source_url, confidence,
+      primary_source_value, created_at)
+authors(id, name, ring_name, is_wrestler, notes)
+book_authors(book_id, author_id, role)          -- author | co-author | as told to | editor | foreword
+categories(id, code, label, description)
+
+periodicals(id, title, publisher, country, language, year_started, year_ended,
+            frequency, type, parent_company, notes, issue_count_known,
+            archive_in_collection, source_url, confidence, created_at)
+periodical_issues(...)                          -- individual issues, with covers
+issue_cover_subjects(...)                       -- which wrestlers appeared on a cover
+
+territories(id, name, short_name, region, nwa_member, headquarters_city,
+            headquarters_state, year_founded, year_closed, promoter_lineage,
+            notes, country, aliases, cagematch_id, cagematch_url, created_at)
+
+wrestlers(id, legal_name, primary_ring_name, other_ring_names, born_date,
+          died_date, living, debut_year, retired_year, primary_role,
+          hometown_billed, hometown_real, finisher, style, socials,
+          convention_status, last_known_appearance, footage_notes,
+          midcard_files_status, midcard_files_priority, why_they_mattered,
+          notes, cagematch_id, cagematch_url, created_at)
+wrestler_territory_runs(id, wrestler_id, territory_id, start_year, start_month,
+                        end_year, end_month, role_during_run,
+                        ring_name_during_run, primary_run, notes)
+
+factions(...)         faction_members(...)
+ranking_lists(...)    ranking_entries(...)      -- e.g., PWI 500 historical rankings
+research_sources(id, url, description, consulted_at, notes)</code></pre>
+
+<h2>Local-only</h2>
+<p>This app has add forms but no authentication. Run it on <code>127.0.0.1</code>
+only — don't expose it.</p>
+
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Periodicals — Pro Wrestling Bibliography{% endblock %}
+{% block content %}
+
+<h1>Periodicals</h1>
+<p class="dim">Magazines, newsletters, dirt sheets, and promotion programs.</p>
+
+<form class="filters" action="{{ url_for('periodicals') }}" method="get">
+  <select name="country">
+    <option value="">All countries</option>
+    {% for c in countries %}
+      <option value="{{ c }}" {% if filters.country == c %}selected{% endif %}>{{ c }}</option>
+    {% endfor %}
+  </select>
+
+  <select name="type">
+    <option value="">All types</option>
+    {% for t in types %}
+      <option value="{{ t }}" {% if filters.type == t %}selected{% endif %}>{{ t }}</option>
+    {% endfor %}
+  </select>
+
+  <label class="check">
+    <input type="checkbox" name="in_archive" value="1" {% if filters.in_archive %}checked{% endif %}>
+    In your archive only
+  </label>
+
+  <button type="submit">Filter</button>
+  <a class="clear" href="{{ url_for('periodicals') }}">Clear</a>
+</form>
+
+<p class="result-count">{{ total }} periodical{{ 's' if total != 1 else '' }}</p>
+
+{% for country, items in grouped.items() %}
+<section>
+  <h2>{{ country }}</h2>
+  <table class="periodicals">
+    <thead>
+      <tr><th>Title</th><th>Years</th><th>Frequency</th><th>Type</th><th>Publisher</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for p in items %}
+      <tr>
+        <td>
+          <strong>{{ p['title'] }}</strong>
+          {% if p['notes'] %}<div class="dim small">{{ p['notes'] }}</div>{% endif %}
+        </td>
+        <td>
+          {% if p['year_started'] %}{{ p['year_started'] }}–{{ p['year_ended'] or 'present' }}{% else %}—{% endif %}
+        </td>
+        <td>{{ p['frequency'] | ifnull }}</td>
+        <td>{{ p['type'] | ifnull }}</td>
+        <td>{{ p['publisher'] | ifnull }}</td>
+        <td>
+          {% if p['archive_in_collection'] %}<span class="tag archive">in archive</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endfor %}
+
+{% endblock %}

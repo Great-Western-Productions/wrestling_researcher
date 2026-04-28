@@ -1,0 +1,28 @@
+# secrets
+.env
+.env~
+.env.bak
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# sqlite (legacy export, regeneratable from postgres)
+*.db
+*.db-journal
+*.db.bak
+*.db.corrupt-*.bak
+
+# os / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# generated dumps
+bibliography/wrestling_bibliography_postgres.sql

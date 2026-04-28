@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ a['name'] }} — Pro Wrestling Bibliography{% endblock %}
+{% block content %}
+
+<p class="breadcrumbs"><a href="{{ url_for('books') }}">&laquo; All books</a></p>
+
+<h1>{{ a['name'] }}
+  {% if a['is_wrestler'] %}<span class="tag wr">wrestler</span>{% endif %}
+</h1>
+{% if a['ring_name'] and a['ring_name'] != a['name'] %}
+  <p class="subtitle">Also known as <strong>{{ a['ring_name'] }}</strong></p>
+{% endif %}
+{% if a['notes'] %}<p>{{ a['notes'] }}</p>{% endif %}
+
+<h2>{{ books|length }} book{{ 's' if books|length != 1 else '' }}</h2>
+
+<table class="books">
+  <thead>
+    <tr><th>Title</th><th>Year</th><th>Role</th><th>Category</th></tr>
+  </thead>
+  <tbody>
+    {% for b in books %}
+    <tr>
+      <td><a href="{{ url_for('book_detail', book_id=b['id']) }}">{{ b['title'] }}</a></td>
+      <td>{{ b['year_published'] | ifnull }}</td>
+      <td>{{ b['role'] }}</td>
+      <td><span class="cat-tag {{ b['category_code'] }}">{{ b['category_code'] | category_label }}</span></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
