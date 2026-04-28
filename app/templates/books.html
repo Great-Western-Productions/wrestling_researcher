@@ -40,6 +40,7 @@
   <input type="number" name="to" placeholder="To year" min="1900" max="2030" value="{{ filters.to }}">
 
   <select name="sort">
+    <option value="author" {% if filters.sort == 'author' %}selected{% endif %}>Author A-Z</option>
     <option value="year_desc" {% if filters.sort == 'year_desc' %}selected{% endif %}>Newest first</option>
     <option value="year_asc" {% if filters.sort == 'year_asc' %}selected{% endif %}>Oldest first</option>
     <option value="title" {% if filters.sort == 'title' %}selected{% endif %}>Title A-Z</option>
@@ -63,7 +64,8 @@
       <th>Year</th>
       <th>Category</th>
       <th>Country</th>
-      <th></th>
+      <th>Status</th>
+      {% if logged_in and items|length > 1 %}<th>Merge</th>{% endif %}
     </tr>
   </thead>
   <tbody>
@@ -84,6 +86,23 @@
       <td><span class="cat-tag {{ b['category_code'] }}">{{ b['category_code'] | category_label }}</span></td>
       <td>{{ b['country'] | ifnull }}</td>
       <td><span class="conf {{ b['confidence'] }}">{{ b['confidence'] }}</span></td>
+      {% if logged_in and items|length > 1 %}
+      <td class="merge-cell">
+        <form class="inline-merge" action="{{ url_for('merge_book_route', book_id=b['id']) }}" method="post">
+          <input type="hidden" name="next" value="{{ request.full_path }}">
+          <select name="duplicate_book_id" aria-label="Duplicate book to merge into {{ b['title'] }}">
+            <option value="">Merge duplicate...</option>
+            {% for candidate in items %}
+              {% set other = candidate.book %}
+              {% if other['id'] != b['id'] %}
+                <option value="{{ other['id'] }}">{{ other['title'] }}{% if other['year_published'] %} ({{ other['year_published'] }}){% endif %}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+          <button type="submit">Merge</button>
+        </form>
+      </td>
+      {% endif %}
     </tr>
     {% endfor %}
   </tbody>

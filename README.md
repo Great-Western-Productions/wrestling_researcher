@@ -44,7 +44,7 @@ python3 bibliography/migrate_to_postgres.py --apply
 
 ```bash
 python3 app/app.py
-# → http://127.0.0.1:5050/
+# → http://127.0.0.1:5150/
 
 python3 app/app.py --port 8080
 PWBIB_DEBUG=1 python3 app/app.py        # auto-reload

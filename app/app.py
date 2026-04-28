@@ -3,7 +3,7 @@
 Pro Wrestling Researcher — local Flask app.
 
 USAGE
-    python3 app/app.py              # http://127.0.0.1:5050
+    python3 app/app.py              # http://127.0.0.1:5150
     python3 app/app.py --port 8080
     PWBIB_DEBUG=1 python3 app/app.py
 
@@ -19,7 +19,7 @@ import sys
 
 import psycopg
 import requests
-from flask import Flask, abort, flash, redirect, render_template, request, url_for
+from flask import Flask, abort, flash, g, redirect, render_template, request, url_for
 
 # Allow `python3 app/app.py` from the repo root and `python3 app.py` from inside.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from config import CONFIG  # noqa: E402
 from db import close_db, commit, execute, get_db, query, query_one  # noqa: E402
 
-app = Flask(__name__, static_folder="public", static_url_path="/static")
+app = Flask(__name__, root_path=os.path.dirname(os.path.abspath(__file__)), static_folder="public", static_url_path="/static")
 app.secret_key = CONFIG.secret
 app.teardown_appcontext(close_db)
 
@@ -44,10 +44,40 @@ CATEGORIES = [
 PER_PAGE = 30
 PENDING_PER_PAGE = 50
 
+BOOK_MERGE_FILL_FIELDS = [
+    "subtitle",
+    "category_code",
+    "publisher",
+    "year_published",
+    "isbn10",
+    "isbn13",
+    "pages",
+    "format",
+    "language",
+    "country",
+    "subject_wrestler",
+    "era",
+    "territory_or_promotion",
+    "synopsis",
+    "source_url",
+    "confidence",
+    "primary_source_value",
+]
+
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+@app.before_request
+def mark_logged_in():
+    g.logged_in = True
+
+
+@app.context_processor
+def logged_in_context():
+    return {"logged_in": getattr(g, "logged_in", False)}
+
 
 def authors_for(book_id: int) -> list[dict]:
     return query(
@@ -81,6 +111,113 @@ def _distinct_values(table: str, column: str, where: str = "") -> list[str]:
         sql += f" AND {where}"
     sql += f" ORDER BY {column}"
     return [r["v"] for r in query(sql)]
+
+
+def _is_blank(value) -> bool:
+    return value is None or value == ""
+
+
+def merge_books(target_book_id: int, duplicate_book_id: int) -> None:
+    """Merge duplicate into target, preserving target values when present."""
+    if target_book_id == duplicate_book_id:
+        raise ValueError("Cannot merge a book into the same book.")
+
+    target = query_one("SELECT * FROM books WHERE id = %s", (target_book_id,))
+    duplicate = query_one("SELECT * FROM books WHERE id = %s", (duplicate_book_id,))
+    if not target or not duplicate:
+        raise ValueError("Both books must exist before they can be merged.")
+
+    updates = []
+    params = []
+    for field in BOOK_MERGE_FILL_FIELDS:
+        if _is_blank(target.get(field)) and not _is_blank(duplicate.get(field)):
+            updates.append(f"{field} = %s")
+            params.append(duplicate[field])
+
+    execute(
+        """INSERT INTO book_authors (book_id, author_id, role)
+           SELECT %s, author_id, role FROM book_authors
+            WHERE book_id = %s
+           ON CONFLICT DO NOTHING""",
+        (target_book_id, duplicate_book_id),
+    )
+    execute("DELETE FROM books WHERE id = %s", (duplicate_book_id,))
+
+    if updates:
+        execute(
+            f"UPDATE books SET {', '.join(updates)} WHERE id = %s",
+            tuple(params + [target_book_id]),
+        )
+
+    commit()
+
+
+def _book_author_names(book_id: int) -> str:
+    rows = query(
+        """SELECT a.name
+             FROM book_authors ba
+             JOIN authors a ON a.id = ba.author_id
+            WHERE ba.book_id = %s
+            ORDER BY ba.role, a.name""",
+        (book_id,),
+    )
+    return ", ".join(r["name"] for r in rows)
+
+
+def update_book_from_form(book_id: int, form) -> None:
+    title = _opt(form.get("title"))
+    category_code = _opt(form.get("category_code"))
+    if not title or not category_code:
+        raise ValueError("Title and category are required.")
+
+    execute(
+        """UPDATE books
+              SET title = %s, subtitle = %s, category_code = %s, publisher = %s,
+                  year_published = %s, isbn10 = %s, isbn13 = %s, pages = %s,
+                  format = %s, language = %s, country = %s, subject_wrestler = %s,
+                  era = %s, territory_or_promotion = %s, synopsis = %s,
+                  source_url = %s, confidence = %s
+            WHERE id = %s""",
+        (
+            title,
+            _opt(form.get("subtitle")),
+            category_code,
+            _opt(form.get("publisher")),
+            _opt_int(form.get("year_published")),
+            _opt(form.get("isbn10")),
+            _opt(form.get("isbn13")),
+            _opt_int(form.get("pages")),
+            _opt(form.get("format")),
+            _opt(form.get("language")) or "English",
+            _opt(form.get("country")),
+            _opt(form.get("subject_wrestler")),
+            _opt(form.get("era")),
+            _opt(form.get("territory_or_promotion")),
+            _opt(form.get("synopsis")),
+            _opt(form.get("source_url")),
+            _opt(form.get("confidence")) or "medium",
+            book_id,
+        ),
+    )
+
+    author_names = [n.strip() for n in (form.get("authors") or "").split(",") if n.strip()]
+    execute("DELETE FROM book_authors WHERE book_id = %s", (book_id,))
+    is_wrestler = 1 if form.get("authors_are_wrestlers") else 0
+    for name in author_names:
+        row = query_one("SELECT id FROM authors WHERE name = %s", (name,))
+        if row:
+            aid = row["id"]
+        else:
+            aid = execute(
+                "INSERT INTO authors (name, is_wrestler) VALUES (%s, %s) RETURNING id",
+                (name, is_wrestler),
+            ).fetchone()["id"]
+        execute(
+            "INSERT INTO book_authors (book_id, author_id, role) VALUES (%s, %s, 'author') "
+            "ON CONFLICT DO NOTHING",
+            (book_id, aid),
+        )
+    commit()
 
 
 # ---------------------------------------------------------------------------
@@ -147,7 +284,7 @@ def books():
     confidence = request.args.get("confidence", "").strip() or None
     year_from = request.args.get("from", "").strip()
     year_to = request.args.get("to", "").strip()
-    sort = request.args.get("sort", "year_desc")
+    sort = request.args.get("sort", "author")
     page = max(1, int(request.args.get("page", 1)))
 
     where = []
@@ -179,20 +316,26 @@ def books():
     where_sql = ("WHERE " + " AND ".join(where)) if where else ""
 
     sort_map = {
-        "year_desc": "b.year_published DESC NULLS LAST, b.title",
-        "year_asc": "b.year_published ASC NULLS LAST, b.title",
+        "author": "primary_author NULLS LAST, LOWER(b.title)",
+        "year_desc": "b.year_published DESC NULLS LAST, LOWER(b.title)",
+        "year_asc": "b.year_published ASC NULLS LAST, LOWER(b.title)",
         "title": "LOWER(b.title)",
-        "category": "b.category_code, b.year_published DESC NULLS LAST",
+        "category": "b.category_code, b.year_published DESC NULLS LAST, LOWER(b.title)",
     }
-    order_sql = sort_map.get(sort, sort_map["year_desc"])
+    order_sql = sort_map.get(sort, sort_map["author"])
 
     total = query_one(
         f"SELECT COUNT(*) AS n FROM books b {where_sql}", params)["n"]
     offset = (page - 1) * PER_PAGE
     rows = query(
-        f"""SELECT b.* FROM books b {where_sql}
-            ORDER BY {order_sql}
-            LIMIT %s OFFSET %s""",
+        f"""SELECT b.*,
+                   (SELECT MIN(LOWER(a.name))
+                      FROM book_authors ba
+                      JOIN authors a ON a.id = ba.author_id
+                     WHERE ba.book_id = b.id) AS primary_author
+              FROM books b {where_sql}
+             ORDER BY {order_sql}
+             LIMIT %s OFFSET %s""",
         params + [PER_PAGE, offset],
     )
 
@@ -220,6 +363,49 @@ def book_detail(book_id):
     if not row:
         abort(404)
     return render_template("book.html", b=row, authors=authors_for(book_id))
+
+
+@app.route("/book/<int:book_id>/edit", methods=["GET", "POST"])
+def edit_book(book_id):
+    row = query_one("SELECT * FROM books WHERE id = %s", (book_id,))
+    if not row:
+        abort(404)
+    if request.method == "POST":
+        try:
+            update_book_from_form(book_id, request.form)
+            flash(f"Updated: {request.form.get('title')}", "success")
+            return redirect(url_for("book_detail", book_id=book_id))
+        except ValueError as exc:
+            flash(str(exc), "error")
+        except psycopg.errors.Error as exc:
+            get_db().rollback()
+            flash(f"Could not update book: {exc}", "error")
+
+    countries = _distinct_values("books", "country")
+    eras = _distinct_values("books", "era")
+    return render_template(
+        "edit_book.html",
+        b=row, authors_text=_book_author_names(book_id),
+        categories=CATEGORIES, countries=countries, eras=eras,
+    )
+
+
+@app.route("/books/<int:book_id>/merge", methods=["POST"])
+def merge_book_route(book_id):
+    duplicate_id = _opt_int(request.form.get("duplicate_book_id"))
+    next_url = request.form.get("next") or url_for("books")
+    if not duplicate_id:
+        flash("Choose a duplicate book to merge.", "error")
+        return redirect(next_url)
+    try:
+        merge_books(book_id, duplicate_id)
+        flash("Merged duplicate book record.", "success")
+    except ValueError as exc:
+        flash(str(exc), "error")
+    except psycopg.errors.Error as exc:
+        get_db().rollback()
+        flash(f"Could not merge books: {exc}", "error")
+    return redirect(next_url)
 
 
 def _resolve_cover_url(isbn: str) -> str | None:
@@ -290,7 +476,7 @@ def author_detail(author_id):
           FROM books b
           JOIN book_authors ba ON ba.book_id = b.id
          WHERE ba.author_id = %s
-         ORDER BY b.year_published NULLS LAST, b.title
+         ORDER BY b.year_published ASC NULLS LAST, LOWER(b.title)
     """, (author_id,))
     return render_template("author.html", a=a, books=books)
 

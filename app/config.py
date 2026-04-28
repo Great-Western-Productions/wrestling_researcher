@@ -64,7 +64,7 @@ class Config:
             google_api_token=os.environ.get("GOOGLE_API_TOKEN") or None,
             secret=os.environ.get("PWBIB_SECRET", "local-only-not-a-real-secret"),
             host=os.environ.get("PWBIB_HOST", "127.0.0.1"),
-            port=int(os.environ.get("PWBIB_PORT", "5050")),
+            port=int(os.environ.get("PWBIB_PORT", "5150")),
             debug=os.environ.get("PWBIB_DEBUG", "").lower() in ("1", "true", "yes"),
         )
 

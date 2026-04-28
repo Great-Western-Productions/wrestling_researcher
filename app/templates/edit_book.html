@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ b['title'] }} — Pro Wrestling Bibliography{% endblock %}
+{% block content %}
+
+<p class="breadcrumbs"><a href="{{ url_for('book_detail', book_id=b['id']) }}">&laquo; {{ b['title'] }}</a></p>
+
+<h1>Edit book</h1>
+
+<form class="add-form" method="post" action="{{ url_for('edit_book', book_id=b['id']) }}">
+  <div class="form-row">
+    <label>Title <span class="req">*</span>
+      <input type="text" name="title" required autofocus value="{{ b['title'] or '' }}">
+    </label>
+    <label>Subtitle
+      <input type="text" name="subtitle" value="{{ b['subtitle'] or '' }}">
+    </label>
+  </div>
+
+  <div class="form-row">
+    <label>Category <span class="req">*</span>
+      <select name="category_code" required>
+        {% for code, label in categories %}
+          <option value="{{ code }}" {% if b['category_code'] == code %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Confidence
+      <select name="confidence">
+        {% for c in ['medium', 'high', 'low', 'low_searched'] %}
+          <option value="{{ c }}" {% if b['confidence'] == c %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+
+  <div class="form-row">
+    <label class="grow">Author(s) — comma-separated
+      <input type="text" name="authors" value="{{ authors_text }}" placeholder="e.g., Mick Foley, Larry Sweeney">
+    </label>
+    <label class="check">
+      <input type="checkbox" name="authors_are_wrestlers" value="1">
+      New author(s) are wrestlers
+    </label>
+  </div>
+
+  <div class="form-row">
+    <label>Publisher
+      <input type="text" name="publisher" value="{{ b['publisher'] or '' }}">
+    </label>
+    <label>Year
+      <input type="number" name="year_published" min="1900" max="2099" value="{{ b['year_published'] or '' }}">
+    </label>
+    <label>Pages
+      <input type="number" name="pages" min="1" value="{{ b['pages'] or '' }}">
+    </label>
+  </div>
+
+  <div class="form-row">
+    <label>ISBN-10
+      <input type="text" name="isbn10" value="{{ b['isbn10'] or '' }}">
+    </label>
+    <label>ISBN-13
+      <input type="text" name="isbn13" value="{{ b['isbn13'] or '' }}">
+    </label>
+    <label>Format
+      <input type="text" name="format" value="{{ b['format'] or '' }}" placeholder="hardcover, paperback, ebook...">
+    </label>
+  </div>
+
+  <div class="form-row">
+    <label>Language
+      <input type="text" name="language" value="{{ b['language'] or 'English' }}">
+    </label>
+    <label>Country
+      <input type="text" name="country" list="country-options" value="{{ b['country'] or '' }}" placeholder="US, UK, Japan...">
+      <datalist id="country-options">
+        {% for c in countries %}<option value="{{ c }}">{% endfor %}
+      </datalist>
+    </label>
+    <label>Era
+      <input type="text" name="era" list="era-options" value="{{ b['era'] or '' }}" placeholder="territorial, attitude...">
+      <datalist id="era-options">
+        {% for e in eras %}<option value="{{ e }}">{% endfor %}
+      </datalist>
+    </label>
+  </div>
+
+  <div class="form-row">
+    <label>Subject wrestler (if biography)
+      <input type="text" name="subject_wrestler" value="{{ b['subject_wrestler'] or '' }}">
+    </label>
+    <label>Territory / promotion
+      <input type="text" name="territory_or_promotion" value="{{ b['territory_or_promotion'] or '' }}">
+    </label>
+  </div>
+
+  <label>Synopsis
+    <textarea name="synopsis" rows="4">{{ b['synopsis'] or '' }}</textarea>
+  </label>
+
+  <label>Source URL
+    <input type="url" name="source_url" value="{{ b['source_url'] or '' }}" placeholder="https://...">
+  </label>
+
+  <div class="form-actions">
+    <button type="submit">Save changes</button>
+    <a class="clear" href="{{ url_for('book_detail', book_id=b['id']) }}">Cancel</a>
+  </div>
+</form>
+
+{% endblock %}

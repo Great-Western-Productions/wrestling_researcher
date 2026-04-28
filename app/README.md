@@ -9,7 +9,7 @@ no build step, no JS framework, reads from local PostgreSQL.
 From the project root:
 
 ```bash
-python3 app/app.py                       # http://127.0.0.1:5050
+python3 app/app.py                       # http://127.0.0.1:5150
 python3 app/app.py --port 8080           # custom port
 PWBIB_DEBUG=1 python3 app/app.py         # auto-reload
 ```
@@ -58,8 +58,18 @@ app/
 
 ```bash
 #!/bin/bash
-cd "/Users/jschairb-gwp/Documents/Claude/Projects/ProWrestling Researcher"
-python3 app/app.py &
+cd "/Users/jschairb-gwp/src/ProWrestling Researcher"
+python3 app/app.py --port 5150 --debug &
 sleep 1
-open "http://127.0.0.1:5050/"
+open "http://wrestling-researcher.local:5150/"
 ```
+
+## Background dev service
+
+The repo includes a macOS `launchd` user-agent plist at
+`launchd/com.gwp.wrestling-researcher.plist`. It runs
+`scripts/run_dev_server.sh`, which starts the Flask app on
+`127.0.0.1:5150` with debug reload enabled.
+
+Once installed in `~/Library/LaunchAgents`, the app is available at
+`http://wrestling-researcher.local:5150/`.
