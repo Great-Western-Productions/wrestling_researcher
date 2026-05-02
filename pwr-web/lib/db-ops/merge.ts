@@ -68,6 +68,7 @@ export async function mergeBooks(
       }
     }
     if (updates.length > 0) {
+      updates.push(sql`updated_at = CURRENT_TIMESTAMP`);
       await tx.execute(sql`
         UPDATE books SET ${sql.join(updates, sql`, `)}
          WHERE id = ${targetBookId}
@@ -100,7 +101,7 @@ export async function mergePendingIntoWrestler(
     if (wrestlers.length === 0) throw new ValidationError("Target wrestler not found.");
 
     await tx.execute(
-      sql`UPDATE pending_wrestlers SET resolved_wrestler_id = ${wrestlerId} WHERE id = ${pendingId}`,
+      sql`UPDATE pending_wrestlers SET resolved_wrestler_id = ${wrestlerId}, updated_at = CURRENT_TIMESTAMP WHERE id = ${pendingId}`,
     );
     const updated = await tx.execute<{ count: number }>(sql`
       WITH updated AS (
@@ -141,7 +142,7 @@ export async function unmergePendingFromWrestler(
     const wid = head.resolved_wrestler_id;
 
     await tx.execute(
-      sql`UPDATE pending_wrestlers SET resolved_wrestler_id = NULL WHERE id = ${pendingId}`,
+      sql`UPDATE pending_wrestlers SET resolved_wrestler_id = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ${pendingId}`,
     );
     const reverted = await tx.execute<{ count: number }>(sql`
       WITH reverted AS (

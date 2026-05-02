@@ -1,9 +1,16 @@
 import { sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "@/lib/db/schema";
+import { confidenceLevel, type Confidence } from "@/lib/db/schema";
 import { getCheckbox, getInt, getStr } from "@/lib/actions/_helpers";
 
 type Db = PostgresJsDatabase<typeof schema>;
+
+const CONFIDENCE_VALUES = new Set<string>(confidenceLevel.enumValues);
+function parseConfidence(raw: string | null): Confidence {
+  if (raw && CONFIDENCE_VALUES.has(raw)) return raw as Confidence;
+  return "medium";
+}
 
 export type BookInput = {
   title: string;
@@ -22,7 +29,7 @@ export type BookInput = {
   territory_or_promotion: string | null;
   synopsis: string | null;
   source_url: string | null;
-  confidence: string;
+  confidence: Confidence;
   authorNames: string[];
   authorsAreWrestlers: boolean;
 };
@@ -58,7 +65,7 @@ export function parseBookInput(form: FormData): BookInput {
     territory_or_promotion: getStr(form, "territory_or_promotion"),
     synopsis: getStr(form, "synopsis"),
     source_url: getStr(form, "source_url"),
-    confidence: getStr(form, "confidence") ?? "medium",
+    confidence: parseConfidence(getStr(form, "confidence")),
     authorNames,
     authorsAreWrestlers: getCheckbox(form, "authors_are_wrestlers"),
   };
@@ -125,7 +132,8 @@ export async function updateBook(db: Db, bookId: number, input: BookInput): Prom
              subject_wrestler = ${input.subject_wrestler}, era = ${input.era},
              territory_or_promotion = ${input.territory_or_promotion},
              synopsis = ${input.synopsis}, source_url = ${input.source_url},
-             confidence = ${input.confidence}
+             confidence = ${input.confidence},
+             updated_at = CURRENT_TIMESTAMP
        WHERE id = ${bookId}
     `);
     await syncBookAuthors(tx, bookId, input.authorNames, input.authorsAreWrestlers);

@@ -15,6 +15,13 @@
       "when": 1777738445787,
       "tag": "0001_native_types",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777739531491,
+      "tag": "0002_confidence_enum",
+      "breakpoints": true
     }
   ]
 }

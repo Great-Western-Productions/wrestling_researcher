@@ -1,8 +1,15 @@
 import { sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "@/lib/db/schema";
+import { confidenceLevel, type Confidence } from "@/lib/db/schema";
 import { getCheckbox, getInt, getStr } from "@/lib/actions/_helpers";
 import { ValidationError } from "./books";
+
+const CONFIDENCE_VALUES = new Set<string>(confidenceLevel.enumValues);
+function parseConfidence(raw: string | null): Confidence {
+  if (raw && CONFIDENCE_VALUES.has(raw)) return raw as Confidence;
+  return "medium";
+}
 
 type Db = PostgresJsDatabase<typeof schema>;
 
@@ -20,7 +27,7 @@ export type PeriodicalInput = {
   issue_count_known: number | null;
   archive_in_collection: boolean;
   source_url: string | null;
-  confidence: string;
+  confidence: Confidence;
 };
 
 export function parsePeriodicalInput(form: FormData): PeriodicalInput {
@@ -40,7 +47,7 @@ export function parsePeriodicalInput(form: FormData): PeriodicalInput {
     issue_count_known: getInt(form, "issue_count_known"),
     archive_in_collection: getCheckbox(form, "archive_in_collection"),
     source_url: getStr(form, "source_url"),
-    confidence: getStr(form, "confidence") ?? "medium",
+    confidence: parseConfidence(getStr(form, "confidence")),
   };
 }
 

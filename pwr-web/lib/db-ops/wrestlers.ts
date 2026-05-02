@@ -94,7 +94,7 @@ export async function insertWrestler(
     let rankingEntriesBackfilled = 0;
     if (input.fromPending) {
       await tx.execute(
-        sql`UPDATE pending_wrestlers SET resolved_wrestler_id = ${id} WHERE id = ${input.fromPending}`,
+        sql`UPDATE pending_wrestlers SET resolved_wrestler_id = ${id}, updated_at = CURRENT_TIMESTAMP WHERE id = ${input.fromPending}`,
       );
       const updated = await tx.execute<{ count: number }>(sql`
         WITH updated AS (

@@ -1,5 +1,14 @@
-import { pgTable, index, foreignKey, unique, integer, text, uniqueIndex, check, boolean, primaryKey, pgView, bigint, timestamp, date } from "drizzle-orm/pg-core"
+import { pgTable, pgEnum, index, foreignKey, unique, integer, text, uniqueIndex, check, boolean, primaryKey, pgView, bigint, timestamp, date } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
+
+export const confidenceLevel = pgEnum("confidence_level", [
+  "low",
+  "low_searched",
+  "medium",
+  "medium_search",
+  "high",
+]);
+export type Confidence = (typeof confidenceLevel.enumValues)[number];
 
 
 
@@ -64,7 +73,7 @@ export const books = pgTable("books", {
 	territory_or_promotion: text(),
 	synopsis: text(),
 	source_url: text(),
-	confidence: text().default('medium'),
+	confidence: confidenceLevel().default('medium'),
 	primary_source_value: text(),
 	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
 	updated_at: timestamp({ withTimezone: true }),
@@ -161,7 +170,7 @@ export const factions = pgTable("factions", {
 	disbanded_year: integer(),
 	primary_territory_id: integer(),
 	notes: text(),
-	confidence: text().default('medium'),
+	confidence: confidenceLevel().default('medium'),
 	source_url: text(),
 	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
 	updated_at: timestamp({ withTimezone: true }),
@@ -250,7 +259,7 @@ export const periodical_issues = pgTable("periodical_issues", {
 	drive_pdf_path: text(),
 	in_collection: boolean().default(false),
 	source_url: text(),
-	confidence: text().default('medium'),
+	confidence: confidenceLevel().default('medium'),
 	notes: text(),
 	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
 	updated_at: timestamp({ withTimezone: true }),
@@ -308,7 +317,7 @@ export const periodicals = pgTable("periodicals", {
 	issue_count_known: integer(),
 	archive_in_collection: boolean().default(false),
 	source_url: text(),
-	confidence: text().default('medium'),
+	confidence: confidenceLevel().default('medium'),
 	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
 	updated_at: timestamp({ withTimezone: true }),
 }, (table) => [

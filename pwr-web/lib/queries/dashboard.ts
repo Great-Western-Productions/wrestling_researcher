@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "@/lib/db/schema";
+import type { Confidence } from "@/lib/db/schema";
 
 type Db = PostgresJsDatabase<typeof schema>;
 
@@ -37,7 +38,7 @@ export async function getDashboardCounts(db: Db): Promise<DashboardCounts> {
     db.execute<{ category_code: string; n: number }>(
       sql`SELECT category_code, COUNT(*)::int AS n FROM books GROUP BY category_code`,
     ),
-    db.execute<{ confidence: string | null; n: number }>(
+    db.execute<{ confidence: Confidence | null; n: number }>(
       sql`SELECT confidence, COUNT(*)::int AS n FROM books GROUP BY confidence`,
     ),
   ]);

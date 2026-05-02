@@ -1,6 +1,7 @@
 import { sql, type SQL } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "@/lib/db/schema";
+import type { Confidence } from "@/lib/db/schema";
 
 type Db = PostgresJsDatabase<typeof schema>;
 
@@ -19,7 +20,7 @@ export type PeriodicalRow = {
   issue_count_known: number | null;
   archive_in_collection: boolean | null;
   source_url: string | null;
-  confidence: string | null;
+  confidence: Confidence | null;
   created_at: string | null;
 };
 

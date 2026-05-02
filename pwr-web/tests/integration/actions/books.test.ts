@@ -101,4 +101,19 @@ describe("updateBook", () => {
     expect(result.book?.confidence).toBe("high");
     expect(result.authors).toEqual(["Bob", "Carol"]);
   });
+
+  it("touches updated_at on update", async () => {
+    const updatedAt = await withTx(async (tx) => {
+      await tx.insert(categories).values({ code: "x", label: "X" });
+      const id = await insertBook(tx, makeInput({ title: "T" }));
+      await updateBook(tx, id, makeInput({ title: "T2" }));
+      const rows = await tx.execute<{ updated_at: string | null }>(
+        sql`SELECT updated_at FROM books WHERE id = ${id}`,
+      );
+      return rows[0]?.updated_at;
+    });
+    expect(updatedAt).not.toBeNull();
+    // postgres.js returns timestamptz as an ISO-shaped string; just confirm it parses.
+    expect(Number.isNaN(Date.parse(updatedAt!))).toBe(false);
+  });
 });
