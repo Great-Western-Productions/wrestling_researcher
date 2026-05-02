@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3000",
+    "dev": "next dev --hostname 127.0.0.1 --port 5150",
     "build": "next build",
     "start": "next start",
     "test": "vitest run",

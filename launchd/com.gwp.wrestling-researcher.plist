@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+        "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.gwp.wrestling-researcher</string>
+
+    <!-- Run Next.js dev server (hot reload) directly via node + the corepack-installed
+         pnpm. Absolute paths so we don't depend on shell init / nvm being sourced. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/jschairb-gwp/.nvm/versions/node/v24.14.0/bin/node</string>
+        <string>/Users/jschairb-gwp/.nvm/versions/node/v24.14.0/lib/node_modules/corepack/dist/pnpm.js</string>
+        <string>dev</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/jschairb-gwp/src/ProWrestling Researcher/pwr-web</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/wrestling-researcher.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/wrestling-researcher.err.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <!-- Node binary's directory on PATH so any spawned subprocess (e.g. swc, esbuild)
+             can find node themselves. -->
+        <key>PATH</key>
+        <string>/Users/jschairb-gwp/.nvm/versions/node/v24.14.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>NODE_ENV</key>
+        <string>development</string>
+    </dict>
+</dict>
+</plist>
