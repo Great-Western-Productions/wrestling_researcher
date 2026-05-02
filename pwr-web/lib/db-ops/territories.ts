@@ -10,7 +10,7 @@ export type TerritoryInput = {
   name: string;
   short_name: string | null;
   region: string | null;
-  nwa_member: number;
+  nwa_member: boolean;
   headquarters_city: string | null;
   headquarters_state: string | null;
   year_founded: number | null;

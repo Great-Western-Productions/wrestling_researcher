@@ -78,7 +78,7 @@ export default async function WrestlerDetail({ params }: Props) {
             )}
             <tr>
               <th>Living</th>
-              <td>{w.living === 1 ? "Yes" : w.living === 0 ? "No" : "—"}</td>
+              <td>{w.living === true ? "Yes" : w.living === false ? "No" : "—"}</td>
             </tr>
             <tr>
               <th>Active</th>

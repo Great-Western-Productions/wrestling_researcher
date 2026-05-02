@@ -10,12 +10,12 @@ describe("listPeriodicals", () => {
   it("filters by country, type, and in-archive flag", async () => {
     const result = await withTx(async (tx) => {
       await tx.insert(periodicals).values([
-        { title: "PWI", country: "US", type: "magazine", archive_in_collection: 1 },
+        { title: "PWI", country: "US", type: "magazine", archive_in_collection: true },
         {
           title: "Observer",
           country: "US",
           type: "newsletter",
-          archive_in_collection: 0,
+          archive_in_collection: false,
         },
         { title: "Tokyo Sports", country: "JP", type: "newspaper" },
       ]);

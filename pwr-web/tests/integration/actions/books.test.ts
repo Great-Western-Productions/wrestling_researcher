@@ -71,7 +71,7 @@ describe("insertBook", () => {
       );
       return rows[0]?.is_wrestler;
     });
-    expect(result).toBe(1);
+    expect(result).toBe(true);
   });
 });
 

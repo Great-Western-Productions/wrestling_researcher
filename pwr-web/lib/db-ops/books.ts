@@ -60,7 +60,7 @@ export function parseBookInput(form: FormData): BookInput {
     source_url: getStr(form, "source_url"),
     confidence: getStr(form, "confidence") ?? "medium",
     authorNames,
-    authorsAreWrestlers: getCheckbox(form, "authors_are_wrestlers") === 1,
+    authorsAreWrestlers: getCheckbox(form, "authors_are_wrestlers"),
   };
 }
 
@@ -71,7 +71,6 @@ async function syncBookAuthors(
   authorsAreWrestlers: boolean,
 ): Promise<void> {
   await tx.execute(sql`DELETE FROM book_authors WHERE book_id = ${bookId}`);
-  const isWrestler = authorsAreWrestlers ? 1 : 0;
   for (const name of authorNames) {
     const existing = await tx.execute<{ id: number }>(
       sql`SELECT id FROM authors WHERE name = ${name}`,
@@ -79,7 +78,7 @@ async function syncBookAuthors(
     let aid = existing[0]?.id;
     if (!aid) {
       const created = await tx.execute<{ id: number }>(
-        sql`INSERT INTO authors (name, is_wrestler) VALUES (${name}, ${isWrestler}) RETURNING id`,
+        sql`INSERT INTO authors (name, is_wrestler) VALUES (${name}, ${authorsAreWrestlers}) RETURNING id`,
       );
       aid = created[0]!.id;
     }

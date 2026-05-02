@@ -55,9 +55,9 @@ describe("getDashboardCounts", () => {
   it("counts wrestler-authors via is_wrestler flag", async () => {
     const result = await withTx(async (tx) => {
       await tx.insert(authors).values([
-        { name: "Civilian Author", is_wrestler: 0 },
-        { name: "Wrestling Author", is_wrestler: 1 },
-        { name: "Another Wrestler", is_wrestler: 1 },
+        { name: "Civilian Author", is_wrestler: false },
+        { name: "Wrestling Author", is_wrestler: true },
+        { name: "Another Wrestler", is_wrestler: true },
       ]);
       return getDashboardCounts(tx);
     });

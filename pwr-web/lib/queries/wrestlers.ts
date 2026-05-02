@@ -12,7 +12,7 @@ export type WrestlerRow = {
   other_ring_names: string | null;
   born_date: string | null;
   died_date: string | null;
-  living: number | null;
+  living: boolean | null;
   debut_year: number | null;
   retired_year: number | null;
   primary_role: string | null;
@@ -71,8 +71,8 @@ export async function listWrestlers(
     );
   }
   if (filters.role) conds.push(sql`w.primary_role = ${filters.role}`);
-  if (filters.living === "1") conds.push(sql`w.living = 1`);
-  if (filters.living === "0") conds.push(sql`w.living = 0`);
+  if (filters.living === "1") conds.push(sql`w.living = true`);
+  if (filters.living === "0") conds.push(sql`w.living = false`);
   if (filters.status) conds.push(sql`w.midcard_files_status = ${filters.status}`);
 
   const joinSql = filters.territoryId
@@ -121,7 +121,7 @@ export type WrestlerRun = {
   end_month: number | null;
   role_during_run: string | null;
   ring_name_during_run: string | null;
-  primary_run: number | null;
+  primary_run: boolean | null;
   notes: string | null;
   tid: number;
   terr_name: string;

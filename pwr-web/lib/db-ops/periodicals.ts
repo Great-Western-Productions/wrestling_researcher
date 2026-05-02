@@ -18,7 +18,7 @@ export type PeriodicalInput = {
   parent_company: string | null;
   notes: string | null;
   issue_count_known: number | null;
-  archive_in_collection: number;
+  archive_in_collection: boolean;
   source_url: string | null;
   confidence: string;
 };

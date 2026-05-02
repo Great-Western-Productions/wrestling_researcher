@@ -26,7 +26,7 @@ export default async function AuthorDetail({ params }: Props) {
 
       <h1>
         {author.name}
-        {author.is_wrestler === 1 && <span className="tag wr"> wrestler</span>}
+        {author.is_wrestler && <span className="tag wr"> wrestler</span>}
       </h1>
 
       {author.ring_name && author.ring_name !== author.name && (

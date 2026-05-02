@@ -12,7 +12,7 @@ export type WrestlerInput = {
   other_ring_names: string | null;
   born_date: string | null;
   died_date: string | null;
-  living: number | null;
+  living: boolean | null;
   debut_year: number | null;
   retired_year: number | null;
   primary_role: string | null;
@@ -35,7 +35,7 @@ export function parseWrestlerInput(form: FormData): WrestlerInput {
   const primary_ring_name = getStr(form, "primary_ring_name");
   if (!primary_ring_name) throw new ValidationError("Primary ring name is required.");
   const livingRaw = getStr(form, "living");
-  const living = livingRaw === "1" ? 1 : livingRaw === "0" ? 0 : null;
+  const living = livingRaw === "1" ? true : livingRaw === "0" ? false : null;
   return {
     primary_ring_name,
     legal_name: getStr(form, "legal_name"),

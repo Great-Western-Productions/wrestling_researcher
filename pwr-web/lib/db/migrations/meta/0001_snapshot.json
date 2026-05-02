@@ -1,0 +1,4029 @@
+{
+  "id": "56df66fc-9a52-4a8a-8b07-0e659447af78",
+  "prevId": "020250d5-ff1e-4c8d-9ec9-33ca430008ba",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.authors": {
+      "name": "authors",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "authors_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ring_name": {
+          "name": "ring_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_wrestler": {
+          "name": "is_wrestler",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "authors_name_key": {
+          "name": "authors_name_key",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.book_authors": {
+      "name": "book_authors",
+      "schema": "",
+      "columns": {
+        "book_id": {
+          "name": "book_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "author_id": {
+          "name": "author_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'author'"
+        }
+      },
+      "indexes": {
+        "book_authors_book_id_author_id_role_key": {
+          "name": "book_authors_book_id_author_id_role_key",
+          "columns": [
+            {
+              "expression": "book_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "author_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "role",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "book_authors_fk_0": {
+          "name": "book_authors_fk_0",
+          "tableFrom": "book_authors",
+          "tableTo": "authors",
+          "columnsFrom": [
+            "author_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "book_authors_fk_1": {
+          "name": "book_authors_fk_1",
+          "tableFrom": "book_authors",
+          "tableTo": "books",
+          "columnsFrom": [
+            "book_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "book_authors_pkey": {
+          "name": "book_authors_pkey",
+          "columns": [
+            "book_id",
+            "author_id",
+            "role"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.books": {
+      "name": "books",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "books_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subtitle": {
+          "name": "subtitle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category_code": {
+          "name": "category_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "publisher": {
+          "name": "publisher",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "year_published": {
+          "name": "year_published",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "isbn10": {
+          "name": "isbn10",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "isbn13": {
+          "name": "isbn13",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pages": {
+          "name": "pages",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "format": {
+          "name": "format",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "language": {
+          "name": "language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'English'"
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "subject_wrestler": {
+          "name": "subject_wrestler",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "era": {
+          "name": "era",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "territory_or_promotion": {
+          "name": "territory_or_promotion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "synopsis": {
+          "name": "synopsis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'medium'"
+        },
+        "primary_source_value": {
+          "name": "primary_source_value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "books_title_year_published_isbn13_key": {
+          "name": "books_title_year_published_isbn13_key",
+          "columns": [
+            {
+              "expression": "title",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "year_published",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "isbn13",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_books_category": {
+          "name": "idx_books_category",
+          "columns": [
+            {
+              "expression": "category_code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_books_country": {
+          "name": "idx_books_country",
+          "columns": [
+            {
+              "expression": "country",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_books_subject": {
+          "name": "idx_books_subject",
+          "columns": [
+            {
+              "expression": "subject_wrestler",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_books_year": {
+          "name": "idx_books_year",
+          "columns": [
+            {
+              "expression": "year_published",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "books_fk_0": {
+          "name": "books_fk_0",
+          "tableFrom": "books",
+          "tableTo": "categories",
+          "columnsFrom": [
+            "category_code"
+          ],
+          "columnsTo": [
+            "code"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.categories": {
+      "name": "categories",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "categories_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "label": {
+          "name": "label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "categories_code_key": {
+          "name": "categories_code_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "code"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.faction_members": {
+      "name": "faction_members",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "faction_members_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "faction_id": {
+          "name": "faction_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wrestler_id": {
+          "name": "wrestler_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "joined_year": {
+          "name": "joined_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "left_year": {
+          "name": "left_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "faction_members_faction_id_wrestler_id_joined_year_key": {
+          "name": "faction_members_faction_id_wrestler_id_joined_year_key",
+          "columns": [
+            {
+              "expression": "faction_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "wrestler_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "joined_year",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_faction_members_faction": {
+          "name": "idx_faction_members_faction",
+          "columns": [
+            {
+              "expression": "faction_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_faction_members_wrestler": {
+          "name": "idx_faction_members_wrestler",
+          "columns": [
+            {
+              "expression": "wrestler_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "faction_members_fk_0": {
+          "name": "faction_members_fk_0",
+          "tableFrom": "faction_members",
+          "tableTo": "wrestlers",
+          "columnsFrom": [
+            "wrestler_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "faction_members_fk_1": {
+          "name": "faction_members_fk_1",
+          "tableFrom": "faction_members",
+          "tableTo": "factions",
+          "columnsFrom": [
+            "faction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.factions": {
+      "name": "factions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "factions_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "formed_year": {
+          "name": "formed_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "disbanded_year": {
+          "name": "disbanded_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "primary_territory_id": {
+          "name": "primary_territory_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'medium'"
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "factions_name_formed_year_key": {
+          "name": "factions_name_formed_year_key",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "formed_year",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_factions_name": {
+          "name": "idx_factions_name",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_factions_type": {
+          "name": "idx_factions_type",
+          "columns": [
+            {
+              "expression": "type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "factions_fk_0": {
+          "name": "factions_fk_0",
+          "tableFrom": "factions",
+          "tableTo": "territories",
+          "columnsFrom": [
+            "primary_territory_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.issue_cover_subjects": {
+      "name": "issue_cover_subjects",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "issue_cover_subjects_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "issue_id": {
+          "name": "issue_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wrestler_id": {
+          "name": "wrestler_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "faction_id": {
+          "name": "faction_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "subject_name": {
+          "name": "subject_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "position": {
+          "name": "position",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_cover_subjects_faction": {
+          "name": "idx_cover_subjects_faction",
+          "columns": [
+            {
+              "expression": "faction_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_cover_subjects_issue": {
+          "name": "idx_cover_subjects_issue",
+          "columns": [
+            {
+              "expression": "issue_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_cover_subjects_wrestler": {
+          "name": "idx_cover_subjects_wrestler",
+          "columns": [
+            {
+              "expression": "wrestler_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "issue_cover_subjects_fk_0": {
+          "name": "issue_cover_subjects_fk_0",
+          "tableFrom": "issue_cover_subjects",
+          "tableTo": "factions",
+          "columnsFrom": [
+            "faction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "issue_cover_subjects_fk_1": {
+          "name": "issue_cover_subjects_fk_1",
+          "tableFrom": "issue_cover_subjects",
+          "tableTo": "wrestlers",
+          "columnsFrom": [
+            "wrestler_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "issue_cover_subjects_fk_2": {
+          "name": "issue_cover_subjects_fk_2",
+          "tableFrom": "issue_cover_subjects",
+          "tableTo": "periodical_issues",
+          "columnsFrom": [
+            "issue_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pending_wrestlers": {
+      "name": "pending_wrestlers",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "pending_wrestlers_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "profightdb_id": {
+          "name": "profightdb_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profightdb_slug": {
+          "name": "profightdb_slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "printed_name": {
+          "name": "printed_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalized_name": {
+          "name": "normalized_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "other_printed_names": {
+          "name": "other_printed_names",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_seen_date": {
+          "name": "first_seen_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_seen_date": {
+          "name": "last_seen_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "occurrence_count": {
+          "name": "occurrence_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "resolved_wrestler_id": {
+          "name": "resolved_wrestler_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_pending_wrestlers_count": {
+          "name": "idx_pending_wrestlers_count",
+          "columns": [
+            {
+              "expression": "occurrence_count",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_pending_wrestlers_pfdb": {
+          "name": "idx_pending_wrestlers_pfdb",
+          "columns": [
+            {
+              "expression": "profightdb_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_pending_wrestlers_resolved": {
+          "name": "idx_pending_wrestlers_resolved",
+          "columns": [
+            {
+              "expression": "resolved_wrestler_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "pending_wrestlers_normalized_name_key": {
+          "name": "pending_wrestlers_normalized_name_key",
+          "columns": [
+            {
+              "expression": "normalized_name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "pending_wrestlers_profightdb_id_key": {
+          "name": "pending_wrestlers_profightdb_id_key",
+          "columns": [
+            {
+              "expression": "profightdb_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "pending_wrestlers_fk_0": {
+          "name": "pending_wrestlers_fk_0",
+          "tableFrom": "pending_wrestlers",
+          "tableTo": "wrestlers",
+          "columnsFrom": [
+            "resolved_wrestler_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.periodical_issues": {
+      "name": "periodical_issues",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "periodical_issues_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "periodical_id": {
+          "name": "periodical_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "publication_date": {
+          "name": "publication_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "period_date": {
+          "name": "period_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issue_number": {
+          "name": "issue_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "volume": {
+          "name": "volume",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cover_image_url": {
+          "name": "cover_image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cover_description": {
+          "name": "cover_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cover_story": {
+          "name": "cover_story",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profightdb_id": {
+          "name": "profightdb_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "drive_pdf_path": {
+          "name": "drive_pdf_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "in_collection": {
+          "name": "in_collection",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'medium'"
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_issues_periodical_date": {
+          "name": "idx_issues_periodical_date",
+          "columns": [
+            {
+              "expression": "periodical_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "publication_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_issues_profightdb": {
+          "name": "idx_issues_profightdb",
+          "columns": [
+            {
+              "expression": "profightdb_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "periodical_issues_periodical_id_profightdb_id_key": {
+          "name": "periodical_issues_periodical_id_profightdb_id_key",
+          "columns": [
+            {
+              "expression": "periodical_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "profightdb_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "periodical_issues_periodical_id_publication_date_key": {
+          "name": "periodical_issues_periodical_id_publication_date_key",
+          "columns": [
+            {
+              "expression": "periodical_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "publication_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "periodical_issues_fk_0": {
+          "name": "periodical_issues_fk_0",
+          "tableFrom": "periodical_issues",
+          "tableTo": "periodicals",
+          "columnsFrom": [
+            "periodical_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.periodicals": {
+      "name": "periodicals",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "periodicals_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "publisher": {
+          "name": "publisher",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "language": {
+          "name": "language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'English'"
+        },
+        "year_started": {
+          "name": "year_started",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "year_ended": {
+          "name": "year_ended",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "frequency": {
+          "name": "frequency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parent_company": {
+          "name": "parent_company",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issue_count_known": {
+          "name": "issue_count_known",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "archive_in_collection": {
+          "name": "archive_in_collection",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'medium'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_periodicals_country": {
+          "name": "idx_periodicals_country",
+          "columns": [
+            {
+              "expression": "country",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "periodicals_title_year_started_key": {
+          "name": "periodicals_title_year_started_key",
+          "columns": [
+            {
+              "expression": "title",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "year_started",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ranking_entries": {
+      "name": "ranking_entries",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "ranking_entries_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "ranking_list_id": {
+          "name": "ranking_list_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rank": {
+          "name": "rank",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wrestler_id": {
+          "name": "wrestler_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "faction_id": {
+          "name": "faction_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entry_name": {
+          "name": "entry_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "previous_rank": {
+          "name": "previous_rank",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pending_wrestler_id": {
+          "name": "pending_wrestler_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_ranking_entries_faction": {
+          "name": "idx_ranking_entries_faction",
+          "columns": [
+            {
+              "expression": "faction_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_ranking_entries_list": {
+          "name": "idx_ranking_entries_list",
+          "columns": [
+            {
+              "expression": "ranking_list_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_ranking_entries_name": {
+          "name": "idx_ranking_entries_name",
+          "columns": [
+            {
+              "expression": "entry_name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_ranking_entries_pending": {
+          "name": "idx_ranking_entries_pending",
+          "columns": [
+            {
+              "expression": "pending_wrestler_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_ranking_entries_wrestler": {
+          "name": "idx_ranking_entries_wrestler",
+          "columns": [
+            {
+              "expression": "wrestler_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ranking_entries_ranking_list_id_rank_key": {
+          "name": "ranking_entries_ranking_list_id_rank_key",
+          "columns": [
+            {
+              "expression": "ranking_list_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "rank",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ranking_entries_fk_0": {
+          "name": "ranking_entries_fk_0",
+          "tableFrom": "ranking_entries",
+          "tableTo": "pending_wrestlers",
+          "columnsFrom": [
+            "pending_wrestler_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "ranking_entries_fk_1": {
+          "name": "ranking_entries_fk_1",
+          "tableFrom": "ranking_entries",
+          "tableTo": "factions",
+          "columnsFrom": [
+            "faction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "ranking_entries_fk_2": {
+          "name": "ranking_entries_fk_2",
+          "tableFrom": "ranking_entries",
+          "tableTo": "wrestlers",
+          "columnsFrom": [
+            "wrestler_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "ranking_entries_fk_3": {
+          "name": "ranking_entries_fk_3",
+          "tableFrom": "ranking_entries",
+          "tableTo": "ranking_lists",
+          "columnsFrom": [
+            "ranking_list_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ranking_lists": {
+      "name": "ranking_lists",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "ranking_lists_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "issue_id": {
+          "name": "issue_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "list_label": {
+          "name": "list_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "list_scope": {
+          "name": "list_scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "territory_id": {
+          "name": "territory_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "list_size": {
+          "name": "list_size",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_ranking_lists_issue": {
+          "name": "idx_ranking_lists_issue",
+          "columns": [
+            {
+              "expression": "issue_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_ranking_lists_scope": {
+          "name": "idx_ranking_lists_scope",
+          "columns": [
+            {
+              "expression": "list_scope",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_ranking_lists_territory": {
+          "name": "idx_ranking_lists_territory",
+          "columns": [
+            {
+              "expression": "territory_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ranking_lists_issue_id_list_label_key": {
+          "name": "ranking_lists_issue_id_list_label_key",
+          "columns": [
+            {
+              "expression": "issue_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "list_label",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ranking_lists_fk_0": {
+          "name": "ranking_lists_fk_0",
+          "tableFrom": "ranking_lists",
+          "tableTo": "territories",
+          "columnsFrom": [
+            "territory_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ranking_lists_fk_1": {
+          "name": "ranking_lists_fk_1",
+          "tableFrom": "ranking_lists",
+          "tableTo": "periodical_issues",
+          "columnsFrom": [
+            "issue_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.reign_participants": {
+      "name": "reign_participants",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "reign_participants_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "reign_id": {
+          "name": "reign_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wrestler_id": {
+          "name": "wrestler_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ring_name_used": {
+          "name": "ring_name_used",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_reign_participants_reign": {
+          "name": "idx_reign_participants_reign",
+          "columns": [
+            {
+              "expression": "reign_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_reign_participants_wrestler": {
+          "name": "idx_reign_participants_wrestler",
+          "columns": [
+            {
+              "expression": "wrestler_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "reign_participants_reign_id_fkey": {
+          "name": "reign_participants_reign_id_fkey",
+          "tableFrom": "reign_participants",
+          "tableTo": "reigns",
+          "columnsFrom": [
+            "reign_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "reign_participants_wrestler_id_fkey": {
+          "name": "reign_participants_wrestler_id_fkey",
+          "tableFrom": "reign_participants",
+          "tableTo": "wrestlers",
+          "columnsFrom": [
+            "wrestler_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "reign_participants_reign_id_wrestler_id_key": {
+          "name": "reign_participants_reign_id_wrestler_id_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "reign_id",
+            "wrestler_id"
+          ]
+        },
+        "reign_participants_reign_id_position_key": {
+          "name": "reign_participants_reign_id_position_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "reign_id",
+            "position"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.reigns": {
+      "name": "reigns",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "reigns_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "title_id": {
+          "name": "title_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wrestler_id": {
+          "name": "wrestler_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_vacancy": {
+          "name": "is_vacancy",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "sequence_order": {
+          "name": "sequence_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reign_number": {
+          "name": "reign_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reign_number_for_wrestler": {
+          "name": "reign_number_for_wrestler",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date_precision": {
+          "name": "start_date_precision",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date_precision": {
+          "name": "end_date_precision",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duration_days": {
+          "name": "duration_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_city": {
+          "name": "won_in_city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_state": {
+          "name": "won_in_state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_country": {
+          "name": "won_in_country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "team_name": {
+          "name": "team_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_reigns_start": {
+          "name": "idx_reigns_start",
+          "columns": [
+            {
+              "expression": "start_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_reigns_title": {
+          "name": "idx_reigns_title",
+          "columns": [
+            {
+              "expression": "title_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_reigns_vacancy": {
+          "name": "idx_reigns_vacancy",
+          "columns": [
+            {
+              "expression": "is_vacancy",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_reigns_wrestler": {
+          "name": "idx_reigns_wrestler",
+          "columns": [
+            {
+              "expression": "wrestler_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "reigns_title_id_fkey": {
+          "name": "reigns_title_id_fkey",
+          "tableFrom": "reigns",
+          "tableTo": "titles",
+          "columnsFrom": [
+            "title_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "reigns_wrestler_id_fkey": {
+          "name": "reigns_wrestler_id_fkey",
+          "tableFrom": "reigns",
+          "tableTo": "wrestlers",
+          "columnsFrom": [
+            "wrestler_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "reigns_title_id_sequence_order_key": {
+          "name": "reigns_title_id_sequence_order_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "title_id",
+            "sequence_order"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "reigns_check": {
+          "name": "reigns_check",
+          "value": "(is_vacancy = false) OR (wrestler_id IS NULL)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.research_sources": {
+      "name": "research_sources",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "research_sources_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "consulted_at": {
+          "name": "consulted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "research_sources_url_key": {
+          "name": "research_sources_url_key",
+          "columns": [
+            {
+              "expression": "url",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.territories": {
+      "name": "territories",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "territories_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "short_name": {
+          "name": "short_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "region": {
+          "name": "region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nwa_member": {
+          "name": "nwa_member",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "headquarters_city": {
+          "name": "headquarters_city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "headquarters_state": {
+          "name": "headquarters_state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "year_founded": {
+          "name": "year_founded",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "year_closed": {
+          "name": "year_closed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "promoter_lineage": {
+          "name": "promoter_lineage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cagematch_id": {
+          "name": "cagematch_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aliases": {
+          "name": "aliases",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cagematch_url": {
+          "name": "cagematch_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "generated": {
+            "as": "\nCASE\n    WHEN ((cagematch_id IS NOT NULL) AND (cagematch_id <> ''::text)) THEN ('https://www.cagematch.net/?id=8&nr='::text || cagematch_id)\n    ELSE NULL::text\nEND",
+            "type": "stored"
+          }
+        }
+      },
+      "indexes": {
+        "idx_territories_cm": {
+          "name": "idx_territories_cm",
+          "columns": [
+            {
+              "expression": "cagematch_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_territories_country": {
+          "name": "idx_territories_country",
+          "columns": [
+            {
+              "expression": "country",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_territories_region": {
+          "name": "idx_territories_region",
+          "columns": [
+            {
+              "expression": "region",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "territories_name_key": {
+          "name": "territories_name_key",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.title_aliases": {
+      "name": "title_aliases",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "title_aliases_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "title_id": {
+          "name": "title_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effective_from": {
+          "name": "effective_from",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "effective_to": {
+          "name": "effective_to",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_title_aliases_title": {
+          "name": "idx_title_aliases_title",
+          "columns": [
+            {
+              "expression": "title_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "title_aliases_title_id_fkey": {
+          "name": "title_aliases_title_id_fkey",
+          "tableFrom": "title_aliases",
+          "tableTo": "titles",
+          "columnsFrom": [
+            "title_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "title_aliases_title_id_name_effective_from_key": {
+          "name": "title_aliases_title_id_name_effective_from_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "title_id",
+            "name",
+            "effective_from"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.titles": {
+      "name": "titles",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "titles_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title_type": {
+          "name": "title_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weight_class": {
+          "name": "weight_class",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "territory_id": {
+          "name": "territory_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "promotion_name": {
+          "name": "promotion_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "inception_date": {
+          "name": "inception_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "retired_date": {
+          "name": "retired_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cagematch_id": {
+          "name": "cagematch_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cagematch_url": {
+          "name": "cagematch_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "generated": {
+            "as": "\nCASE\n    WHEN ((cagematch_id IS NOT NULL) AND (cagematch_id <> ''::text)) THEN ('https://www.cagematch.net/?id=5&nr='::text || cagematch_id)\n    ELSE NULL::text\nEND",
+            "type": "stored"
+          }
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_titles_cm": {
+          "name": "idx_titles_cm",
+          "columns": [
+            {
+              "expression": "cagematch_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_titles_status": {
+          "name": "idx_titles_status",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_titles_territory": {
+          "name": "idx_titles_territory",
+          "columns": [
+            {
+              "expression": "territory_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "titles_territory_id_fkey": {
+          "name": "titles_territory_id_fkey",
+          "tableFrom": "titles",
+          "tableTo": "territories",
+          "columnsFrom": [
+            "territory_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "titles_cagematch_id_key": {
+          "name": "titles_cagematch_id_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "cagematch_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.wrestler_territory_runs": {
+      "name": "wrestler_territory_runs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "wrestler_territory_runs_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "wrestler_id": {
+          "name": "wrestler_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "territory_id": {
+          "name": "territory_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_year": {
+          "name": "start_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_month": {
+          "name": "start_month",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_year": {
+          "name": "end_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_month": {
+          "name": "end_month",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role_during_run": {
+          "name": "role_during_run",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ring_name_during_run": {
+          "name": "ring_name_during_run",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "primary_run": {
+          "name": "primary_run",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_wt_runs_territory": {
+          "name": "idx_wt_runs_territory",
+          "columns": [
+            {
+              "expression": "territory_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_wt_runs_wrestler": {
+          "name": "idx_wt_runs_wrestler",
+          "columns": [
+            {
+              "expression": "wrestler_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "wrestler_territory_runs_fk_0": {
+          "name": "wrestler_territory_runs_fk_0",
+          "tableFrom": "wrestler_territory_runs",
+          "tableTo": "territories",
+          "columnsFrom": [
+            "territory_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "wrestler_territory_runs_fk_1": {
+          "name": "wrestler_territory_runs_fk_1",
+          "tableFrom": "wrestler_territory_runs",
+          "tableTo": "wrestlers",
+          "columnsFrom": [
+            "wrestler_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.wrestlers": {
+      "name": "wrestlers",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "wrestlers_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "legal_name": {
+          "name": "legal_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "primary_ring_name": {
+          "name": "primary_ring_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "other_ring_names": {
+          "name": "other_ring_names",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "born_date": {
+          "name": "born_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "died_date": {
+          "name": "died_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "living": {
+          "name": "living",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "debut_year": {
+          "name": "debut_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "retired_year": {
+          "name": "retired_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "primary_role": {
+          "name": "primary_role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hometown_billed": {
+          "name": "hometown_billed",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hometown_real": {
+          "name": "hometown_real",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "finisher": {
+          "name": "finisher",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "style": {
+          "name": "style",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "socials": {
+          "name": "socials",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "convention_status": {
+          "name": "convention_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_known_appearance": {
+          "name": "last_known_appearance",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "footage_notes": {
+          "name": "footage_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "midcard_files_status": {
+          "name": "midcard_files_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "midcard_files_priority": {
+          "name": "midcard_files_priority",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "why_they_mattered": {
+          "name": "why_they_mattered",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cagematch_id": {
+          "name": "cagematch_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cagematch_url": {
+          "name": "cagematch_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "generated": {
+            "as": "\nCASE\n    WHEN ((cagematch_id IS NOT NULL) AND (cagematch_id <> ''::text)) THEN ('https://www.cagematch.net/?id=2&nr='::text || cagematch_id)\n    ELSE NULL::text\nEND",
+            "type": "stored"
+          }
+        }
+      },
+      "indexes": {
+        "idx_wrestlers_cm": {
+          "name": "idx_wrestlers_cm",
+          "columns": [
+            {
+              "expression": "cagematch_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_wrestlers_living": {
+          "name": "idx_wrestlers_living",
+          "columns": [
+            {
+              "expression": "living",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_wrestlers_midcard": {
+          "name": "idx_wrestlers_midcard",
+          "columns": [
+            {
+              "expression": "midcard_files_status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {
+    "public.v_current_champions": {
+      "columns": {
+        "title_id": {
+          "name": "title_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title_name": {
+          "name": "title_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title_status": {
+          "name": "title_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reign_id": {
+          "name": "reign_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wrestler_id": {
+          "name": "wrestler_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wrestler_name": {
+          "name": "wrestler_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "team_name": {
+          "name": "team_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "holder_display": {
+          "name": "holder_display",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reign_number": {
+          "name": "reign_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reign_number_for_wrestler": {
+          "name": "reign_number_for_wrestler",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duration_days": {
+          "name": "duration_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_city": {
+          "name": "won_in_city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_state": {
+          "name": "won_in_state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_country": {
+          "name": "won_in_country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "SELECT DISTINCT ON (r.title_id) t.id AS title_id, t.name AS title_name, t.status AS title_status, r.id AS reign_id, r.wrestler_id, w.primary_ring_name AS wrestler_name, r.team_name, COALESCE(r.team_name, ( SELECT string_agg(w2.primary_ring_name, ' & '::text ORDER BY rp.\"position\") AS string_agg FROM reign_participants rp JOIN wrestlers w2 ON w2.id = rp.wrestler_id WHERE rp.reign_id = r.id), w.primary_ring_name) AS holder_display, r.reign_number, r.reign_number_for_wrestler, r.start_date, r.end_date, r.duration_days, r.won_in_city, r.won_in_state, r.won_in_country FROM titles t LEFT JOIN reigns r ON r.title_id = t.id AND r.is_vacancy = false LEFT JOIN wrestlers w ON w.id = r.wrestler_id ORDER BY r.title_id, r.sequence_order DESC",
+      "name": "v_current_champions",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.v_issue_browser": {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "periodical": {
+          "name": "periodical",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "publication_date": {
+          "name": "publication_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "period_date": {
+          "name": "period_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issue_number": {
+          "name": "issue_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cover_image_url": {
+          "name": "cover_image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cover_description": {
+          "name": "cover_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "drive_pdf_path": {
+          "name": "drive_pdf_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "list_count": {
+          "name": "list_count",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cover_subjects": {
+          "name": "cover_subjects",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "SELECT pi.id, p.title AS periodical, pi.publication_date, pi.period_date, pi.issue_number, pi.cover_image_url, pi.cover_description, pi.drive_pdf_path, ( SELECT count(*) AS count FROM ranking_lists WHERE ranking_lists.issue_id = pi.id) AS list_count, ( SELECT string_agg(COALESCE(w.primary_ring_name, ics.subject_name), ', '::text) AS string_agg FROM issue_cover_subjects ics LEFT JOIN wrestlers w ON ics.wrestler_id = w.id WHERE ics.issue_id = pi.id) AS cover_subjects FROM periodical_issues pi JOIN periodicals p ON pi.periodical_id = p.id",
+      "name": "v_issue_browser",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.v_longest_reigns": {
+      "columns": {
+        "reign_id": {
+          "name": "reign_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title_name": {
+          "name": "title_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "holder_display": {
+          "name": "holder_display",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "team_name": {
+          "name": "team_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reign_number": {
+          "name": "reign_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reign_number_for_wrestler": {
+          "name": "reign_number_for_wrestler",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duration_days": {
+          "name": "duration_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "SELECT r.id AS reign_id, t.name AS title_name, COALESCE(r.team_name, ( SELECT string_agg(w2.primary_ring_name, ' & '::text ORDER BY rp.\"position\") AS string_agg FROM reign_participants rp JOIN wrestlers w2 ON w2.id = rp.wrestler_id WHERE rp.reign_id = r.id), w.primary_ring_name) AS holder_display, r.team_name, r.reign_number, r.reign_number_for_wrestler, r.start_date, r.end_date, r.duration_days FROM reigns r JOIN titles t ON t.id = r.title_id LEFT JOIN wrestlers w ON w.id = r.wrestler_id WHERE r.is_vacancy = false AND r.duration_days IS NOT NULL ORDER BY r.duration_days DESC",
+      "name": "v_longest_reigns",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.v_pending_wrestlers_queue": {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profightdb_id": {
+          "name": "profightdb_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profightdb_slug": {
+          "name": "profightdb_slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "printed_name": {
+          "name": "printed_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "other_printed_names": {
+          "name": "other_printed_names",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "occurrence_count": {
+          "name": "occurrence_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_seen_date": {
+          "name": "first_seen_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_seen_date": {
+          "name": "last_seen_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resolved_wrestler_id": {
+          "name": "resolved_wrestler_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resolved_name": {
+          "name": "resolved_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "merged": {
+          "name": "merged",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "SELECT pw.id, pw.profightdb_id, pw.profightdb_slug, pw.printed_name, pw.other_printed_names, pw.occurrence_count, pw.first_seen_date, pw.last_seen_date, pw.resolved_wrestler_id, w.primary_ring_name AS resolved_name, CASE WHEN pw.resolved_wrestler_id IS NOT NULL THEN 1 ELSE 0 END AS merged FROM pending_wrestlers pw LEFT JOIN wrestlers w ON pw.resolved_wrestler_id = w.id",
+      "name": "v_pending_wrestlers_queue",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.v_ranking_history": {
+      "columns": {
+        "wrestler_id": {
+          "name": "wrestler_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "primary_ring_name": {
+          "name": "primary_ring_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "periodical": {
+          "name": "periodical",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "publication_date": {
+          "name": "publication_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "period_date": {
+          "name": "period_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issue_number": {
+          "name": "issue_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "list_label": {
+          "name": "list_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "list_scope": {
+          "name": "list_scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rank": {
+          "name": "rank",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "previous_rank": {
+          "name": "previous_rank",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "as_printed": {
+          "name": "as_printed",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "SELECT w.id AS wrestler_id, w.primary_ring_name, p.title AS periodical, pi.publication_date, pi.period_date, pi.issue_number, rl.list_label, rl.list_scope, re.rank, re.previous_rank, re.entry_name AS as_printed FROM ranking_entries re JOIN ranking_lists rl ON re.ranking_list_id = rl.id JOIN periodical_issues pi ON rl.issue_id = pi.id JOIN periodicals p ON pi.periodical_id = p.id LEFT JOIN wrestlers w ON re.wrestler_id = w.id",
+      "name": "v_ranking_history",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.v_reigns_full": {
+      "columns": {
+        "reign_id": {
+          "name": "reign_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title_id": {
+          "name": "title_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title_name": {
+          "name": "title_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title_cagematch_id": {
+          "name": "title_cagematch_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wrestler_id": {
+          "name": "wrestler_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wrestler_name": {
+          "name": "wrestler_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wrestler_cagematch_id": {
+          "name": "wrestler_cagematch_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "team_name": {
+          "name": "team_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "holder_display": {
+          "name": "holder_display",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "participant_names": {
+          "name": "participant_names",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_vacancy": {
+          "name": "is_vacancy",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sequence_order": {
+          "name": "sequence_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reign_number": {
+          "name": "reign_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reign_number_for_wrestler": {
+          "name": "reign_number_for_wrestler",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date_precision": {
+          "name": "start_date_precision",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date_precision": {
+          "name": "end_date_precision",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duration_days": {
+          "name": "duration_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_city": {
+          "name": "won_in_city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_state": {
+          "name": "won_in_state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_country": {
+          "name": "won_in_country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "SELECT r.id AS reign_id, r.title_id, t.name AS title_name, t.cagematch_id AS title_cagematch_id, r.wrestler_id, w.primary_ring_name AS wrestler_name, w.cagematch_id AS wrestler_cagematch_id, r.team_name, COALESCE( CASE WHEN r.is_vacancy THEN 'VACANT'::text ELSE NULL::text END, r.team_name, ( SELECT string_agg(w2.primary_ring_name, ' & '::text ORDER BY rp.\"position\") AS string_agg FROM reign_participants rp JOIN wrestlers w2 ON w2.id = rp.wrestler_id WHERE rp.reign_id = r.id), w.primary_ring_name) AS holder_display, ( SELECT array_agg(w2.primary_ring_name ORDER BY rp.\"position\") AS array_agg FROM reign_participants rp JOIN wrestlers w2 ON w2.id = rp.wrestler_id WHERE rp.reign_id = r.id) AS participant_names, r.is_vacancy, r.sequence_order, r.reign_number, r.reign_number_for_wrestler, r.start_date, r.end_date, r.start_date_precision, r.end_date_precision, r.duration_days, r.won_in_city, r.won_in_state, r.won_in_country, r.source_url, r.notes FROM reigns r JOIN titles t ON t.id = r.title_id LEFT JOIN wrestlers w ON w.id = r.wrestler_id",
+      "name": "v_reigns_full",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.v_title_lineage": {
+      "columns": {
+        "title_id": {
+          "name": "title_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title_name": {
+          "name": "title_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sequence_order": {
+          "name": "sequence_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reign_number": {
+          "name": "reign_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "holder": {
+          "name": "holder",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "team_name": {
+          "name": "team_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reign_number_for_wrestler": {
+          "name": "reign_number_for_wrestler",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duration_days": {
+          "name": "duration_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_city": {
+          "name": "won_in_city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_state": {
+          "name": "won_in_state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_country": {
+          "name": "won_in_country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_vacancy": {
+          "name": "is_vacancy",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "SELECT t.id AS title_id, t.name AS title_name, r.sequence_order, r.reign_number, CASE WHEN r.is_vacancy THEN 'VACANT'::text ELSE COALESCE(r.team_name, ( SELECT string_agg(w2.primary_ring_name, ' & '::text ORDER BY rp.\"position\") AS string_agg FROM reign_participants rp JOIN wrestlers w2 ON w2.id = rp.wrestler_id WHERE rp.reign_id = r.id), w.primary_ring_name) END AS holder, r.team_name, r.reign_number_for_wrestler, r.start_date, r.end_date, r.duration_days, r.won_in_city, r.won_in_state, r.won_in_country, r.is_vacancy FROM titles t JOIN reigns r ON r.title_id = t.id LEFT JOIN wrestlers w ON w.id = r.wrestler_id ORDER BY t.id, r.sequence_order",
+      "name": "v_title_lineage",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.v_wrestler_title_history": {
+      "columns": {
+        "wrestler_id": {
+          "name": "wrestler_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wrestler_name": {
+          "name": "wrestler_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title_id": {
+          "name": "title_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title_name": {
+          "name": "title_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "team_name": {
+          "name": "team_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reign_number": {
+          "name": "reign_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reign_number_for_wrestler": {
+          "name": "reign_number_for_wrestler",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duration_days": {
+          "name": "duration_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_city": {
+          "name": "won_in_city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_state": {
+          "name": "won_in_state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "won_in_country": {
+          "name": "won_in_country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reign_role": {
+          "name": "reign_role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "SELECT w.id AS wrestler_id, w.primary_ring_name AS wrestler_name, t.id AS title_id, t.name AS title_name, r.team_name, r.reign_number, r.reign_number_for_wrestler, r.start_date, r.end_date, r.duration_days, r.won_in_city, r.won_in_state, r.won_in_country, 'singles'::text AS reign_role FROM wrestlers w JOIN reigns r ON r.wrestler_id = w.id AND r.is_vacancy = false JOIN titles t ON t.id = r.title_id UNION ALL SELECT w.id AS wrestler_id, w.primary_ring_name AS wrestler_name, t.id AS title_id, t.name AS title_name, r.team_name, r.reign_number, r.reign_number_for_wrestler, r.start_date, r.end_date, r.duration_days, r.won_in_city, r.won_in_state, r.won_in_country, 'tag-partner-'::text || rp.\"position\" AS reign_role FROM wrestlers w JOIN reign_participants rp ON rp.wrestler_id = w.id JOIN reigns r ON r.id = rp.reign_id AND r.is_vacancy = false JOIN titles t ON t.id = r.title_id",
+      "name": "v_wrestler_title_history",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    }
+  },
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

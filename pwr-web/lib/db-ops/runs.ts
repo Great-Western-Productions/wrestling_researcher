@@ -15,7 +15,7 @@ export type RunInput = {
   end_month: number | null;
   role_during_run: string | null;
   ring_name_during_run: string | null;
-  primary_run: number;
+  primary_run: boolean;
   notes: string | null;
 };
 

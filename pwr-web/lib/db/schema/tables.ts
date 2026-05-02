@@ -1,4 +1,4 @@
-import { pgTable, index, foreignKey, unique, integer, text, uniqueIndex, check, boolean, primaryKey, pgView, bigint } from "drizzle-orm/pg-core"
+import { pgTable, index, foreignKey, unique, integer, text, uniqueIndex, check, boolean, primaryKey, pgView, bigint, timestamp, date } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
@@ -30,7 +30,7 @@ export const research_sources = pgTable("research_sources", {
 	id: integer().primaryKey().generatedByDefaultAsIdentity({ name: "research_sources_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 2147483647, cache: 1 }),
 	url: text().notNull(),
 	description: text(),
-	consulted_at: text().default(sql`CURRENT_TIMESTAMP`),
+	consulted_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
 	notes: text(),
 }, (table) => [
 	uniqueIndex("research_sources_url_key").using("btree", table.url.asc().nullsLast()),
@@ -40,7 +40,7 @@ export const authors = pgTable("authors", {
 	id: integer().primaryKey().generatedByDefaultAsIdentity({ name: "authors_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 2147483647, cache: 1 }),
 	name: text().notNull(),
 	ring_name: text(),
-	is_wrestler: integer().default(0),
+	is_wrestler: boolean().default(false),
 	notes: text(),
 }, (table) => [
 	uniqueIndex("authors_name_key").using("btree", table.name.asc().nullsLast()),
@@ -66,7 +66,8 @@ export const books = pgTable("books", {
 	source_url: text(),
 	confidence: text().default('medium'),
 	primary_source_value: text(),
-	created_at: text().default(sql`CURRENT_TIMESTAMP`),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+	updated_at: timestamp({ withTimezone: true }),
 }, (table) => [
 	uniqueIndex("books_title_year_published_isbn13_key").using("btree", table.title.asc().nullsLast(), table.year_published.asc().nullsLast(), table.isbn13.asc().nullsLast()),
 	index("idx_books_category").using("btree", table.category_code.asc().nullsLast()),
@@ -96,7 +97,7 @@ export const wrestlers = pgTable("wrestlers", {
 	other_ring_names: text(),
 	born_date: text(),
 	died_date: text(),
-	living: integer(),
+	living: boolean(),
 	debut_year: integer(),
 	retired_year: integer(),
 	primary_role: text(),
@@ -112,7 +113,8 @@ export const wrestlers = pgTable("wrestlers", {
 	midcard_files_priority: integer(),
 	why_they_mattered: text(),
 	notes: text(),
-	created_at: text().default(sql`CURRENT_TIMESTAMP`),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+	updated_at: timestamp({ withTimezone: true }),
 	cagematch_id: text(),
 	cagematch_url: text().generatedAlwaysAs(sql`
 CASE
@@ -133,7 +135,8 @@ export const faction_members = pgTable("faction_members", {
 	joined_year: integer(),
 	left_year: integer(),
 	notes: text(),
-	created_at: text().default(sql`CURRENT_TIMESTAMP`),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+	updated_at: timestamp({ withTimezone: true }),
 }, (table) => [
 	uniqueIndex("faction_members_faction_id_wrestler_id_joined_year_key").using("btree", table.faction_id.asc().nullsLast(), table.wrestler_id.asc().nullsLast(), table.joined_year.asc().nullsLast()),
 	index("idx_faction_members_faction").using("btree", table.faction_id.asc().nullsLast()),
@@ -160,7 +163,8 @@ export const factions = pgTable("factions", {
 	notes: text(),
 	confidence: text().default('medium'),
 	source_url: text(),
-	created_at: text().default(sql`CURRENT_TIMESTAMP`),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+	updated_at: timestamp({ withTimezone: true }),
 }, (table) => [
 	uniqueIndex("factions_name_formed_year_key").using("btree", table.name.asc().nullsLast(), table.formed_year.asc().nullsLast()),
 	index("idx_factions_name").using("btree", table.name.asc().nullsLast()),
@@ -177,14 +181,15 @@ export const territories = pgTable("territories", {
 	name: text().notNull(),
 	short_name: text(),
 	region: text(),
-	nwa_member: integer().default(0),
+	nwa_member: boolean().default(false),
 	headquarters_city: text(),
 	headquarters_state: text(),
 	year_founded: integer(),
 	year_closed: integer(),
 	promoter_lineage: text(),
 	notes: text(),
-	created_at: text().default(sql`CURRENT_TIMESTAMP`),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+	updated_at: timestamp({ withTimezone: true }),
 	cagematch_id: text(),
 	country: text(),
 	aliases: text(),
@@ -208,7 +213,8 @@ export const issue_cover_subjects = pgTable("issue_cover_subjects", {
 	subject_name: text(),
 	position: text(),
 	notes: text(),
-	created_at: text().default(sql`CURRENT_TIMESTAMP`),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+	updated_at: timestamp({ withTimezone: true }),
 }, (table) => [
 	index("idx_cover_subjects_faction").using("btree", table.faction_id.asc().nullsLast()),
 	index("idx_cover_subjects_issue").using("btree", table.issue_id.asc().nullsLast()),
@@ -233,8 +239,8 @@ export const issue_cover_subjects = pgTable("issue_cover_subjects", {
 export const periodical_issues = pgTable("periodical_issues", {
 	id: integer().primaryKey().generatedByDefaultAsIdentity({ name: "periodical_issues_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 2147483647, cache: 1 }),
 	periodical_id: integer().notNull(),
-	publication_date: text().notNull(),
-	period_date: text(),
+	publication_date: date().notNull(),
+	period_date: date(),
 	issue_number: text(),
 	volume: integer(),
 	cover_image_url: text(),
@@ -242,11 +248,12 @@ export const periodical_issues = pgTable("periodical_issues", {
 	cover_story: text(),
 	profightdb_id: integer(),
 	drive_pdf_path: text(),
-	in_collection: integer().default(0),
+	in_collection: boolean().default(false),
 	source_url: text(),
 	confidence: text().default('medium'),
 	notes: text(),
-	created_at: text().default(sql`CURRENT_TIMESTAMP`),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+	updated_at: timestamp({ withTimezone: true }),
 }, (table) => [
 	index("idx_issues_periodical_date").using("btree", table.periodical_id.asc().nullsLast(), table.publication_date.asc().nullsLast()),
 	index("idx_issues_profightdb").using("btree", table.profightdb_id.asc().nullsLast()),
@@ -266,12 +273,13 @@ export const pending_wrestlers = pgTable("pending_wrestlers", {
 	printed_name: text().notNull(),
 	normalized_name: text().notNull(),
 	other_printed_names: text(),
-	first_seen_date: text(),
-	last_seen_date: text(),
+	first_seen_date: date(),
+	last_seen_date: date(),
 	occurrence_count: integer().default(1).notNull(),
 	resolved_wrestler_id: integer(),
 	notes: text(),
-	created_at: text().default(sql`CURRENT_TIMESTAMP`),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+	updated_at: timestamp({ withTimezone: true }),
 }, (table) => [
 	index("idx_pending_wrestlers_count").using("btree", table.occurrence_count.asc().nullsLast()),
 	index("idx_pending_wrestlers_pfdb").using("btree", table.profightdb_id.asc().nullsLast()),
@@ -298,10 +306,11 @@ export const periodicals = pgTable("periodicals", {
 	parent_company: text(),
 	notes: text(),
 	issue_count_known: integer(),
-	archive_in_collection: integer().default(0),
+	archive_in_collection: boolean().default(false),
 	source_url: text(),
 	confidence: text().default('medium'),
-	created_at: text().default(sql`CURRENT_TIMESTAMP`),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+	updated_at: timestamp({ withTimezone: true }),
 }, (table) => [
 	index("idx_periodicals_country").using("btree", table.country.asc().nullsLast()),
 	uniqueIndex("periodicals_title_year_started_key").using("btree", table.title.asc().nullsLast(), table.year_started.asc().nullsLast()),
@@ -316,7 +325,8 @@ export const ranking_entries = pgTable("ranking_entries", {
 	entry_name: text().notNull(),
 	previous_rank: integer(),
 	notes: text(),
-	created_at: text().default(sql`CURRENT_TIMESTAMP`),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+	updated_at: timestamp({ withTimezone: true }),
 	pending_wrestler_id: integer(),
 }, (table) => [
 	index("idx_ranking_entries_faction").using("btree", table.faction_id.asc().nullsLast()),
@@ -356,7 +366,8 @@ export const ranking_lists = pgTable("ranking_lists", {
 	list_size: integer(),
 	source_url: text(),
 	notes: text(),
-	created_at: text().default(sql`CURRENT_TIMESTAMP`),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+	updated_at: timestamp({ withTimezone: true }),
 }, (table) => [
 	index("idx_ranking_lists_issue").using("btree", table.issue_id.asc().nullsLast()),
 	index("idx_ranking_lists_scope").using("btree", table.list_scope.asc().nullsLast()),
@@ -384,7 +395,7 @@ export const wrestler_territory_runs = pgTable("wrestler_territory_runs", {
 	end_month: integer(),
 	role_during_run: text(),
 	ring_name_during_run: text(),
-	primary_run: integer().default(0),
+	primary_run: boolean().default(false),
 	notes: text(),
 }, (table) => [
 	index("idx_wt_runs_territory").using("btree", table.territory_id.asc().nullsLast()),
@@ -419,7 +430,8 @@ export const reigns = pgTable("reigns", {
 	won_in_country: text(),
 	source_url: text(),
 	notes: text(),
-	created_at: text().default(sql`CURRENT_TIMESTAMP`),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+	updated_at: timestamp({ withTimezone: true }),
 	team_name: text(),
 }, (table) => [
 	index("idx_reigns_start").using("btree", table.start_date.asc().nullsLast()),
@@ -457,7 +469,8 @@ CASE
     ELSE NULL::text
 END`),
 	notes: text(),
-	created_at: text().default(sql`CURRENT_TIMESTAMP`),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+	updated_at: timestamp({ withTimezone: true }),
 }, (table) => [
 	index("idx_titles_cm").using("btree", table.cagematch_id.asc().nullsLast()),
 	index("idx_titles_status").using("btree", table.status.asc().nullsLast()),
@@ -477,7 +490,8 @@ export const title_aliases = pgTable("title_aliases", {
 	effective_from: text(),
 	effective_to: text(),
 	notes: text(),
-	created_at: text().default(sql`CURRENT_TIMESTAMP`),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+	updated_at: timestamp({ withTimezone: true }),
 }, (table) => [
 	index("idx_title_aliases_title").using("btree", table.title_id.asc().nullsLast()),
 	foreignKey({
@@ -595,8 +609,8 @@ export const v_wrestler_title_history = pgView("v_wrestler_title_history", {	wre
 
 export const v_issue_browser = pgView("v_issue_browser", {	id: integer(),
 	periodical: text(),
-	publication_date: text(),
-	period_date: text(),
+	publication_date: date(),
+	period_date: date(),
 	issue_number: text(),
 	cover_image_url: text(),
 	cover_description: text(),
@@ -612,18 +626,18 @@ export const v_pending_wrestlers_queue = pgView("v_pending_wrestlers_queue", {	i
 	printed_name: text(),
 	other_printed_names: text(),
 	occurrence_count: integer(),
-	first_seen_date: text(),
-	last_seen_date: text(),
+	first_seen_date: date(),
+	last_seen_date: date(),
 	resolved_wrestler_id: integer(),
 	resolved_name: text(),
-	merged: integer(),
-}).as(sql`SELECT pw.id, pw.profightdb_id, pw.profightdb_slug, pw.printed_name, pw.other_printed_names, pw.occurrence_count, pw.first_seen_date, pw.last_seen_date, pw.resolved_wrestler_id, w.primary_ring_name AS resolved_name, CASE WHEN pw.resolved_wrestler_id IS NOT NULL THEN 1 ELSE 0 END AS merged FROM pending_wrestlers pw LEFT JOIN wrestlers w ON pw.resolved_wrestler_id = w.id`);
+	merged: boolean(),
+}).as(sql`SELECT pw.id, pw.profightdb_id, pw.profightdb_slug, pw.printed_name, pw.other_printed_names, pw.occurrence_count, pw.first_seen_date, pw.last_seen_date, pw.resolved_wrestler_id, w.primary_ring_name AS resolved_name, CASE WHEN pw.resolved_wrestler_id IS NOT NULL THEN true ELSE false END AS merged FROM pending_wrestlers pw LEFT JOIN wrestlers w ON pw.resolved_wrestler_id = w.id`);
 
 export const v_ranking_history = pgView("v_ranking_history", {	wrestler_id: integer(),
 	primary_ring_name: text(),
 	periodical: text(),
-	publication_date: text(),
-	period_date: text(),
+	publication_date: date(),
+	period_date: date(),
 	issue_number: text(),
 	list_label: text(),
 	list_scope: text(),

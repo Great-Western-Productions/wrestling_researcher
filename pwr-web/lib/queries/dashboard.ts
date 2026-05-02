@@ -30,7 +30,7 @@ export async function getDashboardCounts(db: Db): Promise<DashboardCounts> {
     db.execute<{ n: number }>(sql`SELECT COUNT(*)::int AS n FROM periodicals`),
     db.execute<{ n: number }>(sql`SELECT COUNT(*)::int AS n FROM authors`),
     db.execute<{ n: number }>(
-      sql`SELECT COUNT(*)::int AS n FROM authors WHERE is_wrestler = 1`,
+      sql`SELECT COUNT(*)::int AS n FROM authors WHERE is_wrestler = true`,
     ),
     db.execute<{ n: number }>(sql`SELECT COUNT(*)::int AS n FROM territories`),
     db.execute<{ n: number }>(sql`SELECT COUNT(*)::int AS n FROM wrestlers`),
@@ -72,7 +72,7 @@ export async function getTopAuthors(db: Db, limit: number): Promise<TopAuthor[]>
   const rows = await db.execute<{
     id: number;
     name: string;
-    is_wrestler: number | null;
+    is_wrestler: boolean | null;
     n: number;
   }>(sql`
     SELECT a.id, a.name, a.is_wrestler, COUNT(*)::int AS n
@@ -85,7 +85,7 @@ export async function getTopAuthors(db: Db, limit: number): Promise<TopAuthor[]>
   return rows.map((r) => ({
     id: r.id,
     name: r.name,
-    isWrestler: r.is_wrestler === 1,
+    isWrestler: r.is_wrestler === true,
     bookCount: r.n,
   }));
 }

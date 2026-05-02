@@ -21,9 +21,8 @@ export const optInt = z
 export const checkbox = z
   .union([z.string(), z.boolean(), z.null(), z.undefined()])
   .transform((v) => {
-    if (typeof v === "boolean") return v ? 1 : 0;
-    if (v === "1" || v === "on" || v === "true") return 1;
-    return 0;
+    if (typeof v === "boolean") return v;
+    return v === "1" || v === "on" || v === "true";
   });
 
 export function getStr(form: FormData, name: string): string | null {
@@ -40,8 +39,7 @@ export function getInt(form: FormData, name: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-export function getCheckbox(form: FormData, name: string): number {
+export function getCheckbox(form: FormData, name: string): boolean {
   const v = form.get(name);
-  if (v === "1" || v === "on" || v === "true") return 1;
-  return 0;
+  return v === "1" || v === "on" || v === "true";
 }

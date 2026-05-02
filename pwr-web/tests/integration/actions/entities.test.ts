@@ -32,7 +32,7 @@ describe("insertPeriodical", () => {
         parent_company: null,
         notes: null,
         issue_count_known: null,
-        archive_in_collection: 1,
+        archive_in_collection: true,
         source_url: null,
         confidence: "medium",
       }),
@@ -48,7 +48,7 @@ describe("insertTerritory", () => {
         name: "Test Territory",
         short_name: "TT",
         region: "South",
-        nwa_member: 1,
+        nwa_member: true,
         headquarters_city: "Atlanta",
         headquarters_state: "GA",
         year_founded: 1985,
@@ -192,7 +192,7 @@ describe("insertRun", () => {
         end_month: null,
         role_during_run: "main event",
         ring_name_during_run: null,
-        primary_run: 1,
+        primary_run: true,
         notes: null,
       });
       return id;

@@ -9,7 +9,7 @@ export type AuthorRow = {
   id: number;
   name: string;
   ring_name: string | null;
-  is_wrestler: number | null;
+  is_wrestler: boolean | null;
   notes: string | null;
 };
 

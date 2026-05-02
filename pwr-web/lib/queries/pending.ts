@@ -15,7 +15,7 @@ export type PendingRow = {
   last_seen_date: string | null;
   resolved_wrestler_id: number | null;
   resolved_name: string | null;
-  merged: number;
+  merged: boolean;
 };
 
 export type PendingFilters = {

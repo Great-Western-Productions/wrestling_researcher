@@ -35,7 +35,7 @@ export type BookListItem = {
 export type AuthorRef = {
   id: number;
   name: string;
-  is_wrestler: number | null;
+  is_wrestler: boolean | null;
   role: string;
 };
 

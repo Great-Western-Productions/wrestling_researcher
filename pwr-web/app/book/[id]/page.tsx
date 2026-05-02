@@ -59,7 +59,7 @@ export default async function BookDetail({ params }: Props) {
             {authors.map((a, i) => (
               <span key={a.id}>
                 <Link href={`/author/${a.id}`}>{a.name}</Link>
-                {a.is_wrestler === 1 && <span className="tag wr"> wrestler</span>}
+                {a.is_wrestler && <span className="tag wr"> wrestler</span>}
                 {a.role !== "author" && <span className="dim"> ({a.role})</span>}
                 {i < authors.length - 1 ? ", " : ""}
               </span>

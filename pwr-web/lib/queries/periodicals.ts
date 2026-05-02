@@ -17,7 +17,7 @@ export type PeriodicalRow = {
   parent_company: string | null;
   notes: string | null;
   issue_count_known: number | null;
-  archive_in_collection: number | null;
+  archive_in_collection: boolean | null;
   source_url: string | null;
   confidence: string | null;
   created_at: string | null;
@@ -43,7 +43,7 @@ export async function listPeriodicals(
   const conds: SQL[] = [];
   if (filters.country) conds.push(sql`country = ${filters.country}`);
   if (filters.type) conds.push(sql`type = ${filters.type}`);
-  if (filters.inArchive) conds.push(sql`archive_in_collection = 1`);
+  if (filters.inArchive) conds.push(sql`archive_in_collection = true`);
   const whereSql = conds.length > 0 ? sql`WHERE ${sql.join(conds, sql` AND `)}` : sql``;
 
   const rows = await db.execute<PeriodicalRow>(sql`

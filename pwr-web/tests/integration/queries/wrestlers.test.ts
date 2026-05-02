@@ -54,8 +54,8 @@ describe("listWrestlers", () => {
   it("filters living=1 and living=0", async () => {
     const result = await withTx(async (tx) => {
       await tx.insert(wrestlers).values([
-        { primary_ring_name: "Alive", living: 1 },
-        { primary_ring_name: "Dead", living: 0 },
+        { primary_ring_name: "Alive", living: true },
+        { primary_ring_name: "Dead", living: false },
         { primary_ring_name: "Unknown", living: null },
       ]);
       return Promise.all([

@@ -10,7 +10,7 @@ export type TerritoryRow = {
   name: string;
   short_name: string | null;
   region: string | null;
-  nwa_member: number | null;
+  nwa_member: boolean | null;
   headquarters_city: string | null;
   headquarters_state: string | null;
   year_founded: number | null;
@@ -44,8 +44,8 @@ export async function listTerritories(
 ): Promise<TerritoryListResult> {
   const conds: SQL[] = [];
   if (filters.region) conds.push(sql`t.region = ${filters.region}`);
-  if (filters.nwa === "1") conds.push(sql`t.nwa_member = 1`);
-  if (filters.nwa === "0") conds.push(sql`t.nwa_member = 0`);
+  if (filters.nwa === "1") conds.push(sql`t.nwa_member = true`);
+  if (filters.nwa === "0") conds.push(sql`t.nwa_member = false`);
   if (filters.q) {
     const like = `%${filters.q}%`;
     conds.push(
@@ -82,7 +82,7 @@ export type TerritoryRun = {
   end_month: number | null;
   role_during_run: string | null;
   ring_name_during_run: string | null;
-  primary_run: number | null;
+  primary_run: boolean | null;
   notes: string | null;
   wid: number;
   primary_ring_name: string;

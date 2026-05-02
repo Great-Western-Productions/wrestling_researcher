@@ -34,9 +34,9 @@ describe("listTerritories", () => {
   it("filters by NWA membership and search query", async () => {
     const result = await withTx(async (tx) => {
       await tx.insert(territories).values([
-        { name: "WCW", nwa_member: 1, headquarters_city: "Atlanta" },
-        { name: "WWF", nwa_member: 0, headquarters_city: "Stamford" },
-        { name: "AWA", nwa_member: 1, headquarters_city: "Minneapolis" },
+        { name: "WCW", nwa_member: true, headquarters_city: "Atlanta" },
+        { name: "WWF", nwa_member: false, headquarters_city: "Stamford" },
+        { name: "AWA", nwa_member: true, headquarters_city: "Minneapolis" },
       ]);
       return Promise.all([
         listTerritories(tx, { nwa: "1" }),
