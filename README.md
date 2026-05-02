@@ -1,23 +1,27 @@
 # Wrestling Researcher
 
 A personal pro-wrestling research archive — bibliography, periodicals,
-territories, wrestler/territory runs, ranking lists, plus a local Flask UI
+territories, wrestler/territory runs, ranking lists, plus a local web UI
 for browsing and curating it all. Local-only, no auth, no production
 deploy story. Source of truth is a local PostgreSQL database.
 
 ## Layout
 
 ```
-app/                    Flask web app (Postgres-backed)
+pwr-web/                Next.js + Drizzle web app (Postgres-backed)
 bibliography/           Ingest pipeline + source data; Postgres migration script
 calendar/               Content calendar builder
 catalog/                Magazine catalog builder + dedupe
 covers/                 Cover-image describer (LLM-based)
 magazine_downloader/    Bulk magazine downloader
 research/               Loose research notes and surveys
+scripts/                Standalone helper scripts (e.g. titles migration)
 .env                    Local secrets (gitignored)
 .env.example            Template
 ```
+
+The original Flask app at `app/` was retired on 2026-05-02 once the
+Next.js rewrite reached parity. See git history if you need it back.
 
 ## Setup
 
@@ -27,10 +31,10 @@ brew install postgresql@17
 brew services start postgresql@17
 createdb wrestling_bibliography
 
-# 2. Python deps
+# 2. Python deps (for the ingest/enrichment scripts)
 python3 -m venv .venv
 source .venv/bin/activate
-pip install flask "psycopg[binary]" requests pytest
+pip install "psycopg[binary]" requests pytest
 
 # 3. Env
 cp .env.example .env
@@ -43,15 +47,17 @@ python3 bibliography/migrate_to_postgres.py --apply
 ## Run the app
 
 ```bash
-python3 app/app.py
-# → http://127.0.0.1:5150/
-
-python3 app/app.py --port 8080
-PWBIB_DEBUG=1 python3 app/app.py        # auto-reload
+cd pwr-web
+pnpm install
+pnpm dev          # → http://localhost:3000/
 ```
 
 The app binds to localhost only — don't expose it; the `/add/*` and
-`/pending/*/merge` routes are unauthenticated.
+merge routes are unauthenticated.
+
+See [pwr-web/README.md](pwr-web/README.md) for the full Next.js/Drizzle/Vitest
+stack notes, including how to run the test suite (Testcontainers + real
+Postgres).
 
 ## Other tools
 
@@ -70,7 +76,11 @@ Each subfolder has its own README with usage notes:
 ## Tests
 
 ```bash
+# Python ingest/enrichment tests
 python3 -m pytest bibliography/tests/
+
+# Next.js app tests (Vitest + Testcontainers, requires Docker)
+cd pwr-web && pnpm test
 ```
 
 ## Security
@@ -79,22 +89,15 @@ python3 -m pytest bibliography/tests/
 - ⚠️ **Rotate the credentials currently in `.env`** (Google, Exa,
   Cagematch). They were visible in the planning conversation that produced
   this layout, so they should be considered exposed.
-- The Flask app has no auth — bind it to `127.0.0.1` (the default) and
-  don't put it behind a public reverse proxy.
-
-## Future
-
-A Node.js / Rails rewrite was considered and parked. The current Flask app
-is ~1k lines and works; a rewrite would be the same scale of work for the
-same UX. Revisit if the project grows past what one Python file can comfortably
-hold or if there's a reason to want the Node ecosystem (e.g. a SPA frontend).
+- The web app has no auth — keep it on `127.0.0.1` and don't put it behind
+  a public reverse proxy.
 
 ## Legacy SQLite
 
 `bibliography/wrestling_bibliography.db` is still on disk as a legacy
 source for older ingest/enrichment utilities. Do not delete the SQLite file yet.
 Several legacy ingest/enrichment scripts still read it directly, even though
-the Flask app and calendar now use Postgres.
+the web app and calendar now use Postgres.
 
 When those scripts have been migrated or explicitly retired, remove the
 SQLite files and keep re-seeding Postgres through:
