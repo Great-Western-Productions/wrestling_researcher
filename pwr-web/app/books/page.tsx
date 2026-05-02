@@ -183,7 +183,6 @@ export default async function BooksPage({ searchParams }: { searchParams: Search
                 <td className="merge-cell">
                   <form
                     className="inline-merge"
-                    method="post"
                     action={mergeBookAction.bind(null, b.id)}
                   >
                     <input type="hidden" name="next" value="/books" />

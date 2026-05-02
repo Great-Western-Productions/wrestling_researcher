@@ -46,7 +46,7 @@ export default async function AddWrestlerPage({ searchParams }: { searchParams: 
         </p>
       )}
 
-      <form className="add-form" action={createWrestlerAction} method="post">
+      <form className="add-form" action={createWrestlerAction}>
         {fromPending && (
           <input type="hidden" name="from_pending" value={fromPending} />
         )}

@@ -30,7 +30,7 @@ export function BookForm({
   const conf = book?.confidence ?? "medium";
 
   return (
-    <form className="add-form" action={action} method="post">
+    <form className="add-form" action={action}>
       <div className="form-row">
         <label>
           Title <span className="req">*</span>

@@ -31,7 +31,7 @@ export default async function AddRunPage({ searchParams }: { searchParams: Searc
         Records a stretch when a wrestler worked a specific territory.
       </p>
 
-      <form className="add-form" action={createRunAction} method="post">
+      <form className="add-form" action={createRunAction}>
         <div className="form-row">
           <label>
             Wrestler <span className="req">*</span>

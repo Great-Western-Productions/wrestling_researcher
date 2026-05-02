@@ -16,7 +16,7 @@ export default async function AddPeriodicalPage() {
       </p>
       <h1>Add a periodical</h1>
 
-      <form className="add-form" action={createPeriodicalAction} method="post">
+      <form className="add-form" action={createPeriodicalAction}>
         <div className="form-row">
           <label>
             Title <span className="req">*</span>

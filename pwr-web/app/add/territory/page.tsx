@@ -15,7 +15,7 @@ export default async function AddTerritoryPage() {
       </p>
       <h1>Add a territory</h1>
 
-      <form className="add-form" action={createTerritoryAction} method="post">
+      <form className="add-form" action={createTerritoryAction}>
         <div className="form-row">
           <label>
             Name <span className="req">*</span>

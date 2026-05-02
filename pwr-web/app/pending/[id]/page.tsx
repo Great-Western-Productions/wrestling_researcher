@@ -73,7 +73,7 @@ export default async function PendingDetailPage({ params }: Props) {
         >
           <section style={{ border: "1px solid var(--border)", padding: "1rem", background: "var(--paper-soft)" }}>
             <h2 style={{ marginTop: 0 }}>Merge into existing wrestler</h2>
-            <form method="post" action={pendingMergeAction.bind(null, p.id)}>
+            <form action={pendingMergeAction.bind(null, p.id)}>
               {p.suggestions.length > 0 ? (
                 <>
                   <p className="dim small">Suggestions (name-similar):</p>
@@ -130,7 +130,6 @@ export default async function PendingDetailPage({ params }: Props) {
 
       {p.merged ? (
         <form
-          method="post"
           action={pendingUnmergeAction.bind(null, p.id)}
           style={{ margin: "1rem 0" }}
         >
