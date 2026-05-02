@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+/* The site visual style is owned by /public/style.css (loaded in layout.tsx).
+ * Tailwind utilities are available here as an escape hatch for new UI bits
+ * that don't have an equivalent in the Flask-era CSS. */
