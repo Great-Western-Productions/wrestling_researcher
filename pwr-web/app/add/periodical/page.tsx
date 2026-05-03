@@ -1,7 +1,7 @@
 import Link from "next/link";
+import { createPeriodicalAction } from "@/lib/actions/entities";
 import { db } from "@/lib/db/client";
 import { listPeriodicals } from "@/lib/queries/periodicals";
-import { createPeriodicalAction } from "@/lib/actions/entities";
 
 export const dynamic = "force-dynamic";
 

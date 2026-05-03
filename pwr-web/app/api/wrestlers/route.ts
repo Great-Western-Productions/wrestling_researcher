@@ -1,7 +1,8 @@
 import type { NextRequest } from "next/server";
-import { db } from "@/lib/db/client";
-import { wrestlerCreateSchema } from "@/lib/api/schemas";
 import { jsonCreated, jsonError, jsonOk, parseJsonBody } from "@/lib/api/route-helpers";
+import { wrestlerCreateSchema } from "@/lib/api/schemas";
+import { getSession } from "@/lib/auth/require-session";
+import { db } from "@/lib/db/client";
 import { findWrestlerByRingName, insertWrestler } from "@/lib/db-ops/wrestlers";
 
 export async function GET(req: NextRequest) {
@@ -13,6 +14,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: Request) {
+  const session = await getSession();
+  if (!session) return jsonError(401, "Unauthorized");
   const parsed = await parseJsonBody(req, wrestlerCreateSchema);
   if (!parsed.ok) return parsed.response;
 

@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import type { NextRequest } from "next/server";
-import { db } from "@/lib/db/client";
 import { jsonError, jsonOk } from "@/lib/api/route-helpers";
+import { db } from "@/lib/db/client";
 
 export async function GET(req: NextRequest) {
   const name = req.nextUrl.searchParams.get("name");

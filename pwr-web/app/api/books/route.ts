@@ -1,7 +1,8 @@
 import type { NextRequest } from "next/server";
-import { db } from "@/lib/db/client";
-import { bookCreateSchema } from "@/lib/api/schemas";
 import { jsonCreated, jsonError, jsonOk, parseJsonBody } from "@/lib/api/route-helpers";
+import { bookCreateSchema } from "@/lib/api/schemas";
+import { getSession } from "@/lib/auth/require-session";
+import { db } from "@/lib/db/client";
 import { findBookByTitleYear, insertBook } from "@/lib/db-ops/books";
 
 export async function GET(req: NextRequest) {
@@ -15,6 +16,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: Request) {
+  const session = await getSession();
+  if (!session) return jsonError(401, "Unauthorized");
   const parsed = await parseJsonBody(req, bookCreateSchema);
   if (!parsed.ok) return parsed.response;
 

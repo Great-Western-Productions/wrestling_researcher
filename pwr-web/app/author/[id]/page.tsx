@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db/client";
-import { booksForAuthor, getAuthorById } from "@/lib/queries/authors";
 import { categoryLabel, ifnull } from "@/lib/format";
+import { booksForAuthor, getAuthorById } from "@/lib/queries/authors";
 
 export const dynamic = "force-dynamic";
 

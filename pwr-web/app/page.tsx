@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { db } from "@/lib/db/client";
 import {
-  getDashboardCounts,
-  getTopAuthors,
   getBooksByDecade,
+  getDashboardCounts,
   getFeaturedTerritories,
+  getTopAuthors,
 } from "@/lib/queries/dashboard";
 
 export const dynamic = "force-dynamic";
@@ -31,8 +31,8 @@ export default async function Home() {
       <section className="hero">
         <h1>Pro Wrestling Researcher</h1>
         <p className="subtitle">
-          Books, periodicals, territories, and the workers who filled them — across
-          eras and continents.
+          Books, periodicals, territories, and the workers who filled them — across eras and
+          continents.
         </p>
       </section>
 

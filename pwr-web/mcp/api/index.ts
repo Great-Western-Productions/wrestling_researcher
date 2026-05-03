@@ -8,22 +8,21 @@
 import { sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import type * as schema from "@/lib/db/schema";
-import { findBookByTitleYear, insertBook } from "@/lib/db-ops/books";
-import { insertTerritory } from "@/lib/db-ops/territories";
-import {
-  findWrestlerByRingName,
-  insertWrestler,
-  patchWrestlerFillBlanks,
-} from "@/lib/db-ops/wrestlers";
-import { mergeBooks } from "@/mcp/api/books";
-import { fuzzy, normalizeName } from "@/mcp/api/dedup";
+import { findBookByTitleYear, insertBook, mergeBooks } from "@/lib/db-ops/books";
 import {
   listPendingWrestlers,
   promotePending,
   resolvePendingTo,
-} from "@/mcp/api/pending-wrestlers";
-import { upsertTerritoryByCagematch } from "@/mcp/api/territories";
-import { findDuplicateCandidates, mergeWrestlers } from "@/mcp/api/wrestlers";
+} from "@/lib/db-ops/pending-wrestlers";
+import { insertTerritory, upsertTerritoryByCagematch } from "@/lib/db-ops/territories";
+import {
+  findDuplicateCandidates,
+  findWrestlerByRingName,
+  insertWrestler,
+  mergeWrestlers,
+  patchWrestlerFillBlanks,
+} from "@/lib/db-ops/wrestlers";
+import { fuzzy, normalizeName } from "@/lib/dedup";
 
 type Db = PostgresJsDatabase<typeof schema>;
 type Method = (db: Db, ...args: any[]) => Promise<unknown>;

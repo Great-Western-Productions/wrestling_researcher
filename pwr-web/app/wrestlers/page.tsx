@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db/client";
-import { listWrestlers, type WrestlerFilters } from "@/lib/queries/wrestlers";
 import { ifnull } from "@/lib/format";
+import { listWrestlers, type WrestlerFilters } from "@/lib/queries/wrestlers";
 
 export const dynamic = "force-dynamic";
 
@@ -130,9 +130,7 @@ export default async function WrestlersPage({ searchParams }: { searchParams: Se
             <tr key={w.id}>
               <td className="title">
                 <Link href={`/wrestler/${w.id}`}>{w.primary_ring_name}</Link>
-                {w.other_ring_names && (
-                  <div className="dim small">aka {w.other_ring_names}</div>
-                )}
+                {w.other_ring_names && <div className="dim small">aka {w.other_ring_names}</div>}
               </td>
               <td>{ifnull(w.legal_name)}</td>
               <td>

@@ -6,5 +6,5 @@
 // expect. Do not rename columns or change types here without coordinating
 // with bibliography/, calendar/, covers/, magazine_downloader/.
 
-export * from "./tables";
 export * from "./relations";
+export * from "./tables";

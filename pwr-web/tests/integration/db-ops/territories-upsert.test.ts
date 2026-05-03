@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
-import { upsertTerritoryByCagematch } from "@/mcp/api/territories";
+import { upsertTerritoryByCagematch } from "@/lib/db-ops/territories";
 import { closeTestDb, withTx } from "../../helpers/db";
 
 afterAll(closeTestDb);

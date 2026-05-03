@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db/client";
-import { authorsForBook, getBookById } from "@/lib/queries/books";
 import { categoryLabel, ifnull } from "@/lib/format";
+import { authorsForBook, getBookById } from "@/lib/queries/books";
 
 export const dynamic = "force-dynamic";
 
@@ -13,10 +13,7 @@ export default async function BookDetail({ params }: Props) {
   const bookId = Number.parseInt(id, 10);
   if (!Number.isFinite(bookId)) notFound();
 
-  const [book, authors] = await Promise.all([
-    getBookById(db, bookId),
-    authorsForBook(db, bookId),
-  ]);
+  const [book, authors] = await Promise.all([getBookById(db, bookId), authorsForBook(db, bookId)]);
   if (!book) notFound();
 
   const isbn = book.isbn13 || book.isbn10;
@@ -48,9 +45,7 @@ export default async function BookDetail({ params }: Props) {
           <span className={`cat-tag ${book.category_code}`}>
             {categoryLabel(book.category_code)}
           </span>
-          <span className={`conf ${book.confidence ?? ""}`}>
-            {book.confidence ?? "—"}
-          </span>
+          <span className={`conf ${book.confidence ?? ""}`}>{book.confidence ?? "—"}</span>
         </div>
 
         {authors.length > 0 && (

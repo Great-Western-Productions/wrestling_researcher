@@ -1,6 +1,6 @@
 import { db } from "@/lib/db/client";
-import { listPeriodicals, type PeriodicalFilters } from "@/lib/queries/periodicals";
 import { ifnull } from "@/lib/format";
+import { listPeriodicals, type PeriodicalFilters } from "@/lib/queries/periodicals";
 
 export const dynamic = "force-dynamic";
 
@@ -54,12 +54,7 @@ export default async function PeriodicalsPage({ searchParams }: { searchParams: 
           ))}
         </select>
         <label className="check">
-          <input
-            type="checkbox"
-            name="in_archive"
-            value="1"
-            defaultChecked={filters.inArchive}
-          />{" "}
+          <input type="checkbox" name="in_archive" value="1" defaultChecked={filters.inArchive} />{" "}
           In your archive only
         </label>
         <button type="submit">Filter</button>
@@ -93,11 +88,7 @@ export default async function PeriodicalsPage({ searchParams }: { searchParams: 
                     <strong>{p.title}</strong>
                     {p.notes && <div className="dim small">{p.notes}</div>}
                   </td>
-                  <td>
-                    {p.year_started
-                      ? `${p.year_started}–${p.year_ended ?? "present"}`
-                      : "—"}
-                  </td>
+                  <td>{p.year_started ? `${p.year_started}–${p.year_ended ?? "present"}` : "—"}</td>
                   <td>{ifnull(p.frequency)}</td>
                   <td>{ifnull(p.type)}</td>
                   <td>{ifnull(p.publisher)}</td>

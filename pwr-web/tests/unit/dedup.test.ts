@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fuzzy, normalizeName } from "@/mcp/api/dedup";
+import { fuzzy, normalizeName } from "@/lib/dedup";
 
 describe("normalizeName", () => {
   it("lowercases and trims surrounding whitespace", () => {

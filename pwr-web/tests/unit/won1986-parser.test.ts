@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  parseBornDate,
-  parseCorpus,
-  parseHometown,
-  splitByPage,
-} from "@/scripts/won1986/parser";
+import { parseBornDate, parseCorpus, parseHometown, splitByPage } from "@/scripts/won1986/parser";
 
 // ---------------------------------------------------------------------------
 // Fixture — distilled from the actual OCR output the script will produce.

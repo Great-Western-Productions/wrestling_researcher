@@ -3,8 +3,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { categories } from "@/lib/db/schema";
 import { insertBook } from "@/lib/db-ops/books";
 import { insertTerritory } from "@/lib/db-ops/territories";
-import { insertWrestler } from "@/lib/db-ops/wrestlers";
-import { findDuplicateCandidates, mergeWrestlers } from "@/mcp/api/wrestlers";
+import { findDuplicateCandidates, insertWrestler, mergeWrestlers } from "@/lib/db-ops/wrestlers";
 import { closeTestDb, withTx } from "../../helpers/db";
 
 afterAll(closeTestDb);

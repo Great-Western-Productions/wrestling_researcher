@@ -1,6 +1,6 @@
-import { sql, type SQL } from "drizzle-orm";
+import { type SQL, sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import * as schema from "@/lib/db/schema";
+import type * as schema from "@/lib/db/schema";
 import type { Confidence } from "@/lib/db/schema";
 
 type Db = PostgresJsDatabase<typeof schema>;
@@ -91,8 +91,7 @@ export async function listBooks(db: Db, filters: BookFilters): Promise<BookListR
   if (filters.yearFrom !== undefined) conds.push(sql`b.year_published >= ${filters.yearFrom}`);
   if (filters.yearTo !== undefined) conds.push(sql`b.year_published <= ${filters.yearTo}`);
 
-  const whereSql =
-    conds.length > 0 ? sql`WHERE ${sql.join(conds, sql` AND `)}` : sql``;
+  const whereSql = conds.length > 0 ? sql`WHERE ${sql.join(conds, sql` AND `)}` : sql``;
 
   const totalRow = await db.execute<{ n: number }>(
     sql`SELECT COUNT(*)::int AS n FROM books b ${whereSql}`,
@@ -138,9 +137,7 @@ export async function listBooks(db: Db, filters: BookFilters): Promise<BookListR
 }
 
 export async function getBookById(db: Db, id: number): Promise<BookRow | null> {
-  const rows = await db.execute<BookRow>(
-    sql`SELECT * FROM books WHERE id = ${id}`,
-  );
+  const rows = await db.execute<BookRow>(sql`SELECT * FROM books WHERE id = ${id}`);
   return rows[0] ?? null;
 }
 
@@ -160,7 +157,10 @@ async function authorsForBooks(db: Db, bookIds: number[]): Promise<Map<number, A
     SELECT ba.book_id, a.id, a.name, a.is_wrestler, ba.role
       FROM book_authors ba
       JOIN authors a ON a.id = ba.author_id
-     WHERE ba.book_id IN ${sql`(${sql.join(bookIds.map((id) => sql`${id}`), sql`, `)})`}
+     WHERE ba.book_id IN ${sql`(${sql.join(
+       bookIds.map((id) => sql`${id}`),
+       sql`, `,
+     )})`}
      ORDER BY ba.role, a.name
   `);
   const map = new Map<number, AuthorRef[]>();

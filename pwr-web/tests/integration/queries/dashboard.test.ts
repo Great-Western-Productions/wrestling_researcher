@@ -10,10 +10,10 @@ import {
   wrestlers,
 } from "@/lib/db/schema";
 import {
-  getDashboardCounts,
-  getTopAuthors,
   getBooksByDecade,
+  getDashboardCounts,
   getFeaturedTerritories,
+  getTopAuthors,
 } from "@/lib/queries/dashboard";
 import { closeTestDb, withTx } from "../../helpers/db";
 
@@ -109,18 +109,9 @@ describe("getBooksByDecade", () => {
 describe("getFeaturedTerritories", () => {
   it("ranks territories by run count, capped to limit", async () => {
     const result = await withTx(async (tx) => {
-      const [t1] = await tx
-        .insert(territories)
-        .values({ name: "Big T" })
-        .returning();
-      const [t2] = await tx
-        .insert(territories)
-        .values({ name: "Small T" })
-        .returning();
-      const [w] = await tx
-        .insert(wrestlers)
-        .values({ primary_ring_name: "W" })
-        .returning();
+      const [t1] = await tx.insert(territories).values({ name: "Big T" }).returning();
+      const [t2] = await tx.insert(territories).values({ name: "Small T" }).returning();
+      const [w] = await tx.insert(wrestlers).values({ primary_ring_name: "W" }).returning();
       await tx.insert(wrestler_territory_runs).values([
         { wrestler_id: w!.id, territory_id: t1!.id },
         { wrestler_id: w!.id, territory_id: t1!.id },

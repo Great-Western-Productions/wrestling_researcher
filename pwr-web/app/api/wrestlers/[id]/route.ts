@@ -1,13 +1,11 @@
 import { sql } from "drizzle-orm";
-import { db } from "@/lib/db/client";
-import { wrestlerPatchSchema } from "@/lib/api/schemas";
 import { jsonError, jsonOk, parseIdParam, parseJsonBody } from "@/lib/api/route-helpers";
+import { wrestlerPatchSchema } from "@/lib/api/schemas";
+import { getSession } from "@/lib/auth/require-session";
+import { db } from "@/lib/db/client";
 import { patchWrestlerFillBlanks } from "@/lib/db-ops/wrestlers";
 
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const idParam = await parseIdParam(params);
   if (!idParam.ok) return idParam.response;
   const rows = await db.execute<{ id: number; primary_ring_name: string }>(
@@ -17,10 +15,10 @@ export async function GET(
   return jsonOk(rows[0]);
 }
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+  if (!session) return jsonError(401, "Unauthorized");
+
   const idParam = await parseIdParam(params);
   if (!idParam.ok) return idParam.response;
 

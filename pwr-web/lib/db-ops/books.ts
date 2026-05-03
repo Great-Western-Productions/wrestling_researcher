@@ -1,8 +1,8 @@
 import { sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import * as schema from "@/lib/db/schema";
-import { confidenceLevel, type Confidence } from "@/lib/db/schema";
 import { getCheckbox, getInt, getStr } from "@/lib/actions/_helpers";
+import type * as schema from "@/lib/db/schema";
+import { type Confidence, confidenceLevel } from "@/lib/db/schema";
 
 type Db = PostgresJsDatabase<typeof schema>;
 
@@ -154,3 +154,8 @@ export async function updateBook(db: Db, bookId: number, input: BookInput): Prom
     await syncBookAuthors(tx, bookId, input.authorNames, input.authorsAreWrestlers);
   });
 }
+
+// mergeBooks lives at @/lib/db-ops/merge — single source of truth for book
+// merging, called by both the HTTP server-action `mergeBookAction` and by the
+// MCP `pwr.books.merge` registry entry.
+export { mergeBooks } from "./merge";

@@ -1,12 +1,19 @@
-import { db } from "@/lib/db/client";
+import {
+  jsonCreated,
+  jsonError,
+  jsonOk,
+  parseIdParam,
+  parseJsonBody,
+} from "@/lib/api/route-helpers";
 import { runCreateSchema } from "@/lib/api/schemas";
-import { jsonCreated, jsonOk, parseIdParam, parseJsonBody } from "@/lib/api/route-helpers";
+import { getSession } from "@/lib/auth/require-session";
+import { db } from "@/lib/db/client";
 import { findOrCreateRun } from "@/lib/db-ops/wrestlers";
 
-export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+  if (!session) return jsonError(401, "Unauthorized");
+
   const idParam = await parseIdParam(params);
   if (!idParam.ok) return idParam.response;
 

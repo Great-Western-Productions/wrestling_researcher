@@ -20,7 +20,10 @@ const livingEnum = z.preprocess((v) => {
 }, z.boolean().nullable());
 
 export const wrestlerCreateSchema = z.object({
-  primary_ring_name: z.string().min(1, "primary_ring_name required").transform((s) => s.trim()),
+  primary_ring_name: z
+    .string()
+    .min(1, "primary_ring_name required")
+    .transform((s) => s.trim()),
   legal_name: optStr,
   other_ring_names: optStr,
   born_date: optStr,
@@ -71,7 +74,10 @@ export const citationCreateSchema = z.object({
 export type CitationCreateInput = z.infer<typeof citationCreateSchema>;
 
 export const bookCreateSchema = z.object({
-  title: z.string().min(1).transform((s) => s.trim()),
+  title: z
+    .string()
+    .min(1)
+    .transform((s) => s.trim()),
   subtitle: optStr,
   category_code: z.string().min(1),
   publisher: optStr,

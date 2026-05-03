@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db/client";
+import { categoryLabel, ifnull } from "@/lib/format";
 import {
   citationsForWrestler,
   getWrestlerById,
   relatedBooksForWrestler,
   runsForWrestler,
 } from "@/lib/queries/wrestlers";
-import { categoryLabel, ifnull } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -57,9 +57,7 @@ export default async function WrestlerDetail({ params }: Props) {
         {w.legal_name && w.legal_name !== w.primary_ring_name && (
           <p className="subtitle">{w.legal_name}</p>
         )}
-        {w.other_ring_names && (
-          <p className="dim">Also worked as: {w.other_ring_names}</p>
-        )}
+        {w.other_ring_names && <p className="dim">Also worked as: {w.other_ring_names}</p>}
 
         {w.why_they_mattered && (
           <div className="lookup">

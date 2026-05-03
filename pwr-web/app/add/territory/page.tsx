@@ -1,7 +1,7 @@
 import Link from "next/link";
+import { createTerritoryAction } from "@/lib/actions/entities";
 import { db } from "@/lib/db/client";
 import { getTerritoryRegions } from "@/lib/db-ops/territories";
-import { createTerritoryAction } from "@/lib/actions/entities";
 
 export const dynamic = "force-dynamic";
 

@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import type * as schema from "@/lib/db/schema";
-import { normalizeName } from "@/mcp/api/dedup";
+import { mergePendingIntoWrestler } from "./merge";
 
 type Db = PostgresJsDatabase<typeof schema>;
 
@@ -12,12 +12,6 @@ export type PendingWrestlerRow = {
   profightdb_id: number | null;
   occurrence_count: number;
   resolved_wrestler_id: number | null;
-};
-
-export type ResolveResult = {
-  pendingId: number;
-  wrestlerId: number;
-  rankingEntriesBackfilled: number;
 };
 
 export type PromoteResult = {
@@ -46,41 +40,12 @@ export async function listPendingWrestlers(
   `);
 }
 
-export async function resolvePendingTo(
-  db: Db,
-  pendingId: number,
-  wrestlerId: number,
-): Promise<ResolveResult> {
-  return db.transaction(async (tx) => {
-    const pendingRows = await tx.execute<{ id: number }>(
-      sql`SELECT id FROM pending_wrestlers WHERE id = ${pendingId}`,
-    );
-    if (!pendingRows[0]) throw new Error(`Pending wrestler ${pendingId} not found.`);
-    const wrestlerRows = await tx.execute<{ id: number }>(
-      sql`SELECT id FROM wrestlers WHERE id = ${wrestlerId}`,
-    );
-    if (!wrestlerRows[0]) throw new Error(`Wrestler ${wrestlerId} not found.`);
-
-    await tx.execute(sql`
-      UPDATE pending_wrestlers
-         SET resolved_wrestler_id = ${wrestlerId},
-             updated_at = CURRENT_TIMESTAMP
-       WHERE id = ${pendingId}
-    `);
-    const updated = await tx.execute<{ id: number }>(sql`
-      UPDATE ranking_entries
-         SET wrestler_id = ${wrestlerId}, pending_wrestler_id = NULL
-       WHERE pending_wrestler_id = ${pendingId}
-      RETURNING 1 AS id
-    `);
-    return {
-      pendingId,
-      wrestlerId,
-      rankingEntriesBackfilled: updated.length,
-    };
-  });
-}
-
+/**
+ * Promote a pending row into a brand new canonical wrestler. Creates the
+ * `wrestlers` row, then delegates to `mergePendingIntoWrestler` (the shared
+ * resolve-and-backfill helper) so the same code path applies whether the
+ * curator picks an existing wrestler or spins up a new one.
+ */
 export async function promotePending(db: Db, pendingId: number): Promise<PromoteResult> {
   return db.transaction(async (tx) => {
     const rows = await tx.execute<{ printed_name: string }>(
@@ -93,7 +58,7 @@ export async function promotePending(db: Db, pendingId: number): Promise<Promote
       RETURNING id
     `);
     const newId = inserted[0]!.id;
-    const r = await resolvePendingTo(tx, pendingId, newId);
+    const r = await mergePendingIntoWrestler(tx, pendingId, newId);
     return {
       pendingId,
       wrestlerId: newId,
@@ -102,5 +67,6 @@ export async function promotePending(db: Db, pendingId: number): Promise<Promote
   });
 }
 
-// Re-export for completeness on the API surface.
-export { normalizeName };
+// Re-export the shared resolve helper so MCP can wire `pendingWrestlers.resolveTo`
+// to the same function the HTTP server-action `pendingMergeAction` uses.
+export { mergePendingIntoWrestler as resolvePendingTo } from "./merge";

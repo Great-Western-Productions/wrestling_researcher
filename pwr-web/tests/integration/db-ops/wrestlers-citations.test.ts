@@ -1,6 +1,8 @@
-import { afterAll, describe, expect, it } from "vitest";
 import { sql } from "drizzle-orm";
+import { afterAll, describe, expect, it } from "vitest";
 import { categories } from "@/lib/db/schema";
+import { insertBook } from "@/lib/db-ops/books";
+import { insertTerritory } from "@/lib/db-ops/territories";
 import {
   addCitation,
   findOrCreateRun,
@@ -8,8 +10,6 @@ import {
   insertWrestler,
   patchWrestlerFillBlanks,
 } from "@/lib/db-ops/wrestlers";
-import { insertBook } from "@/lib/db-ops/books";
-import { insertTerritory } from "@/lib/db-ops/territories";
 import { closeTestDb, withTx } from "../../helpers/db";
 
 afterAll(closeTestDb);

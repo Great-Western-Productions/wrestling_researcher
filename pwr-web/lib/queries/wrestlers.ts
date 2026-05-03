@@ -1,6 +1,6 @@
-import { sql, type SQL } from "drizzle-orm";
+import { type SQL, sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import * as schema from "@/lib/db/schema";
+import type * as schema from "@/lib/db/schema";
 import type { BookRow } from "./books";
 
 type Db = PostgresJsDatabase<typeof schema>;
@@ -60,10 +60,7 @@ const SORT_MAP: Record<NonNullable<WrestlerFilters["sort"]>, SQL> = {
   priority: sql`w.midcard_files_priority NULLS LAST, w.primary_ring_name`,
 };
 
-export async function listWrestlers(
-  db: Db,
-  filters: WrestlerFilters,
-): Promise<WrestlerListResult> {
+export async function listWrestlers(db: Db, filters: WrestlerFilters): Promise<WrestlerListResult> {
   const sort = filters.sort ?? "name";
 
   const conds: SQL[] = [];
@@ -110,9 +107,7 @@ export async function listWrestlers(
 }
 
 export async function getWrestlerById(db: Db, id: number): Promise<WrestlerRow | null> {
-  const rows = await db.execute<WrestlerRow>(
-    sql`SELECT * FROM wrestlers WHERE id = ${id}`,
-  );
+  const rows = await db.execute<WrestlerRow>(sql`SELECT * FROM wrestlers WHERE id = ${id}`);
   return rows[0] ?? null;
 }
 

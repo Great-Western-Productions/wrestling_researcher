@@ -1,11 +1,7 @@
 import { sql } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
+import { listPendingWrestlers, promotePending } from "@/lib/db-ops/pending-wrestlers";
 import { insertWrestler } from "@/lib/db-ops/wrestlers";
-import {
-  listPendingWrestlers,
-  promotePending,
-  resolvePendingTo,
-} from "@/mcp/api/pending-wrestlers";
 import { closeTestDb, withTx } from "../../helpers/db";
 
 afterAll(closeTestDb);
@@ -53,49 +49,9 @@ async function seedRankingFixture(tx: Parameters<Parameters<typeof withTx>[0]>[0
   return list[0]!.id;
 }
 
-describe("resolvePendingTo", () => {
-  it("links the pending row to a canonical wrestler and repoints ranking_entries", async () => {
-    await withTx(async (tx) => {
-      const { id: canon } = await insertWrestler(tx, {
-        ...blank,
-        primary_ring_name: "Ric Flair",
-      });
-      const pending = await tx.execute<{ id: number }>(sql`
-        INSERT INTO pending_wrestlers (printed_name, normalized_name)
-        VALUES ('Rick Flair', 'rick flair') RETURNING id
-      `);
-      const listId = await seedRankingFixture(tx);
-      await tx.execute(sql`
-        INSERT INTO ranking_entries (ranking_list_id, rank, pending_wrestler_id, entry_name)
-        VALUES (${listId}, 1, ${pending[0]!.id}, 'Rick Flair'),
-               (${listId}, 2, ${pending[0]!.id}, 'Rick Flair')
-      `);
-
-      const result = await resolvePendingTo(tx, pending[0]!.id, canon);
-      expect(result).toEqual({
-        pendingId: pending[0]!.id,
-        wrestlerId: canon,
-        rankingEntriesBackfilled: 2,
-      });
-
-      const pendingRow = await tx.execute<{ resolved_wrestler_id: number | null }>(
-        sql`SELECT resolved_wrestler_id FROM pending_wrestlers WHERE id = ${pending[0]!.id}`,
-      );
-      expect(pendingRow[0]!.resolved_wrestler_id).toBe(canon);
-
-      const entries = await tx.execute<{
-        wrestler_id: number | null;
-        pending_wrestler_id: number | null;
-      }>(
-        sql`SELECT wrestler_id, pending_wrestler_id FROM ranking_entries WHERE ranking_list_id = ${listId}`,
-      );
-      for (const e of entries) {
-        expect(e.wrestler_id).toBe(canon);
-        expect(e.pending_wrestler_id).toBeNull();
-      }
-    });
-  });
-});
+// `resolvePendingTo` is `mergePendingIntoWrestler` from lib/db-ops/merge — its
+// behavior is exhaustively covered by tests/integration/actions/merge.test.ts.
+// We don't re-test it here.
 
 describe("promotePending", () => {
   it("creates a new wrestler from the pending row and resolves it", async () => {

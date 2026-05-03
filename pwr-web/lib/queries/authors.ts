@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import * as schema from "@/lib/db/schema";
+import type * as schema from "@/lib/db/schema";
 import type { BookRow } from "./books";
 
 type Db = PostgresJsDatabase<typeof schema>;
@@ -14,9 +14,7 @@ export type AuthorRow = {
 };
 
 export async function getAuthorById(db: Db, id: number): Promise<AuthorRow | null> {
-  const rows = await db.execute<AuthorRow>(
-    sql`SELECT * FROM authors WHERE id = ${id}`,
-  );
+  const rows = await db.execute<AuthorRow>(sql`SELECT * FROM authors WHERE id = ${id}`);
   return rows[0] ?? null;
 }
 

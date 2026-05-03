@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { pendingMergeAction, pendingUnmergeAction } from "@/lib/actions/merge";
 import { db } from "@/lib/db/client";
 import { getPendingDetail } from "@/lib/queries/pending";
-import { pendingMergeAction, pendingUnmergeAction } from "@/lib/actions/merge";
 
 export const dynamic = "force-dynamic";
 
@@ -31,8 +31,8 @@ export default async function PendingDetailPage({ params }: Props) {
           </>
         ) : (
           <>
-            <span className="conf low">open</span> · {p.occurrence_count} ranking entries
-            reference this name
+            <span className="conf low">open</span> · {p.occurrence_count} ranking entries reference
+            this name
           </>
         )}
       </p>
@@ -69,9 +69,20 @@ export default async function PendingDetailPage({ params }: Props) {
 
       {!p.merged && (
         <div
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", margin: "1.5rem 0" }}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1.5rem",
+            margin: "1.5rem 0",
+          }}
         >
-          <section style={{ border: "1px solid var(--border)", padding: "1rem", background: "var(--paper-soft)" }}>
+          <section
+            style={{
+              border: "1px solid var(--border)",
+              padding: "1rem",
+              background: "var(--paper-soft)",
+            }}
+          >
             <h2 style={{ marginTop: 0 }}>Merge into existing wrestler</h2>
             <form action={pendingMergeAction.bind(null, p.id)}>
               {p.suggestions.length > 0 ? (
@@ -92,9 +103,7 @@ export default async function PendingDetailPage({ params }: Props) {
                   </label>
                 </>
               ) : (
-                <p className="dim small">
-                  No name-similar wrestlers in the curated table.
-                </p>
+                <p className="dim small">No name-similar wrestlers in the curated table.</p>
               )}
               <p className="dim small">Or pick from the full list:</p>
               <label>
@@ -113,7 +122,13 @@ export default async function PendingDetailPage({ params }: Props) {
             </form>
           </section>
 
-          <section style={{ border: "1px solid var(--border)", padding: "1rem", background: "var(--paper-soft)" }}>
+          <section
+            style={{
+              border: "1px solid var(--border)",
+              padding: "1rem",
+              background: "var(--paper-soft)",
+            }}
+          >
             <h2 style={{ marginTop: 0 }}>Promote to new wrestler</h2>
             <p className="dim">
               Open the Add Wrestler form pre-filled with this name. On save, all{" "}
@@ -129,10 +144,7 @@ export default async function PendingDetailPage({ params }: Props) {
       )}
 
       {p.merged ? (
-        <form
-          action={pendingUnmergeAction.bind(null, p.id)}
-          style={{ margin: "1rem 0" }}
-        >
+        <form action={pendingUnmergeAction.bind(null, p.id)} style={{ margin: "1rem 0" }}>
           <button type="submit" className="btn-pill">
             Undo merge
           </button>
@@ -155,9 +167,7 @@ export default async function PendingDetailPage({ params }: Props) {
             <tr key={i}>
               <td>
                 {s.publication_date}
-                {s.issue_number && (
-                  <span className="dim small"> ({s.issue_number})</span>
-                )}
+                {s.issue_number && <span className="dim small"> ({s.issue_number})</span>}
               </td>
               <td>
                 {s.list_label} <span className="dim small">{s.list_scope}</span>
