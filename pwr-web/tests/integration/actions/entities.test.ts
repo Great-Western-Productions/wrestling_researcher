@@ -86,6 +86,9 @@ describe("insertWrestler", () => {
         midcard_files_priority: null,
         why_they_mattered: null,
         notes: null,
+        height_inches: null,
+        weight_lbs: null,
+        bio: null,
         fromPending: null,
       }),
     );
@@ -157,6 +160,9 @@ describe("insertWrestler", () => {
         midcard_files_priority: null,
         why_they_mattered: null,
         notes: null,
+        height_inches: null,
+        weight_lbs: null,
+        bio: null,
         fromPending: pending!.id,
       });
 

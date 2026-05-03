@@ -1,4 +1,4 @@
-import { pgTable, pgEnum, index, foreignKey, unique, integer, text, uniqueIndex, check, boolean, primaryKey, pgView, bigint, timestamp, date } from "drizzle-orm/pg-core"
+import { pgTable, pgEnum, index, foreignKey, unique, integer, text, uniqueIndex, check, boolean, primaryKey, pgView, bigint, timestamp, date, jsonb } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const confidenceLevel = pgEnum("confidence_level", [
@@ -122,6 +122,9 @@ export const wrestlers = pgTable("wrestlers", {
 	midcard_files_priority: integer(),
 	why_they_mattered: text(),
 	notes: text(),
+	height_inches: integer(),
+	weight_lbs: integer(),
+	bio: text(),
 	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
 	updated_at: timestamp({ withTimezone: true }),
 	cagematch_id: text(),
@@ -394,6 +397,29 @@ export const ranking_lists = pgTable("ranking_lists", {
 		}).onDelete("cascade"),
 ]);
 
+export const wrestler_book_citations = pgTable("wrestler_book_citations", {
+	id: integer().primaryKey().generatedByDefaultAsIdentity({ name: "wrestler_book_citations_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 2147483647, cache: 1 }),
+	wrestler_id: integer().notNull(),
+	book_id: integer().notNull(),
+	page: text(),
+	excerpt: text(),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+	index("idx_wbc_wrestler").using("btree", table.wrestler_id.asc().nullsLast()),
+	index("idx_wbc_book").using("btree", table.book_id.asc().nullsLast()),
+	uniqueIndex("uq_wbc_wrestler_book_page").using("btree", table.wrestler_id.asc().nullsLast(), table.book_id.asc().nullsLast(), table.page.asc().nullsLast()),
+	foreignKey({
+			columns: [table.wrestler_id],
+			foreignColumns: [wrestlers.id],
+			name: "wrestler_book_citations_wrestler_id_fkey"
+		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.book_id],
+			foreignColumns: [books.id],
+			name: "wrestler_book_citations_book_id_fkey"
+		}).onDelete("cascade"),
+]);
+
 export const wrestler_territory_runs = pgTable("wrestler_territory_runs", {
 	id: integer().primaryKey().generatedByDefaultAsIdentity({ name: "wrestler_territory_runs_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 2147483647, cache: 1 }),
 	wrestler_id: integer().notNull(),
@@ -654,3 +680,16 @@ export const v_ranking_history = pgView("v_ranking_history", {	wrestler_id: inte
 	previous_rank: integer(),
 	as_printed: text(),
 }).as(sql`SELECT w.id AS wrestler_id, w.primary_ring_name, p.title AS periodical, pi.publication_date, pi.period_date, pi.issue_number, rl.list_label, rl.list_scope, re.rank, re.previous_rank, re.entry_name AS as_printed FROM ranking_entries re JOIN ranking_lists rl ON re.ranking_list_id = rl.id JOIN periodical_issues pi ON rl.issue_id = pi.id JOIN periodicals p ON pi.periodical_id = p.id LEFT JOIN wrestlers w ON re.wrestler_id = w.id`);
+export const mcp_audit_log = pgTable("mcp_audit_log", {
+	id: integer().primaryKey().generatedByDefaultAsIdentity({ name: "mcp_audit_log_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 2147483647, cache: 1 }),
+	created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	code_hash: text().notNull(),
+	code_excerpt: text().notNull(),
+	dry_run: boolean().default(false).notNull(),
+	duration_ms: integer(),
+	result_status: text().notNull(),
+	rpc_calls: jsonb().default(sql`'[]'::jsonb`).notNull(),
+	error_message: text(),
+}, (table) => [
+	index("idx_mcp_audit_log_created").using("btree", table.created_at.asc().nullsLast()),
+]);

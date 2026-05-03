@@ -129,6 +129,17 @@ export default async function AddWrestlerPage({ searchParams }: { searchParams: 
 
         <div className="form-row">
           <label>
+            Height (inches)
+            <input type="number" name="height_inches" min="36" max="96" placeholder="73 = 6'1&quot;" />
+          </label>
+          <label>
+            Weight (lbs)
+            <input type="number" name="weight_lbs" min="50" max="800" />
+          </label>
+        </div>
+
+        <div className="form-row">
+          <label>
             Style
             <input
               type="text"
@@ -182,6 +193,11 @@ export default async function AddWrestlerPage({ searchParams }: { searchParams: 
             <input type="number" name="midcard_files_priority" min="1" max="5" />
           </label>
         </div>
+
+        <label>
+          Bio (long-form, sourced narrative)
+          <textarea name="bio" rows={6} />
+        </label>
 
         <label>
           Why they mattered

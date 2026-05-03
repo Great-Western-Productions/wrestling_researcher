@@ -97,6 +97,21 @@ async function syncBookAuthors(
   }
 }
 
+export async function findBookByTitleYear(
+  db: Db,
+  title: string,
+  year: number | null,
+): Promise<{ id: number; title: string; year_published: number | null } | null> {
+  const rows = await db.execute<{ id: number; title: string; year_published: number | null }>(sql`
+    SELECT id, title, year_published
+      FROM books
+     WHERE LOWER(title) = LOWER(${title})
+       AND COALESCE(year_published, 0) = COALESCE(${year}, 0)
+     LIMIT 1
+  `);
+  return rows[0] ?? null;
+}
+
 /** Insert a new book with its authors. Returns the new book id. */
 export async function insertBook(db: Db, input: BookInput): Promise<number> {
   return db.transaction(async (tx) => {

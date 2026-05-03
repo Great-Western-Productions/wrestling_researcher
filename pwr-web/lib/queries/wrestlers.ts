@@ -28,6 +28,9 @@ export type WrestlerRow = {
   midcard_files_priority: number | null;
   why_they_mattered: string | null;
   notes: string | null;
+  height_inches: number | null;
+  weight_lbs: number | null;
+  bio: string | null;
   cagematch_id: string | null;
   cagematch_url: string | null;
   created_at: string | null;
@@ -138,6 +141,30 @@ export async function runsForWrestler(db: Db, wrestlerId: number): Promise<Wrest
       JOIN territories t ON t.id = r.territory_id
      WHERE r.wrestler_id = ${wrestlerId}
      ORDER BY r.start_year NULLS LAST
+  `);
+  return [...rows];
+}
+
+export type WrestlerCitation = {
+  id: number;
+  page: string | null;
+  excerpt: string | null;
+  book_id: number;
+  book_title: string;
+  book_year: number | null;
+};
+
+export async function citationsForWrestler(
+  db: Db,
+  wrestlerId: number,
+): Promise<WrestlerCitation[]> {
+  const rows = await db.execute<WrestlerCitation>(sql`
+    SELECT c.id, c.page, c.excerpt,
+           b.id AS book_id, b.title AS book_title, b.year_published AS book_year
+      FROM wrestler_book_citations c
+      JOIN books b ON b.id = c.book_id
+     WHERE c.wrestler_id = ${wrestlerId}
+     ORDER BY b.year_published NULLS LAST, b.title
   `);
   return [...rows];
 }

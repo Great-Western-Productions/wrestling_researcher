@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { reigns, reign_participants, wrestlers, categories, books, faction_members, factions, territories, issue_cover_subjects, periodical_issues, periodicals, pending_wrestlers, ranking_entries, ranking_lists, wrestler_territory_runs, titles, title_aliases, authors, book_authors } from "./tables";
+import { reigns, reign_participants, wrestlers, categories, books, faction_members, factions, territories, issue_cover_subjects, periodical_issues, periodicals, pending_wrestlers, ranking_entries, ranking_lists, wrestler_territory_runs, wrestler_book_citations, titles, title_aliases, authors, book_authors } from "./tables";
 
 export const reign_participantsRelations = relations(reign_participants, ({one}) => ({
 	reign: one(reigns, {
@@ -31,6 +31,7 @@ export const wrestlersRelations = relations(wrestlers, ({many}) => ({
 	pending_wrestlers: many(pending_wrestlers),
 	ranking_entries: many(ranking_entries),
 	wrestler_territory_runs: many(wrestler_territory_runs),
+	wrestler_book_citations: many(wrestler_book_citations),
 	reigns: many(reigns),
 }));
 
@@ -40,6 +41,18 @@ export const booksRelations = relations(books, ({one, many}) => ({
 		references: [categories.code]
 	}),
 	book_authors: many(book_authors),
+	wrestler_book_citations: many(wrestler_book_citations),
+}));
+
+export const wrestler_book_citationsRelations = relations(wrestler_book_citations, ({one}) => ({
+	wrestler: one(wrestlers, {
+		fields: [wrestler_book_citations.wrestler_id],
+		references: [wrestlers.id]
+	}),
+	book: one(books, {
+		fields: [wrestler_book_citations.book_id],
+		references: [books.id]
+	}),
 }));
 
 export const categoriesRelations = relations(categories, ({many}) => ({

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db/client";
 import {
+  citationsForWrestler,
   getWrestlerById,
   relatedBooksForWrestler,
   runsForWrestler,
@@ -26,10 +27,15 @@ export default async function WrestlerDetail({ params }: Props) {
   const w = await getWrestlerById(db, wid);
   if (!w) notFound();
 
-  const [runs, related] = await Promise.all([
+  const [runs, related, citations] = await Promise.all([
     runsForWrestler(db, wid),
     relatedBooksForWrestler(db, w.primary_ring_name),
+    citationsForWrestler(db, wid),
   ]);
+
+  const heightDisplay = w.height_inches
+    ? `${Math.floor(w.height_inches / 12)}'${w.height_inches % 12}" (${w.height_inches} in)`
+    : null;
 
   return (
     <>
@@ -96,6 +102,15 @@ export default async function WrestlerDetail({ params }: Props) {
               <th>Hometown (billed)</th>
               <td>{ifnull(w.hometown_billed)}</td>
             </tr>
+            {(heightDisplay || w.weight_lbs) && (
+              <tr>
+                <th>Billed size</th>
+                <td>
+                  {heightDisplay ?? "—"}
+                  {w.weight_lbs && ` · ${w.weight_lbs} lbs`}
+                </td>
+              </tr>
+            )}
             <tr>
               <th>Style</th>
               <td>{ifnull(w.style)}</td>
@@ -136,6 +151,15 @@ export default async function WrestlerDetail({ params }: Props) {
             )}
           </tbody>
         </table>
+
+        {w.bio && (
+          <div className="synopsis">
+            <h2>Bio</h2>
+            {w.bio.split(/\n\n+/).map((para, i) => (
+              <p key={i}>{para}</p>
+            ))}
+          </div>
+        )}
 
         {w.notes && (
           <div className="synopsis">
@@ -194,6 +218,21 @@ export default async function WrestlerDetail({ params }: Props) {
           <p className="dim">No territory runs recorded yet.</p>
         )}
       </section>
+
+      {citations.length > 0 && (
+        <section>
+          <h2>Sources ({citations.length})</h2>
+          <ul className="citations">
+            {citations.map((c) => (
+              <li key={c.id}>
+                <Link href={`/book/${c.book_id}`}>{c.book_title}</Link>
+                {c.book_year && <span className="dim"> ({c.book_year})</span>}
+                {c.page && <span className="dim">, p. {c.page}</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {related.length > 0 && (
         <section>

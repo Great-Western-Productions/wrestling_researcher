@@ -22,11 +22,17 @@ fi
 
 echo "==> Using Python: $PYTHON"
 echo
-echo "==> 1/2 schema migration"
+echo "==> 1/4 schema migration (titles + reigns + views)"
 "$PYTHON" bibliography/migrate_titles_reigns.py
 echo
-echo "==> 2/2 ingest WWA World Heavyweight Championship"
+echo "==> 2/4 schema migration (tag-team support)"
+"$PYTHON" bibliography/migrate_titles_tag_support.py
+echo
+echo "==> 3/4 ingest WWA World Heavyweight Championship"
 "$PYTHON" bibliography/ingest_wwa_world_title.py
+echo
+echo "==> 4/4 ingest WWA World Tag Team Championship"
+"$PYTHON" bibliography/ingest_wwa_world_tag_title.py
 echo
 echo "Done. Press Return to close."
 read -r _

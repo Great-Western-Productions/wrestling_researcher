@@ -22,6 +22,20 @@
       "when": 1777739531491,
       "tag": "0002_confidence_enum",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1777745385689,
+      "tag": "0003_won_whos_who",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1778457600000,
+      "tag": "0004_mcp_audit_log",
+      "breakpoints": true
     }
   ]
 }
