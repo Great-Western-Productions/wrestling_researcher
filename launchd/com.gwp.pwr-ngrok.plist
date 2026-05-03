@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+        "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.gwp.pwr-ngrok</string>
+
+    <!-- Background ngrok tunnel that exposes the local Next.js dev server
+         (running under com.gwp.wrestling-researcher on port 5150) at
+         https://pwr.ngrok.io. Authtoken is read from
+         ~/Library/Application Support/ngrok/ngrok.yml — never embed it here. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/ngrok</string>
+        <string>http</string>
+        <string>--domain=pwr.ngrok.io</string>
+        <string>--log=stdout</string>
+        <string>--log-format=json</string>
+        <string>5150</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <!-- Wait a few seconds between restart attempts on crash; ngrok's edge
+         briefly throttles reconnects from a single account. -->
+    <key>ThrottleInterval</key>
+    <integer>5</integer>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/pwr-ngrok.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/pwr-ngrok.err.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <!-- Default ngrok config path; let the agent pick it up itself. -->
+        <key>HOME</key>
+        <string>/Users/jschairb-gwp</string>
+    </dict>
+</dict>
+</plist>
