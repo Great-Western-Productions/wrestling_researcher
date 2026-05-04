@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logoutAction } from "@/lib/actions/auth";
 
 const NAV: Array<{ href: string; label: string; activeWhen: (p: string) => boolean }> = [
   { href: "/", label: "Home", activeWhen: (p) => p === "/" },
@@ -25,7 +26,9 @@ const NAV: Array<{ href: string; label: string; activeWhen: (p: string) => boole
   { href: "/about", label: "About", activeWhen: (p) => p === "/about" },
 ];
 
-export function Masthead() {
+export type MastheadUser = { email: string | null; name: string | null } | null;
+
+export function Masthead({ user }: { user?: MastheadUser }) {
   const pathname = usePathname() ?? "/";
   return (
     <header className="masthead">
@@ -52,6 +55,20 @@ export function Masthead() {
           >
             + Add
           </Link>
+          {user ? (
+            <form action={logoutAction} className="signout-form">
+              <span className="signed-in-as" title={user.email ?? undefined}>
+                {user.name ?? user.email ?? "Signed in"}
+              </span>
+              <button type="submit" className="signout-btn">
+                Sign out
+              </button>
+            </form>
+          ) : pathname !== "/login" ? (
+            <Link href="/login" className="signin-link">
+              Sign in
+            </Link>
+          ) : null}
         </nav>
 
         <div className="rule-flourish" aria-hidden="true">

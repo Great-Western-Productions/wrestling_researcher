@@ -133,12 +133,8 @@
           "name": "book_authors_fk_0",
           "tableFrom": "book_authors",
           "tableTo": "authors",
-          "columnsFrom": [
-            "author_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["author_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -146,12 +142,8 @@
           "name": "book_authors_fk_1",
           "tableFrom": "book_authors",
           "tableTo": "books",
-          "columnsFrom": [
-            "book_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["book_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -159,11 +151,7 @@
       "compositePrimaryKeys": {
         "book_authors_pkey": {
           "name": "book_authors_pkey",
-          "columns": [
-            "book_id",
-            "author_id",
-            "role"
-          ]
+          "columns": ["book_id", "author_id", "role"]
         }
       },
       "uniqueConstraints": {},
@@ -411,12 +399,8 @@
           "name": "books_fk_0",
           "tableFrom": "books",
           "tableTo": "categories",
-          "columnsFrom": [
-            "category_code"
-          ],
-          "columnsTo": [
-            "code"
-          ],
+          "columnsFrom": ["category_code"],
+          "columnsTo": ["code"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -474,9 +458,7 @@
         "categories_code_key": {
           "name": "categories_code_key",
           "nullsNotDistinct": false,
-          "columns": [
-            "code"
-          ]
+          "columns": ["code"]
         }
       },
       "policies": {},
@@ -618,12 +600,8 @@
           "name": "faction_members_fk_0",
           "tableFrom": "faction_members",
           "tableTo": "wrestlers",
-          "columnsFrom": [
-            "wrestler_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["wrestler_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -631,12 +609,8 @@
           "name": "faction_members_fk_1",
           "tableFrom": "faction_members",
           "tableTo": "factions",
-          "columnsFrom": [
-            "faction_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["faction_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -790,12 +764,8 @@
           "name": "factions_fk_0",
           "tableFrom": "factions",
           "tableTo": "territories",
-          "columnsFrom": [
-            "primary_territory_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["primary_territory_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -929,12 +899,8 @@
           "name": "issue_cover_subjects_fk_0",
           "tableFrom": "issue_cover_subjects",
           "tableTo": "factions",
-          "columnsFrom": [
-            "faction_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["faction_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -942,12 +908,8 @@
           "name": "issue_cover_subjects_fk_1",
           "tableFrom": "issue_cover_subjects",
           "tableTo": "wrestlers",
-          "columnsFrom": [
-            "wrestler_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["wrestler_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -955,12 +917,8 @@
           "name": "issue_cover_subjects_fk_2",
           "tableFrom": "issue_cover_subjects",
           "tableTo": "periodical_issues",
-          "columnsFrom": [
-            "issue_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["issue_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1149,12 +1107,8 @@
           "name": "pending_wrestlers_fk_0",
           "tableFrom": "pending_wrestlers",
           "tableTo": "wrestlers",
-          "columnsFrom": [
-            "resolved_wrestler_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["resolved_wrestler_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1372,12 +1326,8 @@
           "name": "periodical_issues_fk_0",
           "tableFrom": "periodical_issues",
           "tableTo": "periodicals",
-          "columnsFrom": [
-            "periodical_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["periodical_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1742,12 +1692,8 @@
           "name": "ranking_entries_fk_0",
           "tableFrom": "ranking_entries",
           "tableTo": "pending_wrestlers",
-          "columnsFrom": [
-            "pending_wrestler_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["pending_wrestler_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1755,12 +1701,8 @@
           "name": "ranking_entries_fk_1",
           "tableFrom": "ranking_entries",
           "tableTo": "factions",
-          "columnsFrom": [
-            "faction_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["faction_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1768,12 +1710,8 @@
           "name": "ranking_entries_fk_2",
           "tableFrom": "ranking_entries",
           "tableTo": "wrestlers",
-          "columnsFrom": [
-            "wrestler_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["wrestler_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1781,12 +1719,8 @@
           "name": "ranking_entries_fk_3",
           "tableFrom": "ranking_entries",
           "tableTo": "ranking_lists",
-          "columnsFrom": [
-            "ranking_list_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["ranking_list_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1947,12 +1881,8 @@
           "name": "ranking_lists_fk_0",
           "tableFrom": "ranking_lists",
           "tableTo": "territories",
-          "columnsFrom": [
-            "territory_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["territory_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1960,12 +1890,8 @@
           "name": "ranking_lists_fk_1",
           "tableFrom": "ranking_lists",
           "tableTo": "periodical_issues",
-          "columnsFrom": [
-            "issue_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["issue_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2059,12 +1985,8 @@
           "name": "reign_participants_reign_id_fkey",
           "tableFrom": "reign_participants",
           "tableTo": "reigns",
-          "columnsFrom": [
-            "reign_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["reign_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -2072,12 +1994,8 @@
           "name": "reign_participants_wrestler_id_fkey",
           "tableFrom": "reign_participants",
           "tableTo": "wrestlers",
-          "columnsFrom": [
-            "wrestler_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["wrestler_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2087,18 +2005,12 @@
         "reign_participants_reign_id_wrestler_id_key": {
           "name": "reign_participants_reign_id_wrestler_id_key",
           "nullsNotDistinct": false,
-          "columns": [
-            "reign_id",
-            "wrestler_id"
-          ]
+          "columns": ["reign_id", "wrestler_id"]
         },
         "reign_participants_reign_id_position_key": {
           "name": "reign_participants_reign_id_position_key",
           "nullsNotDistinct": false,
-          "columns": [
-            "reign_id",
-            "position"
-          ]
+          "columns": ["reign_id", "position"]
         }
       },
       "policies": {},
@@ -2310,12 +2222,8 @@
           "name": "reigns_title_id_fkey",
           "tableFrom": "reigns",
           "tableTo": "titles",
-          "columnsFrom": [
-            "title_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["title_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -2323,12 +2231,8 @@
           "name": "reigns_wrestler_id_fkey",
           "tableFrom": "reigns",
           "tableTo": "wrestlers",
-          "columnsFrom": [
-            "wrestler_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["wrestler_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -2338,10 +2242,7 @@
         "reigns_title_id_sequence_order_key": {
           "name": "reigns_title_id_sequence_order_key",
           "nullsNotDistinct": false,
-          "columns": [
-            "title_id",
-            "sequence_order"
-          ]
+          "columns": ["title_id", "sequence_order"]
         }
       },
       "policies": {},
@@ -2704,12 +2605,8 @@
           "name": "title_aliases_title_id_fkey",
           "tableFrom": "title_aliases",
           "tableTo": "titles",
-          "columnsFrom": [
-            "title_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["title_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2719,11 +2616,7 @@
         "title_aliases_title_id_name_effective_from_key": {
           "name": "title_aliases_title_id_name_effective_from_key",
           "nullsNotDistinct": false,
-          "columns": [
-            "title_id",
-            "name",
-            "effective_from"
-          ]
+          "columns": ["title_id", "name", "effective_from"]
         }
       },
       "policies": {},
@@ -2887,12 +2780,8 @@
           "name": "titles_territory_id_fkey",
           "tableFrom": "titles",
           "tableTo": "territories",
-          "columnsFrom": [
-            "territory_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["territory_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -2902,9 +2791,7 @@
         "titles_cagematch_id_key": {
           "name": "titles_cagematch_id_key",
           "nullsNotDistinct": false,
-          "columns": [
-            "cagematch_id"
-          ]
+          "columns": ["cagematch_id"]
         }
       },
       "policies": {},
@@ -3031,12 +2918,8 @@
           "name": "wrestler_territory_runs_fk_0",
           "tableFrom": "wrestler_territory_runs",
           "tableTo": "territories",
-          "columnsFrom": [
-            "territory_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["territory_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -3044,12 +2927,8 @@
           "name": "wrestler_territory_runs_fk_1",
           "tableFrom": "wrestler_territory_runs",
           "tableTo": "wrestlers",
-          "columnsFrom": [
-            "wrestler_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["wrestler_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3296,13 +3175,7 @@
     "public.confidence_level": {
       "name": "confidence_level",
       "schema": "public",
-      "values": [
-        "low",
-        "low_searched",
-        "medium",
-        "medium_search",
-        "high"
-      ]
+      "values": ["low", "low_searched", "medium", "medium_search", "high"]
     }
   },
   "schemas": {},

@@ -1,7 +1,7 @@
 import Link from "next/link";
+import { createRunAction } from "@/lib/actions/entities";
 import { db } from "@/lib/db/client";
 import { getRunFormOptions } from "@/lib/db-ops/runs";
-import { createRunAction } from "@/lib/actions/entities";
 
 export const dynamic = "force-dynamic";
 
@@ -27,9 +27,7 @@ export default async function AddRunPage({ searchParams }: { searchParams: Searc
         <Link href="/add">&laquo; Add</Link>
       </p>
       <h1>Add a wrestler-territory run</h1>
-      <p className="subtitle">
-        Records a stretch when a wrestler worked a specific territory.
-      </p>
+      <p className="subtitle">Records a stretch when a wrestler worked a specific territory.</p>
 
       <form className="add-form" action={createRunAction}>
         <div className="form-row">
@@ -95,8 +93,7 @@ export default async function AddRunPage({ searchParams }: { searchParams: Searc
             />
           </label>
           <label className="check">
-            <input type="checkbox" name="primary_run" value="1" /> Primary run for this
-            wrestler
+            <input type="checkbox" name="primary_run" value="1" /> Primary run for this wrestler
           </label>
         </div>
 

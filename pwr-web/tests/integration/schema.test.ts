@@ -1,5 +1,5 @@
 import { afterAll, describe, expect, it } from "vitest";
-import { books, categories, wrestlers, territories } from "@/lib/db/schema";
+import { books, categories, territories, wrestlers } from "@/lib/db/schema";
 import { closeTestDb, withTx } from "../helpers/db";
 
 afterAll(closeTestDb);
@@ -7,9 +7,7 @@ afterAll(closeTestDb);
 describe("introspected schema applies and is queryable", () => {
   it("books FKs into categories.code (constraint is enforced)", async () => {
     const rows = await withTx(async (tx) => {
-      await tx
-        .insert(categories)
-        .values({ code: "about_wrestling", label: "About Wrestling" });
+      await tx.insert(categories).values({ code: "about_wrestling", label: "About Wrestling" });
       const inserted = await tx
         .insert(books)
         .values({ title: "Test Title", category_code: "about_wrestling" })
@@ -36,10 +34,7 @@ describe("introspected schema applies and is queryable", () => {
 
   it("territories table accepts the minimum required fields", async () => {
     const rows = await withTx(async (tx) => {
-      const inserted = await tx
-        .insert(territories)
-        .values({ name: "Test Promotion" })
-        .returning();
+      const inserted = await tx.insert(territories).values({ name: "Test Promotion" }).returning();
       return inserted;
     });
 

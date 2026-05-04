@@ -1,9 +1,9 @@
+import fs from "node:fs";
+import path from "node:path";
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
-import path from "node:path";
-import fs from "node:fs";
 
 let container: StartedPostgreSqlContainer | undefined;
 

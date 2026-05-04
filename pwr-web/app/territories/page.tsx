@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db/client";
-import { listTerritories, type TerritoryFilters } from "@/lib/queries/territories";
 import { ifnull } from "@/lib/format";
+import { listTerritories, type TerritoryFilters } from "@/lib/queries/territories";
 
 export const dynamic = "force-dynamic";
 
@@ -38,8 +38,8 @@ export default async function TerritoriesPage({ searchParams }: { searchParams: 
     <>
       <h1>Territories</h1>
       <p className="subtitle">
-        Promotions and territorial circuits — NWA members, independent operators, and
-        major national companies.
+        Promotions and territorial circuits — NWA members, independent operators, and major national
+        companies.
       </p>
 
       <form className="filters" action="/territories" method="get">
@@ -91,9 +91,7 @@ export default async function TerritoriesPage({ searchParams }: { searchParams: 
                 <tr key={t.id}>
                   <td className="title">
                     <Link href={`/territory/${t.id}`}>{t.name}</Link>
-                    {t.promoter_lineage && (
-                      <div className="dim small">{t.promoter_lineage}</div>
-                    )}
+                    {t.promoter_lineage && <div className="dim small">{t.promoter_lineage}</div>}
                   </td>
                   <td>{ifnull(t.short_name)}</td>
                   <td>
@@ -101,9 +99,7 @@ export default async function TerritoriesPage({ searchParams }: { searchParams: 
                     {t.headquarters_state && `, ${t.headquarters_state}`}
                   </td>
                   <td>
-                    {t.year_founded
-                      ? `${t.year_founded}–${t.year_closed ?? "present"}`
-                      : "—"}
+                    {t.year_founded ? `${t.year_founded}–${t.year_closed ?? "present"}` : "—"}
                   </td>
                   <td>
                     {t.nwa_member ? (

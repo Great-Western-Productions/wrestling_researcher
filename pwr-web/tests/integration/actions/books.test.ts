@@ -1,7 +1,7 @@
-import { afterAll, describe, expect, it } from "vitest";
 import { sql } from "drizzle-orm";
+import { afterAll, describe, expect, it } from "vitest";
 import { authors, book_authors, books, categories } from "@/lib/db/schema";
-import { insertBook, updateBook, type BookInput } from "@/lib/db-ops/books";
+import { type BookInput, insertBook, updateBook } from "@/lib/db-ops/books";
 import { closeTestDb, withTx } from "../../helpers/db";
 
 afterAll(closeTestDb);
@@ -38,10 +38,13 @@ describe("insertBook", () => {
       // Pre-existing author should be reused, not duplicated.
       await tx.insert(authors).values({ name: "Existing Author" });
 
-      const id = await insertBook(tx, makeInput({
-        title: "My Book",
-        authorNames: ["Existing Author", "New Author"],
-      }));
+      const id = await insertBook(
+        tx,
+        makeInput({
+          title: "My Book",
+          authorNames: ["Existing Author", "New Author"],
+        }),
+      );
 
       const links = await tx.execute<{ name: string; is_wrestler: number | null }>(sql`
         SELECT a.name, a.is_wrestler
@@ -62,10 +65,13 @@ describe("insertBook", () => {
   it("flags new authors as wrestlers when requested", async () => {
     const result = await withTx(async (tx) => {
       await tx.insert(categories).values({ code: "x", label: "X" });
-      await insertBook(tx, makeInput({
-        authorNames: ["Wrestling Author"],
-        authorsAreWrestlers: true,
-      }));
+      await insertBook(
+        tx,
+        makeInput({
+          authorNames: ["Wrestling Author"],
+          authorsAreWrestlers: true,
+        }),
+      );
       const rows = await tx.execute<{ is_wrestler: number | null }>(
         sql`SELECT is_wrestler FROM authors WHERE name = 'Wrestling Author'`,
       );
@@ -79,15 +85,22 @@ describe("updateBook", () => {
   it("updates fields and re-syncs authors (removes ones not in the new list)", async () => {
     const result = await withTx(async (tx) => {
       await tx.insert(categories).values({ code: "x", label: "X" });
-      const id = await insertBook(tx, makeInput({
-        title: "Old Title",
-        authorNames: ["Alice", "Bob"],
-      }));
-      await updateBook(tx, id, makeInput({
-        title: "New Title",
-        confidence: "high",
-        authorNames: ["Bob", "Carol"],
-      }));
+      const id = await insertBook(
+        tx,
+        makeInput({
+          title: "Old Title",
+          authorNames: ["Alice", "Bob"],
+        }),
+      );
+      await updateBook(
+        tx,
+        id,
+        makeInput({
+          title: "New Title",
+          confidence: "high",
+          authorNames: ["Bob", "Carol"],
+        }),
+      );
       const book = await tx.execute<{ title: string; confidence: string | null }>(
         sql`SELECT title, confidence FROM books WHERE id = ${id}`,
       );

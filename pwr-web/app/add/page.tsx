@@ -30,8 +30,8 @@ export default function AddIndex() {
       </section>
 
       <p className="dim small">
-        Tip: you can also link directly from any wrestler or territory page to add a run
-        pre-filled with that record.
+        Tip: you can also link directly from any wrestler or territory page to add a run pre-filled
+        with that record.
       </p>
     </>
   );

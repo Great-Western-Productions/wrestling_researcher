@@ -1,8 +1,8 @@
 import { sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import * as schema from "@/lib/db/schema";
-import { confidenceLevel, type Confidence } from "@/lib/db/schema";
 import { getCheckbox, getInt, getStr } from "@/lib/actions/_helpers";
+import type * as schema from "@/lib/db/schema";
+import { type Confidence, confidenceLevel } from "@/lib/db/schema";
 
 type Db = PostgresJsDatabase<typeof schema>;
 
@@ -97,6 +97,21 @@ async function syncBookAuthors(
   }
 }
 
+export async function findBookByTitleYear(
+  db: Db,
+  title: string,
+  year: number | null,
+): Promise<{ id: number; title: string; year_published: number | null } | null> {
+  const rows = await db.execute<{ id: number; title: string; year_published: number | null }>(sql`
+    SELECT id, title, year_published
+      FROM books
+     WHERE LOWER(title) = LOWER(${title})
+       AND COALESCE(year_published, 0) = COALESCE(${year}, 0)
+     LIMIT 1
+  `);
+  return rows[0] ?? null;
+}
+
 /** Insert a new book with its authors. Returns the new book id. */
 export async function insertBook(db: Db, input: BookInput): Promise<number> {
   return db.transaction(async (tx) => {
@@ -139,3 +154,8 @@ export async function updateBook(db: Db, bookId: number, input: BookInput): Prom
     await syncBookAuthors(tx, bookId, input.authorNames, input.authorsAreWrestlers);
   });
 }
+
+// mergeBooks lives at @/lib/db-ops/merge — single source of truth for book
+// merging, called by both the HTTP server-action `mergeBookAction` and by the
+// MCP `pwr.books.merge` registry entry.
+export { mergeBooks } from "./merge";

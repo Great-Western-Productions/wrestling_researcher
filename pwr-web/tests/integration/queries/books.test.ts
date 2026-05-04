@@ -1,10 +1,6 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { authors, book_authors, books, categories } from "@/lib/db/schema";
-import {
-  authorsForBook,
-  getBookById,
-  listBooks,
-} from "@/lib/queries/books";
+import { authorsForBook, getBookById, listBooks } from "@/lib/queries/books";
 import { closeTestDb, withTx } from "../../helpers/db";
 
 afterAll(closeTestDb);
@@ -150,8 +146,6 @@ describe("authorsForBook", () => {
       const { books: inserted } = await seedBooks(tx);
       return authorsForBook(tx, inserted[0]!.id);
     });
-    expect(result).toEqual([
-      expect.objectContaining({ name: "Alice", role: "author" }),
-    ]);
+    expect(result).toEqual([expect.objectContaining({ name: "Alice", role: "author" })]);
   });
 });

@@ -1,8 +1,8 @@
 import { sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import * as schema from "@/lib/db/schema";
-import { confidenceLevel, type Confidence } from "@/lib/db/schema";
 import { getCheckbox, getInt, getStr } from "@/lib/actions/_helpers";
+import type * as schema from "@/lib/db/schema";
+import { type Confidence, confidenceLevel } from "@/lib/db/schema";
 import { ValidationError } from "./books";
 
 const CONFIDENCE_VALUES = new Set<string>(confidenceLevel.enumValues);

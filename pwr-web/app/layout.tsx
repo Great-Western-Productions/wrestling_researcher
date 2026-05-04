@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { auth } from "@/auth";
 import { Masthead } from "@/components/Masthead";
 import "./globals.css";
 
@@ -7,7 +8,12 @@ export const metadata: Metadata = {
   description: "Personal pro-wrestling research archive",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+  const user = session?.user
+    ? { email: session.user.email ?? null, name: session.user.name ?? null }
+    : null;
+
   return (
     <html lang="en">
       <head>
@@ -20,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href="/style.css" />
       </head>
       <body>
-        <Masthead />
+        <Masthead user={user} />
         <main>{children}</main>
         <footer>
           <small>Pro Wrestling Researcher · Local Postgres Archive</small>

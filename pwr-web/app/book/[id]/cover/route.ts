@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
+import { resolveCoverUrl } from "@/lib/covers";
 import { db } from "@/lib/db/client";
 import { getBookById } from "@/lib/queries/books";
-import { resolveCoverUrl } from "@/lib/covers";
 
-export async function GET(
-  req: Request,
-  ctx: { params: Promise<{ id: string }> },
-) {
+export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
   const bookId = Number.parseInt(id, 10);
   const placeholder = new URL("/cover-placeholder.svg", req.url);

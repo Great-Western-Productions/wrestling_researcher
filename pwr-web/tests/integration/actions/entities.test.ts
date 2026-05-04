@@ -1,5 +1,5 @@
-import { afterAll, describe, expect, it } from "vitest";
 import { sql } from "drizzle-orm";
+import { afterAll, describe, expect, it } from "vitest";
 import {
   pending_wrestlers,
   periodical_issues,
@@ -10,9 +10,9 @@ import {
   wrestlers,
 } from "@/lib/db/schema";
 import { insertPeriodical } from "@/lib/db-ops/periodicals";
+import { insertRun } from "@/lib/db-ops/runs";
 import { insertTerritory } from "@/lib/db-ops/territories";
 import { insertWrestler } from "@/lib/db-ops/wrestlers";
-import { insertRun } from "@/lib/db-ops/runs";
 import { closeTestDb, withTx } from "../../helpers/db";
 
 afterAll(closeTestDb);
@@ -86,6 +86,9 @@ describe("insertWrestler", () => {
         midcard_files_priority: null,
         why_they_mattered: null,
         notes: null,
+        height_inches: null,
+        weight_lbs: null,
+        bio: null,
         fromPending: null,
       }),
     );
@@ -95,10 +98,7 @@ describe("insertWrestler", () => {
 
   it("when promoting from pending, links pending row + backfills ranking_entries", async () => {
     const result = await withTx(async (tx) => {
-      const [periodical] = await tx
-        .insert(periodicals)
-        .values({ title: "PWI" })
-        .returning();
+      const [periodical] = await tx.insert(periodicals).values({ title: "PWI" }).returning();
       const [issue] = await tx
         .insert(periodical_issues)
         .values({ periodical_id: periodical!.id, publication_date: "1985-07-01" })
@@ -157,6 +157,9 @@ describe("insertWrestler", () => {
         midcard_files_priority: null,
         why_they_mattered: null,
         notes: null,
+        height_inches: null,
+        weight_lbs: null,
+        bio: null,
         fromPending: pending!.id,
       });
 
@@ -166,7 +169,9 @@ describe("insertWrestler", () => {
       const entries = await tx.execute<{
         wrestler_id: number | null;
         pending_wrestler_id: number | null;
-      }>(sql`SELECT wrestler_id, pending_wrestler_id FROM ranking_entries WHERE ranking_list_id = ${list!.id}`);
+      }>(
+        sql`SELECT wrestler_id, pending_wrestler_id FROM ranking_entries WHERE ranking_list_id = ${list!.id}`,
+      );
 
       return { created, resolved: reloadedPending[0]?.resolved_wrestler_id, entries: [...entries] };
     });

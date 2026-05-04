@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db/client";
-import { listPending, type PendingFilters } from "@/lib/queries/pending";
 import { buildQueryString } from "@/lib/format";
+import { listPending, type PendingFilters } from "@/lib/queries/pending";
 
 export const dynamic = "force-dynamic";
 
@@ -37,13 +37,19 @@ export default async function PendingPage({ searchParams }: { searchParams: Sear
     <>
       <h1>Pending wrestlers</h1>
       <p className="subtitle">
-        Names from PWI rankings (and other ingested sources) not yet linked to a curated
-        wrestler. Merge into an existing record or promote to a new one.
+        Names from PWI rankings (and other ingested sources) not yet linked to a curated wrestler.
+        Merge into an existing record or promote to a new one.
       </p>
 
       <div
         className="filters"
-        style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap", marginBottom: "1rem" }}
+        style={{
+          display: "flex",
+          gap: "1rem",
+          alignItems: "center",
+          flexWrap: "wrap",
+          marginBottom: "1rem",
+        }}
       >
         <form
           action="/pending"
@@ -74,12 +80,8 @@ export default async function PendingPage({ searchParams }: { searchParams: Sear
               className={`btn-pill${filters.show === s ? " active" : ""}`}
             >
               {s.charAt(0).toUpperCase() + s.slice(1)}
-              {s === "open" && (
-                <span className="dim small"> ({result.counts.open})</span>
-              )}
-              {s === "merged" && (
-                <span className="dim small"> ({result.counts.merged})</span>
-              )}
+              {s === "open" && <span className="dim small"> ({result.counts.open})</span>}
+              {s === "merged" && <span className="dim small"> ({result.counts.merged})</span>}
             </Link>
           ))}
         </div>

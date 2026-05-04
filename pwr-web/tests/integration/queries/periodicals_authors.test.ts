@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { authors, book_authors, books, categories, periodicals } from "@/lib/db/schema";
-import { listPeriodicals } from "@/lib/queries/periodicals";
 import { booksForAuthor, getAuthorById } from "@/lib/queries/authors";
+import { listPeriodicals } from "@/lib/queries/periodicals";
 import { closeTestDb, withTx } from "../../helpers/db";
 
 afterAll(closeTestDb);

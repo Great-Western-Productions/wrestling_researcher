@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { db } from "@/lib/db/client";
-import { listBooks, type BookFilters } from "@/lib/queries/books";
-import { CATEGORIES, categoryLabel, ifnull, buildQueryString } from "@/lib/format";
 import { mergeBookAction } from "@/lib/actions/merge";
+import { db } from "@/lib/db/client";
+import { buildQueryString, CATEGORIES, categoryLabel, ifnull } from "@/lib/format";
+import { type BookFilters, listBooks } from "@/lib/queries/books";
 
 export const dynamic = "force-dynamic";
 
@@ -63,7 +63,12 @@ export default async function BooksPage({ searchParams }: { searchParams: Search
       <h1>Books</h1>
 
       <form className="filters" action="/books" method="get">
-        <input type="text" name="q" defaultValue={filters.q ?? ""} placeholder="Search title or author" />
+        <input
+          type="text"
+          name="q"
+          defaultValue={filters.q ?? ""}
+          placeholder="Search title or author"
+        />
 
         <select name="cat" defaultValue={filters.cat ?? ""}>
           <option value="">All categories</option>
@@ -175,18 +180,16 @@ export default async function BooksPage({ searchParams }: { searchParams: Search
               </td>
               <td>{ifnull(b.country)}</td>
               <td>
-                <span className={`conf ${b.confidence ?? ""}`}>
-                  {b.confidence ?? "—"}
-                </span>
+                <span className={`conf ${b.confidence ?? ""}`}>{b.confidence ?? "—"}</span>
               </td>
               {result.items.length > 1 && (
                 <td className="merge-cell">
-                  <form
-                    className="inline-merge"
-                    action={mergeBookAction.bind(null, b.id)}
-                  >
+                  <form className="inline-merge" action={mergeBookAction.bind(null, b.id)}>
                     <input type="hidden" name="next" value="/books" />
-                    <select name="duplicate_book_id" aria-label={`Duplicate book to merge into ${b.title}`}>
+                    <select
+                      name="duplicate_book_id"
+                      aria-label={`Duplicate book to merge into ${b.title}`}
+                    >
                       <option value="">Merge duplicate...</option>
                       {result.items
                         .filter((c) => c.book.id !== b.id)

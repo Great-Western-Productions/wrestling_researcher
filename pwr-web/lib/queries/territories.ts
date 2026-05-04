@@ -1,6 +1,6 @@
-import { sql, type SQL } from "drizzle-orm";
+import { type SQL, sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import * as schema from "@/lib/db/schema";
+import type * as schema from "@/lib/db/schema";
 import type { BookRow } from "./books";
 
 type Db = PostgresJsDatabase<typeof schema>;
@@ -68,9 +68,7 @@ export async function listTerritories(
 }
 
 export async function getTerritoryById(db: Db, id: number): Promise<TerritoryRow | null> {
-  const rows = await db.execute<TerritoryRow>(
-    sql`SELECT * FROM territories WHERE id = ${id}`,
-  );
+  const rows = await db.execute<TerritoryRow>(sql`SELECT * FROM territories WHERE id = ${id}`);
   return rows[0] ?? null;
 }
 

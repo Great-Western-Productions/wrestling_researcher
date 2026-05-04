@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db/client";
+import { ifnull } from "@/lib/format";
 import {
   getTerritoryById,
   relatedBooksForTerritory,
   runsForTerritory,
 } from "@/lib/queries/territories";
-import { ifnull } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -53,11 +53,7 @@ export default async function TerritoryDetail({ params }: Props) {
             </tr>
             <tr>
               <th>Active</th>
-              <td>
-                {t.year_founded
-                  ? `${t.year_founded}–${t.year_closed ?? "present"}`
-                  : "—"}
-              </td>
+              <td>{t.year_founded ? `${t.year_founded}–${t.year_closed ?? "present"}` : "—"}</td>
             </tr>
             <tr>
               <th>Promoter lineage</th>

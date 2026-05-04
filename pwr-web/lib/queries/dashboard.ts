@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import * as schema from "@/lib/db/schema";
+import type * as schema from "@/lib/db/schema";
 import type { Confidence } from "@/lib/db/schema";
 
 type Db = PostgresJsDatabase<typeof schema>;
@@ -30,9 +30,7 @@ export async function getDashboardCounts(db: Db): Promise<DashboardCounts> {
     db.execute<{ n: number }>(sql`SELECT COUNT(*)::int AS n FROM books`),
     db.execute<{ n: number }>(sql`SELECT COUNT(*)::int AS n FROM periodicals`),
     db.execute<{ n: number }>(sql`SELECT COUNT(*)::int AS n FROM authors`),
-    db.execute<{ n: number }>(
-      sql`SELECT COUNT(*)::int AS n FROM authors WHERE is_wrestler = true`,
-    ),
+    db.execute<{ n: number }>(sql`SELECT COUNT(*)::int AS n FROM authors WHERE is_wrestler = true`),
     db.execute<{ n: number }>(sql`SELECT COUNT(*)::int AS n FROM territories`),
     db.execute<{ n: number }>(sql`SELECT COUNT(*)::int AS n FROM wrestlers`),
     db.execute<{ category_code: string; n: number }>(
@@ -114,10 +112,7 @@ export type FeaturedTerritory = {
   runCount: number;
 };
 
-export async function getFeaturedTerritories(
-  db: Db,
-  limit: number,
-): Promise<FeaturedTerritory[]> {
+export async function getFeaturedTerritories(db: Db, limit: number): Promise<FeaturedTerritory[]> {
   const rows = await db.execute<{
     id: number;
     name: string;

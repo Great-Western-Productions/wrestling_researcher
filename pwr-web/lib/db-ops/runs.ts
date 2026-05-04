@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import * as schema from "@/lib/db/schema";
 import { getCheckbox, getInt, getStr } from "@/lib/actions/_helpers";
+import type * as schema from "@/lib/db/schema";
 import { ValidationError } from "./books";
 
 type Db = PostgresJsDatabase<typeof schema>;

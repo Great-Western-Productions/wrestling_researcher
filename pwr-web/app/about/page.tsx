@@ -1,6 +1,6 @@
 import { db } from "@/lib/db/client";
-import { getAboutCounts } from "@/lib/queries/about";
 import { ifnull } from "@/lib/format";
+import { getAboutCounts } from "@/lib/queries/about";
 
 export const dynamic = "force-dynamic";
 
@@ -13,11 +13,10 @@ export default async function AboutPage() {
       <h1>About</h1>
 
       <p>
-        Pro Wrestling Researcher is a local browser over a Postgres-backed archive of pro
-        wrestling literature, periodicals, territories, wrestlers, factions, and ranking
-        lists. Records are seeded from curated sources, then enriched against public
-        catalogs (Open Library, Google Books, Library of Congress, the Internet Archive,
-        and Cagematch).
+        Pro Wrestling Researcher is a local browser over a Postgres-backed archive of pro wrestling
+        literature, periodicals, territories, wrestlers, factions, and ranking lists. Records are
+        seeded from curated sources, then enriched against public catalogs (Open Library, Google
+        Books, Library of Congress, the Internet Archive, and Cagematch).
       </p>
 
       <h2>Archive contents</h2>
@@ -76,8 +75,7 @@ export default async function AboutPage() {
           <strong>About wrestling</strong>
         </dt>
         <dd>
-          Histories, business and cultural studies, encyclopedias, photo books, reference
-          works.
+          Histories, business and cultural studies, encyclopedias, photo books, reference works.
         </dd>
         <dt>
           <strong>About wrestlers</strong>
@@ -86,10 +84,7 @@ export default async function AboutPage() {
         <dt>
           <strong>By wrestlers</strong>
         </dt>
-        <dd>
-          Autobiographies, memoirs, instructionals, books written or co-written by
-          wrestlers.
-        </dd>
+        <dd>Autobiographies, memoirs, instructionals, books written or co-written by wrestlers.</dd>
         <dt>
           <strong>Fiction</strong>
         </dt>
@@ -106,8 +101,7 @@ export default async function AboutPage() {
           <span className="conf medium">medium</span> &nbsp; {c.byConfidence.medium ?? 0} books
         </dt>
         <dd>
-          Single-source attribution from Open Library or Google Books — generally
-          trustworthy.
+          Single-source attribution from Open Library or Google Books — generally trustworthy.
         </dd>
         <dt>
           <span className="conf medium_search">medium_search</span> &nbsp;{" "}
@@ -120,23 +114,18 @@ export default async function AboutPage() {
         <dt>
           <span className="conf low">low</span> &nbsp; {c.byConfidence.low ?? 0} books
         </dt>
-        <dd>
-          Title-only entries — confirmed real books but author / year / ISBN need
-          enrichment.
-        </dd>
+        <dd>Title-only entries — confirmed real books but author / year / ISBN need enrichment.</dd>
         <dt>
           <span className="conf low_searched">low_searched</span> &nbsp;{" "}
           {c.byConfidence.low_searched ?? 0} books
         </dt>
-        <dd>
-          Searched all sources and matched nothing wrestling-related; needs manual review.
-        </dd>
+        <dd>Searched all sources and matched nothing wrestling-related; needs manual review.</dd>
       </dl>
 
       <h2>Local-only</h2>
       <p>
-        This app has add forms but no authentication. Run it on <code>127.0.0.1</code> only —
-        don't expose it.
+        This app has add forms but no authentication. Run it on <code>127.0.0.1</code> only — don't
+        expose it.
       </p>
     </>
   );

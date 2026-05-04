@@ -1,6 +1,6 @@
-import { sql, type SQL } from "drizzle-orm";
+import { type SQL, sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import * as schema from "@/lib/db/schema";
+import type * as schema from "@/lib/db/schema";
 import type { BookRow } from "./books";
 
 type Db = PostgresJsDatabase<typeof schema>;
@@ -28,6 +28,9 @@ export type WrestlerRow = {
   midcard_files_priority: number | null;
   why_they_mattered: string | null;
   notes: string | null;
+  height_inches: number | null;
+  weight_lbs: number | null;
+  bio: string | null;
   cagematch_id: string | null;
   cagematch_url: string | null;
   created_at: string | null;
@@ -57,10 +60,7 @@ const SORT_MAP: Record<NonNullable<WrestlerFilters["sort"]>, SQL> = {
   priority: sql`w.midcard_files_priority NULLS LAST, w.primary_ring_name`,
 };
 
-export async function listWrestlers(
-  db: Db,
-  filters: WrestlerFilters,
-): Promise<WrestlerListResult> {
+export async function listWrestlers(db: Db, filters: WrestlerFilters): Promise<WrestlerListResult> {
   const sort = filters.sort ?? "name";
 
   const conds: SQL[] = [];
@@ -107,9 +107,7 @@ export async function listWrestlers(
 }
 
 export async function getWrestlerById(db: Db, id: number): Promise<WrestlerRow | null> {
-  const rows = await db.execute<WrestlerRow>(
-    sql`SELECT * FROM wrestlers WHERE id = ${id}`,
-  );
+  const rows = await db.execute<WrestlerRow>(sql`SELECT * FROM wrestlers WHERE id = ${id}`);
   return rows[0] ?? null;
 }
 
@@ -138,6 +136,30 @@ export async function runsForWrestler(db: Db, wrestlerId: number): Promise<Wrest
       JOIN territories t ON t.id = r.territory_id
      WHERE r.wrestler_id = ${wrestlerId}
      ORDER BY r.start_year NULLS LAST
+  `);
+  return [...rows];
+}
+
+export type WrestlerCitation = {
+  id: number;
+  page: string | null;
+  excerpt: string | null;
+  book_id: number;
+  book_title: string;
+  book_year: number | null;
+};
+
+export async function citationsForWrestler(
+  db: Db,
+  wrestlerId: number,
+): Promise<WrestlerCitation[]> {
+  const rows = await db.execute<WrestlerCitation>(sql`
+    SELECT c.id, c.page, c.excerpt,
+           b.id AS book_id, b.title AS book_title, b.year_published AS book_year
+      FROM wrestler_book_citations c
+      JOIN books b ON b.id = c.book_id
+     WHERE c.wrestler_id = ${wrestlerId}
+     ORDER BY b.year_published NULLS LAST, b.title
   `);
   return [...rows];
 }

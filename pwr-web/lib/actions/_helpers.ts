@@ -10,13 +10,11 @@ export const optStr = z
     return t.length > 0 ? t : null;
   });
 
-export const optInt = z
-  .union([z.string(), z.number(), z.null(), z.undefined()])
-  .transform((v) => {
-    if (v === null || v === undefined || v === "") return null;
-    const n = typeof v === "number" ? v : Number.parseInt(String(v).trim(), 10);
-    return Number.isFinite(n) ? n : null;
-  });
+export const optInt = z.union([z.string(), z.number(), z.null(), z.undefined()]).transform((v) => {
+  if (v === null || v === undefined || v === "") return null;
+  const n = typeof v === "number" ? v : Number.parseInt(String(v).trim(), 10);
+  return Number.isFinite(n) ? n : null;
+});
 
 export const checkbox = z
   .union([z.string(), z.boolean(), z.null(), z.undefined()])

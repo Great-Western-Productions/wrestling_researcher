@@ -66,9 +66,7 @@ describe("resolveCoverUrl", () => {
       fetchImpl: fetchImpl as unknown as typeof fetch,
       googleApiToken: "test-key",
     });
-    expect(result).toBe(
-      "https://covers.openlibrary.org/b/isbn/9780000000000-L.jpg?default=false",
-    );
+    expect(result).toBe("https://covers.openlibrary.org/b/isbn/9780000000000-L.jpg?default=false");
   });
 
   it("returns null when both sources miss", async () => {

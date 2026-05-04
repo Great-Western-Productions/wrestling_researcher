@@ -1,14 +1,16 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { requireSessionOrThrow } from "@/lib/auth/require-session";
 import { db } from "@/lib/db/client";
 import { insertPeriodical, parsePeriodicalInput } from "@/lib/db-ops/periodicals";
+import { insertRun, parseRunInput } from "@/lib/db-ops/runs";
 import { insertTerritory, parseTerritoryInput } from "@/lib/db-ops/territories";
 import { insertWrestler, parseWrestlerInput } from "@/lib/db-ops/wrestlers";
-import { insertRun, parseRunInput } from "@/lib/db-ops/runs";
 
 export async function createPeriodicalAction(formData: FormData) {
+  await requireSessionOrThrow();
   const input = parsePeriodicalInput(formData);
   await insertPeriodical(db, input);
   revalidatePath("/periodicals");
@@ -16,6 +18,7 @@ export async function createPeriodicalAction(formData: FormData) {
 }
 
 export async function createTerritoryAction(formData: FormData) {
+  await requireSessionOrThrow();
   const input = parseTerritoryInput(formData);
   const id = await insertTerritory(db, input);
   revalidatePath("/territories");
@@ -24,6 +27,7 @@ export async function createTerritoryAction(formData: FormData) {
 }
 
 export async function createWrestlerAction(formData: FormData) {
+  await requireSessionOrThrow();
   const input = parseWrestlerInput(formData);
   const result = await insertWrestler(db, input);
   revalidatePath("/wrestlers");
@@ -36,6 +40,7 @@ export async function createWrestlerAction(formData: FormData) {
 }
 
 export async function createRunAction(formData: FormData) {
+  await requireSessionOrThrow();
   const input = parseRunInput(formData);
   await insertRun(db, input);
   revalidatePath(`/wrestler/${input.wrestler_id}`);

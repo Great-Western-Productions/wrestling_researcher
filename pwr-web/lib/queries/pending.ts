@@ -1,6 +1,6 @@
-import { sql, type SQL } from "drizzle-orm";
+import { type SQL, sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import * as schema from "@/lib/db/schema";
+import type * as schema from "@/lib/db/schema";
 
 type Db = PostgresJsDatabase<typeof schema>;
 
@@ -34,10 +34,7 @@ export type PendingListResult = {
   counts: { open: number; merged: number };
 };
 
-export async function listPending(
-  db: Db,
-  filters: PendingFilters,
-): Promise<PendingListResult> {
+export async function listPending(db: Db, filters: PendingFilters): Promise<PendingListResult> {
   const perPage = filters.perPage ?? 50;
   const page = Math.max(1, filters.page ?? 1);
   const show = filters.show ?? "open";
@@ -107,10 +104,7 @@ export type PendingDetail = PendingRow & {
   allWrestlers: Array<{ id: number; primary_ring_name: string }>;
 };
 
-export async function getPendingDetail(
-  db: Db,
-  pid: number,
-): Promise<PendingDetail | null> {
+export async function getPendingDetail(db: Db, pid: number): Promise<PendingDetail | null> {
   const headRows = await db.execute<PendingRow>(
     sql`SELECT * FROM v_pending_wrestlers_queue WHERE id = ${pid}`,
   );
@@ -121,9 +115,7 @@ export async function getPendingDetail(
     id: number;
     normalized_name: string | null;
     notes: string | null;
-  }>(
-    sql`SELECT id, normalized_name, notes FROM pending_wrestlers WHERE id = ${pid}`,
-  );
+  }>(sql`SELECT id, normalized_name, notes FROM pending_wrestlers WHERE id = ${pid}`);
   const raw = rawRows[0]!;
 
   const samples = await db.execute<{

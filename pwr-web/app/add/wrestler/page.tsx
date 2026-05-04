@@ -1,10 +1,7 @@
 import Link from "next/link";
-import { db } from "@/lib/db/client";
-import {
-  getPendingNamePrefill,
-  getWrestlerFormOptions,
-} from "@/lib/db-ops/wrestlers";
 import { createWrestlerAction } from "@/lib/actions/entities";
+import { db } from "@/lib/db/client";
+import { getPendingNamePrefill, getWrestlerFormOptions } from "@/lib/db-ops/wrestlers";
 
 export const dynamic = "force-dynamic";
 
@@ -40,16 +37,13 @@ export default async function AddWrestlerPage({ searchParams }: { searchParams: 
 
       {fromPending && (
         <p className="dim small">
-          Promoting pending wrestler{" "}
-          <Link href={`/pending/${fromPending}`}>#{fromPending}</Link>. On save, every
-          ranking entry referencing this name will be backfilled to the new wrestler.
+          Promoting pending wrestler <Link href={`/pending/${fromPending}`}>#{fromPending}</Link>.
+          On save, every ranking entry referencing this name will be backfilled to the new wrestler.
         </p>
       )}
 
       <form className="add-form" action={createWrestlerAction}>
-        {fromPending && (
-          <input type="hidden" name="from_pending" value={fromPending} />
-        )}
+        {fromPending && <input type="hidden" name="from_pending" value={fromPending} />}
         <div className="form-row">
           <label>
             Primary ring name <span className="req">*</span>
@@ -129,12 +123,25 @@ export default async function AddWrestlerPage({ searchParams }: { searchParams: 
 
         <div className="form-row">
           <label>
-            Style
+            Height (inches)
             <input
-              type="text"
-              name="style"
-              placeholder="brawler, technical, lucha, comedy…"
+              type="number"
+              name="height_inches"
+              min="36"
+              max="96"
+              placeholder="73 = 6'1&quot;"
             />
+          </label>
+          <label>
+            Weight (lbs)
+            <input type="number" name="weight_lbs" min="50" max="800" />
+          </label>
+        </div>
+
+        <div className="form-row">
+          <label>
+            Style
+            <input type="text" name="style" placeholder="brawler, technical, lucha, comedy…" />
           </label>
           <label>
             Finisher
@@ -182,6 +189,11 @@ export default async function AddWrestlerPage({ searchParams }: { searchParams: 
             <input type="number" name="midcard_files_priority" min="1" max="5" />
           </label>
         </div>
+
+        <label>
+          Bio (long-form, sourced narrative)
+          <textarea name="bio" rows={6} />
+        </label>
 
         <label>
           Why they mattered

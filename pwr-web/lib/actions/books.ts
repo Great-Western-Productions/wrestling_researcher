@@ -1,11 +1,13 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { requireSessionOrThrow } from "@/lib/auth/require-session";
 import { db } from "@/lib/db/client";
 import { insertBook, parseBookInput, updateBook } from "@/lib/db-ops/books";
 
 export async function createBookAction(formData: FormData) {
+  await requireSessionOrThrow();
   const input = parseBookInput(formData);
   const id = await insertBook(db, input);
   revalidatePath("/books");
@@ -14,6 +16,7 @@ export async function createBookAction(formData: FormData) {
 }
 
 export async function updateBookAction(bookId: number, formData: FormData) {
+  await requireSessionOrThrow();
   const input = parseBookInput(formData);
   await updateBook(db, bookId, input);
   revalidatePath("/books");

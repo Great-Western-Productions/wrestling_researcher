@@ -104,6 +104,32 @@ main {
   color: var(--burgundy);
 }
 .topnav a.add-link.active { padding-bottom: 14px; margin-bottom: -16px; }
+.topnav .signin-link { color: var(--burgundy); }
+.topnav .signout-form {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .55rem;
+}
+.topnav .signed-in-as {
+  font-weight: 500;
+  font-size: .9rem;
+  color: #555;
+  max-width: 14ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.topnav .signout-btn {
+  font: inherit;
+  font-weight: 600;
+  color: var(--burgundy);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+.topnav .signout-btn:hover { color: #000; }
 
 /* Decorative flourish + dot caps on the rule */
 .rule-flourish {
