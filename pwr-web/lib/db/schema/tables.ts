@@ -1284,3 +1284,23 @@ export const territory_market_runs = pgTable(
     ),
   ],
 );
+
+// Created by migration 0006_territory_markets. Declared here because anything
+// present in the database but absent from this file reads to drizzle-kit as an
+// object to remove: push proposed DROP VIEW on every diff, and would have taken
+// the view with it. The eight views above are declared for the same reason.
+export const v_territory_year_markets = pgView("v_territory_year_markets", {
+  territory_id: integer(),
+  territory_name: text(),
+  year: integer(),
+  market_id: integer(),
+  market_name: text(),
+  state: text(),
+  country: text(),
+  lat: doublePrecision(),
+  lon: doublePrecision(),
+  tier: marketTier(),
+  confidence: confidenceLevel(),
+}).as(
+  sql`SELECT r.territory_id, t.name AS territory_name, g.year, r.market_id, m.name AS market_name, m.state, m.country, m.lat, m.lon, r.tier, r.confidence FROM territory_market_runs r JOIN territories t ON t.id = r.territory_id JOIN markets m ON m.id = r.market_id CROSS JOIN LATERAL generate_series(r.from_year, COALESCE(r.to_year, EXTRACT(YEAR FROM CURRENT_DATE)::integer)) AS g(year)`,
+);
