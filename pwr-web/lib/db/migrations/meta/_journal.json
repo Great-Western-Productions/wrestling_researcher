@@ -43,6 +43,13 @@
       "when": 1778544000000,
       "tag": "0005_auth",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1785196800000,
+      "tag": "0007_restore_mcp_audit_log",
+      "breakpoints": true
     }
   ]
 }
