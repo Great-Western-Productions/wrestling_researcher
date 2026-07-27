@@ -163,14 +163,22 @@ export async function executeCode(db: Db, opts: ExecuteOptions): Promise<Execute
     runError = err as Error;
   }
 
-  await writeAuditLog(db, {
-    code: opts.code,
-    dryRun: !!opts.dryRun,
-    durationMs: Date.now() - startTs,
-    status: runError ? "error" : "success",
-    rpcCalls: runResult?.rpcCalls ?? [],
-    errorMessage: runError?.message ?? null,
-  });
+  // Audit logging is best-effort. If the write fails (missing table, dropped
+  // connection), the sandbox has already done its work, so swallow the failure
+  // rather than discarding a good result or masking the sandbox's own error.
+  // stderr is the safe channel: the MCP server speaks JSON-RPC over stdout.
+  try {
+    await writeAuditLog(db, {
+      code: opts.code,
+      dryRun: !!opts.dryRun,
+      durationMs: Date.now() - startTs,
+      status: runError ? "error" : "success",
+      rpcCalls: runResult?.rpcCalls ?? [],
+      errorMessage: runError?.message ?? null,
+    });
+  } catch (auditError) {
+    console.error("[mcp] mcp_audit_log write failed:", (auditError as Error).message);
+  }
 
   if (runError) throw runError;
   return {

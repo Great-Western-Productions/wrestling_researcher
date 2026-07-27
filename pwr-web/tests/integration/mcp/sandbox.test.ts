@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 import { executeCode } from "@/mcp/sandbox/host";
 import { closeTestDb, withTx } from "../../helpers/db";
 
@@ -121,6 +121,39 @@ describe("executeCode (Code Mode sandbox)", () => {
       );
       expect(rows[0]!.result_status).toBe("error");
       expect(rows[0]!.error_message).toContain("boom");
+    });
+  });
+
+  // The test container always migrates from 0000 forward, so mcp_audit_log is
+  // never missing here on its own. The long-lived local database had drifted
+  // without it, which turned every execute_code call into a failure after the
+  // user's code had already run. Dropping the table reproduces that state.
+  it("returns the sandbox result even when the audit write fails", async () => {
+    await withTx(async (tx) => {
+      await tx.execute(sql`DROP TABLE mcp_audit_log`);
+      const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+      try {
+        const result = await executeCode(tx, { code: "return 1 + 41;" });
+        expect(result.returnValue).toBe(42);
+        expect(logged).toHaveBeenCalledWith(
+          "[mcp] mcp_audit_log write failed:",
+          expect.stringContaining("mcp_audit_log"),
+        );
+      } finally {
+        logged.mockRestore();
+      }
+    });
+  });
+
+  it("still surfaces the sandbox error when the audit write also fails", async () => {
+    await withTx(async (tx) => {
+      await tx.execute(sql`DROP TABLE mcp_audit_log`);
+      const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+      try {
+        await expect(executeCode(tx, { code: "throw new Error('boom');" })).rejects.toThrow(/boom/);
+      } finally {
+        logged.mockRestore();
+      }
     });
   });
 
