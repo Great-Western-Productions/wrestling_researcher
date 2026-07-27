@@ -4,6 +4,7 @@ import {
   boolean,
   check,
   date,
+  doublePrecision,
   foreignKey,
   index,
   integer,
@@ -26,6 +27,9 @@ export const confidenceLevel = pgEnum("confidence_level", [
   "high",
 ]);
 export type Confidence = (typeof confidenceLevel.enumValues)[number];
+
+export const marketTier = pgEnum("market_tier", ["Primary", "Secondary", "Tertiary"]);
+export type MarketTier = (typeof marketTier.enumValues)[number];
 
 export const reign_participants = pgTable(
   "reign_participants",
@@ -330,6 +334,7 @@ CASE
     WHEN ((cagematch_id IS NOT NULL) AND (cagematch_id <> ''::text)) THEN ('https://www.cagematch.net/?id=8&nr='::text || cagematch_id)
     ELSE NULL::text
 END`),
+    map_color: text(),
   },
   (table) => [
     index("idx_territories_cm").using("btree", table.cagematch_id.asc().nullsLast()),
@@ -1104,5 +1109,178 @@ export const auth_verification_token = pgTable(
   },
   (table) => [
     primaryKey({ columns: [table.identifier, table.token], name: "auth_verification_token_pkey" }),
+  ],
+);
+
+// A town, independent of who ran it or when. Chicago is one row that both the
+// AWA and the St. Louis office point at.
+//
+// state is NOT NULL because Postgres treats NULLs as distinct, so a nullable
+// column in the uniqueness key would let duplicate cities through.
+export const markets = pgTable(
+  "markets",
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity({
+      name: "markets_id_seq",
+      startWith: 1,
+      increment: 1,
+      minValue: 1,
+      maxValue: 2147483647,
+      cache: 1,
+    }),
+    name: text().notNull(),
+    state: text().notNull(),
+    country: text().default("US").notNull(),
+    lat: doublePrecision(),
+    lon: doublePrecision(),
+    notes: text(),
+    created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+    updated_at: timestamp({ withTimezone: true }),
+  },
+  (table) => [
+    index("idx_markets_country").using("btree", table.country.asc().nullsLast()),
+    index("idx_markets_state").using("btree", table.state.asc().nullsLast()),
+    uniqueIndex("markets_name_state_country_key").using(
+      "btree",
+      table.name.asc().nullsLast(),
+      table.state.asc().nullsLast(),
+      table.country.asc().nullsLast(),
+    ),
+  ],
+);
+
+// A stretch during which a promotion held one identity and one footprint.
+// Detroit under Harry Light, then Barnett-Doyle from 1959, then the Sheik from
+// 1964 is three rows against one territory, instead of three territories.
+//
+// to_year NULL means open-ended.
+export const territory_eras = pgTable(
+  "territory_eras",
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity({
+      name: "territory_eras_id_seq",
+      startWith: 1,
+      increment: 1,
+      minValue: 1,
+      maxValue: 2147483647,
+      cache: 1,
+    }),
+    territory_id: integer().notNull(),
+    from_year: integer().notNull(),
+    from_month: integer(),
+    to_year: integer(),
+    to_month: integer(),
+    states: text().array(),
+    nwa_member: boolean(),
+    promotion_name: text(),
+    promoter: text(),
+    confidence: confidenceLevel().default("medium"),
+    source_id: integer(),
+    notes: text(),
+    created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+    updated_at: timestamp({ withTimezone: true }),
+  },
+  (table) => [
+    index("idx_territory_eras_territory").using("btree", table.territory_id.asc().nullsLast()),
+    index("idx_territory_eras_span").using(
+      "btree",
+      table.from_year.asc().nullsLast(),
+      table.to_year.asc().nullsLast(),
+    ),
+    uniqueIndex("territory_eras_territory_from_key").using(
+      "btree",
+      table.territory_id.asc().nullsLast(),
+      table.from_year.asc().nullsLast(),
+    ),
+    foreignKey({
+      columns: [table.territory_id],
+      foreignColumns: [territories.id],
+      name: "territory_eras_fk_0",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.source_id],
+      foreignColumns: [research_sources.id],
+      name: "territory_eras_fk_1",
+    }).onDelete("set null"),
+    check(
+      "territory_eras_year_check",
+      sql`from_year BETWEEN 1880 AND 2100 AND (to_year IS NULL OR to_year BETWEEN 1880 AND 2100)`,
+    ),
+    check("territory_eras_order_check", sql`to_year IS NULL OR to_year >= from_year`),
+    check(
+      "territory_eras_month_check",
+      sql`(from_month IS NULL OR from_month BETWEEN 1 AND 12) AND (to_month IS NULL OR to_month BETWEEN 1 AND 12)`,
+    ),
+  ],
+);
+
+// Which towns a promotion ran, over what stretch, and how big each was to
+// them. This is the table the research fills.
+//
+// A town dropped and picked back up is two rows. A tier change is two rows.
+// The same market under two territories in one year is how the map draws a
+// split dot over a town two offices both ran.
+export const territory_market_runs = pgTable(
+  "territory_market_runs",
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity({
+      name: "territory_market_runs_id_seq",
+      startWith: 1,
+      increment: 1,
+      minValue: 1,
+      maxValue: 2147483647,
+      cache: 1,
+    }),
+    territory_id: integer().notNull(),
+    market_id: integer().notNull(),
+    from_year: integer().notNull(),
+    from_month: integer(),
+    to_year: integer(),
+    to_month: integer(),
+    tier: marketTier().default("Secondary"),
+    confidence: confidenceLevel().default("medium"),
+    source_id: integer(),
+    notes: text(),
+    created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+    updated_at: timestamp({ withTimezone: true }),
+  },
+  (table) => [
+    index("idx_tmr_market").using("btree", table.market_id.asc().nullsLast()),
+    index("idx_tmr_territory").using("btree", table.territory_id.asc().nullsLast()),
+    index("idx_tmr_span").using(
+      "btree",
+      table.from_year.asc().nullsLast(),
+      table.to_year.asc().nullsLast(),
+    ),
+    uniqueIndex("territory_market_runs_key").using(
+      "btree",
+      table.territory_id.asc().nullsLast(),
+      table.market_id.asc().nullsLast(),
+      table.from_year.asc().nullsLast(),
+    ),
+    foreignKey({
+      columns: [table.territory_id],
+      foreignColumns: [territories.id],
+      name: "territory_market_runs_fk_0",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.market_id],
+      foreignColumns: [markets.id],
+      name: "territory_market_runs_fk_1",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.source_id],
+      foreignColumns: [research_sources.id],
+      name: "territory_market_runs_fk_2",
+    }).onDelete("set null"),
+    check(
+      "territory_market_runs_year_check",
+      sql`from_year BETWEEN 1880 AND 2100 AND (to_year IS NULL OR to_year BETWEEN 1880 AND 2100)`,
+    ),
+    check("territory_market_runs_order_check", sql`to_year IS NULL OR to_year >= from_year`),
+    check(
+      "territory_market_runs_month_check",
+      sql`(from_month IS NULL OR from_month BETWEEN 1 AND 12) AND (to_month IS NULL OR to_month BETWEEN 1 AND 12)`,
+    ),
   ],
 );

@@ -7,6 +7,7 @@ import {
   faction_members,
   factions,
   issue_cover_subjects,
+  markets,
   pending_wrestlers,
   periodical_issues,
   periodicals,
@@ -14,7 +15,10 @@ import {
   ranking_lists,
   reign_participants,
   reigns,
+  research_sources,
   territories,
+  territory_eras,
+  territory_market_runs,
   title_aliases,
   titles,
   wrestler_book_citations,
@@ -106,6 +110,8 @@ export const territoriesRelations = relations(territories, ({ many }) => ({
   ranking_lists: many(ranking_lists),
   wrestler_territory_runs: many(wrestler_territory_runs),
   titles: many(titles),
+  territory_eras: many(territory_eras),
+  territory_market_runs: many(territory_market_runs),
 }));
 
 export const issue_cover_subjectsRelations = relations(issue_cover_subjects, ({ one }) => ({
@@ -215,4 +221,34 @@ export const book_authorsRelations = relations(book_authors, ({ one }) => ({
 
 export const authorsRelations = relations(authors, ({ many }) => ({
   book_authors: many(book_authors),
+}));
+
+export const marketsRelations = relations(markets, ({ many }) => ({
+  territory_market_runs: many(territory_market_runs),
+}));
+
+export const territory_erasRelations = relations(territory_eras, ({ one }) => ({
+  territory: one(territories, {
+    fields: [territory_eras.territory_id],
+    references: [territories.id],
+  }),
+  source: one(research_sources, {
+    fields: [territory_eras.source_id],
+    references: [research_sources.id],
+  }),
+}));
+
+export const territory_market_runsRelations = relations(territory_market_runs, ({ one }) => ({
+  territory: one(territories, {
+    fields: [territory_market_runs.territory_id],
+    references: [territories.id],
+  }),
+  market: one(markets, {
+    fields: [territory_market_runs.market_id],
+    references: [markets.id],
+  }),
+  source: one(research_sources, {
+    fields: [territory_market_runs.source_id],
+    references: [research_sources.id],
+  }),
 }));
