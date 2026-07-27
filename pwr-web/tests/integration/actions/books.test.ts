@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
-import { authors, book_authors, books, categories } from "@/lib/db/schema";
+import { authors, categories } from "@/lib/db/schema";
 import { type BookInput, insertBook, updateBook } from "@/lib/db-ops/books";
 import { closeTestDb, withTx } from "../../helpers/db";
 

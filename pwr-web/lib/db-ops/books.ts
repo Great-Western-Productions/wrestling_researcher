@@ -87,7 +87,7 @@ async function syncBookAuthors(
       const created = await tx.execute<{ id: number }>(
         sql`INSERT INTO authors (name, is_wrestler) VALUES (${name}, ${authorsAreWrestlers}) RETURNING id`,
       );
-      aid = created[0]!.id;
+      aid = created[0].id;
     }
     await tx.execute(sql`
       INSERT INTO book_authors (book_id, author_id, role)
@@ -128,7 +128,7 @@ export async function insertBook(db: Db, input: BookInput): Promise<number> {
               ${input.confidence})
       RETURNING id
     `);
-    const bookId = inserted[0]!.id;
+    const bookId = inserted[0].id;
     await syncBookAuthors(tx, bookId, input.authorNames, input.authorsAreWrestlers);
     return bookId;
   });

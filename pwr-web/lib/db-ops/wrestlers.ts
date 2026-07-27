@@ -94,7 +94,7 @@ export async function insertWrestler(db: Db, input: WrestlerInput): Promise<Inse
               ${input.height_inches}, ${input.weight_lbs}, ${input.bio})
       RETURNING id
     `);
-    const id = inserted[0]!.id;
+    const id = inserted[0].id;
 
     let rankingEntriesBackfilled = 0;
     if (input.fromPending) {
@@ -197,7 +197,7 @@ export async function addCitation(
       SET excerpt = COALESCE(wrestler_book_citations.excerpt, EXCLUDED.excerpt)
     RETURNING id, (xmax = 0) AS created
   `);
-  return rows[0]!;
+  return rows[0];
 }
 
 export async function findOrCreateRun(
@@ -234,7 +234,7 @@ export async function findOrCreateRun(
             ${input.ring_name_during_run}, ${input.primary_run}, ${input.notes})
     RETURNING id
   `);
-  return { id: inserted[0]!.id, created: true };
+  return { id: inserted[0].id, created: true };
 }
 
 export async function getWrestlerFormOptions(db: Db): Promise<{
@@ -438,7 +438,7 @@ export async function findDuplicateCandidates(
     .map((r) => ({
       id: r.id,
       primary_ring_name: r.primary_ring_name,
-      score: fuzzy(target[0]!.primary_ring_name, r.primary_ring_name),
+      score: fuzzy(target[0].primary_ring_name, r.primary_ring_name),
     }))
     .filter((r) => r.score >= threshold)
     .sort((a, b) => b.score - a.score)

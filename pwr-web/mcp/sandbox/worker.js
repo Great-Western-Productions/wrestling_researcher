@@ -88,8 +88,8 @@ parentPort.on("message", async (msg) => {
     } catch (err) {
       parentPort.postMessage({
         type: "throw",
-        message: err && err.message ? String(err.message) : String(err),
-        stack: err && err.stack ? String(err.stack) : undefined,
+        message: err?.message ? String(err.message) : String(err),
+        stack: err?.stack ? String(err.stack) : undefined,
         stdout: stdout.join("\n"),
         stderr: stderr.join("\n"),
       });

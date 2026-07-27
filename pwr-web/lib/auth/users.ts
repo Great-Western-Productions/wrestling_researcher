@@ -45,7 +45,7 @@ export async function createUser(
       VALUES (${id}, ${email}, ${password_hash}, ${input.name ?? null})
       RETURNING id, email, name, image
     `);
-    return rowToUser(rows[0]!);
+    return rowToUser(rows[0]);
   } catch (err) {
     const e = err as { code?: string; cause?: { code?: string }; message?: string };
     const code = e.code ?? e.cause?.code;
@@ -87,7 +87,7 @@ export async function verifyUserPassword(
      LIMIT 1
   `);
   const row = rows[0];
-  if (!row || !row.password_hash) return null;
+  if (!row?.password_hash) return null;
   if (!(await verifyPassword(password, row.password_hash))) return null;
   return rowToUser(row);
 }

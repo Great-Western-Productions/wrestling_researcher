@@ -14,5 +14,14 @@
   },
   "javascript": {
     "formatter": { "quoteStyle": "double", "trailingCommas": "all", "semicolons": "always" }
-  }
+  },
+  "overrides": [
+    {
+      // Tests reach into `.returning()` rows and `.find()` results constantly. A wrong
+      // assertion there throws and fails the test, which is the outcome we want anyway,
+      // so the guard clauses the rule asks for would only add noise.
+      "includes": ["tests/**"],
+      "linter": { "rules": { "style": { "noNonNullAssertion": "off" } } }
+    }
+  ]
 }

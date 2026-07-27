@@ -1,9 +1,9 @@
 import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
-import path from "node:path";
 import os from "node:os";
+import path from "node:path";
+import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 
@@ -15,10 +15,13 @@ async function ocrSinglePage(opts: {
   const pngBase = path.join(opts.tmpDir, `p${String(opts.page).padStart(3, "0")}`);
   await execFileAsync("pdftoppm", [
     "-png",
-    "-r", "300",
+    "-r",
+    "300",
     "-gray",
-    "-f", String(opts.page),
-    "-l", String(opts.page),
+    "-f",
+    String(opts.page),
+    "-l",
+    String(opts.page),
     "-singlefile",
     opts.pdfPath,
     pngBase,
@@ -70,7 +73,6 @@ export async function ocrPdf(opts: {
 
   try {
     let cursor = 0;
-    let done = 0;
     const workers = Array.from({ length: Math.min(concurrency, total) }, async () => {
       while (true) {
         const idx = cursor++;
@@ -78,7 +80,6 @@ export async function ocrPdf(opts: {
         const page = firstPage + idx;
         const text = await ocrSinglePage({ pdfPath, page, tmpDir: tmp });
         results[idx] = `<<<PAGE ${page}>>>\n${text}`;
-        done++;
         opts.onProgress?.({ page, total, elapsedMs: Date.now() - startTs });
       }
     });

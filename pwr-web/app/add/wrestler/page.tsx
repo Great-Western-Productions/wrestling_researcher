@@ -51,6 +51,7 @@ export default async function AddWrestlerPage({ searchParams }: { searchParams: 
               type="text"
               name="primary_ring_name"
               required
+              // biome-ignore lint/a11y/noAutofocus: this page exists only to fill in this form, so focusing its first field is the expected landing behavior
               autoFocus
               defaultValue={prefillName ?? ""}
             />

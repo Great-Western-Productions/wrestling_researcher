@@ -57,7 +57,7 @@ export async function promotePending(db: Db, pendingId: number): Promise<Promote
       VALUES (${rows[0].printed_name}, 'queued')
       RETURNING id
     `);
-    const newId = inserted[0]!.id;
+    const newId = inserted[0].id;
     const r = await mergePendingIntoWrestler(tx, pendingId, newId);
     return {
       pendingId,

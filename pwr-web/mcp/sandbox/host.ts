@@ -181,12 +181,13 @@ export async function executeCode(db: Db, opts: ExecuteOptions): Promise<Execute
   }
 
   if (runError) throw runError;
+  if (!runResult) throw new Error("Sandbox run finished without an error or a result.");
   return {
-    returnValue: runResult!.returnValue,
-    stdout: runResult!.stdout,
-    stderr: runResult!.stderr,
-    durationMs: runResult!.durationMs,
-    rpcCalls: runResult!.rpcCalls,
+    returnValue: runResult.returnValue,
+    stdout: runResult.stdout,
+    stderr: runResult.stderr,
+    durationMs: runResult.durationMs,
+    rpcCalls: runResult.rpcCalls,
     rolledBack: !!opts.dryRun,
   };
 }

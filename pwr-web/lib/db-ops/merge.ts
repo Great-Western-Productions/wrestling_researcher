@@ -46,11 +46,11 @@ export async function mergeBooks(
     const both = await tx.execute<Record<string, unknown> & { id: number }>(
       sql`SELECT * FROM books WHERE id IN (${targetBookId}, ${duplicateBookId})`,
     );
-    if (both.length !== 2) {
+    const target = both.find((r) => r.id === targetBookId);
+    const duplicate = both.find((r) => r.id === duplicateBookId);
+    if (!target || !duplicate) {
       throw new ValidationError("Both books must exist before they can be merged.");
     }
-    const target = both.find((r) => r.id === targetBookId)!;
-    const duplicate = both.find((r) => r.id === duplicateBookId)!;
 
     // Move author links from duplicate to target (skipping ones target already has).
     await tx.execute(sql`
@@ -115,8 +115,8 @@ export async function mergePendingIntoWrestler(
 
     return {
       rankingEntriesBackfilled: updated[0]?.count ?? 0,
-      pendingPrintedName: pendings[0]!.printed_name,
-      wrestlerName: wrestlers[0]!.primary_ring_name,
+      pendingPrintedName: pendings[0].printed_name,
+      wrestlerName: wrestlers[0].primary_ring_name,
     };
   });
 }
@@ -136,7 +136,7 @@ export async function unmergePendingFromWrestler(
         FROM pending_wrestlers WHERE id = ${pendingId}
     `);
     const head = rows[0];
-    if (!head || !head.resolved_wrestler_id) {
+    if (!head?.resolved_wrestler_id) {
       throw new ValidationError("Nothing to undo.");
     }
     const wid = head.resolved_wrestler_id;

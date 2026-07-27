@@ -163,8 +163,8 @@ export default async function PendingDetailPage({ params }: Props) {
           </tr>
         </thead>
         <tbody>
-          {p.samples.map((s, i) => (
-            <tr key={i}>
+          {p.samples.map((s) => (
+            <tr key={s.entry_id}>
               <td>
                 {s.publication_date}
                 {s.issue_number && <span className="dim small"> ({s.issue_number})</span>}

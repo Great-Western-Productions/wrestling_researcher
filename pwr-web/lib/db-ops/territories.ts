@@ -46,7 +46,7 @@ export async function insertTerritory(db: Db, input: TerritoryInput): Promise<nu
             ${input.year_closed}, ${input.promoter_lineage}, ${input.notes})
     RETURNING id
   `);
-  return rows[0]!.id;
+  return rows[0].id;
 }
 
 export async function getTerritoryRegions(db: Db): Promise<string[]> {
@@ -126,6 +126,6 @@ export async function upsertTerritoryByCagematch(
               ${input.year_founded}, ${input.year_closed}, ${input.notes})
       RETURNING id
     `);
-    return { status: "inserted", id: inserted[0]!.id };
+    return { status: "inserted", id: inserted[0].id };
   });
 }

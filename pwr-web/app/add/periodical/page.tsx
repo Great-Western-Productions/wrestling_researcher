@@ -20,6 +20,7 @@ export default async function AddPeriodicalPage() {
         <div className="form-row">
           <label>
             Title <span className="req">*</span>
+            {/* biome-ignore lint/a11y/noAutofocus: this page exists only to fill in this form, so focusing its first field is the expected landing behavior */}
             <input type="text" name="title" required autoFocus />
           </label>
           <label>
