@@ -154,6 +154,8 @@ export default async function WrestlerDetail({ params }: Props) {
           <div className="synopsis">
             <h2>Bio</h2>
             {w.bio.split(/\n\n+/).map((para, i) => (
+              // Paragraph text is the only other candidate key, and it can repeat.
+              // biome-ignore lint/suspicious/noArrayIndexKey: split from one immutable string in a server component, so the list never reorders and the rows hold no state
               <p key={i}>{para}</p>
             ))}
           </div>

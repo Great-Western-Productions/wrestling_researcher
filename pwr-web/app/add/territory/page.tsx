@@ -19,6 +19,7 @@ export default async function AddTerritoryPage() {
         <div className="form-row">
           <label>
             Name <span className="req">*</span>
+            {/* biome-ignore lint/a11y/noAutofocus: this page exists only to fill in this form, so focusing its first field is the expected landing behavior */}
             <input type="text" name="name" required autoFocus />
           </label>
           <label>

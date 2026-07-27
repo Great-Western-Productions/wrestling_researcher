@@ -4,7 +4,6 @@ import {
   book_authors,
   books,
   categories,
-  periodicals,
   territories,
   wrestler_territory_runs,
   wrestlers,

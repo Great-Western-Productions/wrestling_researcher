@@ -215,7 +215,7 @@ function extractLabels(lines: string[]): { values: Record<string, string>; bioSt
       }
     }
     if (current && ln.trim()) {
-      values[current] = (values[current] + " " + ln.trim()).trim();
+      values[current] = `${values[current]} ${ln.trim()}`.trim();
     }
   }
 
@@ -241,7 +241,7 @@ function pullInt(values: Record<string, string>, label: LabelName): number | nul
 function pullAgeBorn(values: Record<string, string>): { age: number | null; born: string | null } {
   const v = values.Age ?? "";
   const ageMatch = v.match(/(\d+)/);
-  const bornMatch = v.match(/born\s+([0-9]{1,2}[\/\\][0-9]{1,2}[\/\\][0-9]{2,4})/i);
+  const bornMatch = v.match(/born\s+([0-9]{1,2}[/\\][0-9]{1,2}[/\\][0-9]{2,4})/i);
   return {
     age: ageMatch ? Number.parseInt(ageMatch[1], 10) : null,
     born: bornMatch ? parseBornDate(bornMatch[1].replace(/\\/g, "/")) : null,
@@ -446,13 +446,11 @@ export function parseEntryBlock(
   const realName = valueOrNull(values["Real name"]);
   const { age, born } = pullAgeBorn(values);
   const yearsPro = pullInt(values, "Years pro");
-  const hometownRaw = valueOrNull(values["Hometown"]);
+  const hometownRaw = valueOrNull(values.Hometown);
   const promo = valueOrNull(values["Promotional affiliation"]);
   const otherRingNames = valueOrNull(values["Other ring names"]);
 
-  const { billed, real } = hometownRaw
-    ? parseHometown(hometownRaw)
-    : { billed: null, real: null };
+  const { billed, real } = hometownRaw ? parseHometown(hometownRaw) : { billed: null, real: null };
 
   // Cross-check born vs. age: if both present, age should be ≈ 1986 - bornYear.
   if (born && age) {
@@ -465,7 +463,8 @@ export function parseEntryBlock(
 
   // Sanity ranges
   if (heightFt < 3 || heightFt > 8) warnings.push(`unusual_height_ft:${heightFt}`);
-  if (heightInPart.inches < 0 || heightInPart.inches > 11) warnings.push(`unusual_height_in:${heightInPart.inches}`);
+  if (heightInPart.inches < 0 || heightInPart.inches > 11)
+    warnings.push(`unusual_height_in:${heightInPart.inches}`);
   if (weight < 80 || weight > 800) warnings.push(`unusual_weight:${weight}`);
 
   return {

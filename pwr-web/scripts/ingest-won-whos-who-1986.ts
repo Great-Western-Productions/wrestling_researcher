@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+
 /**
  * Ingest *The Wrestling Observer's Who's Who in Pro Wrestling* (Dave Meltzer, 1986)
  * into the local Wrestling Researcher app via its HTTP API.
@@ -21,10 +22,10 @@
  *   --concurrency <n>  Parallel HTTP requests (default: 4)
  */
 
-import { parseArgs } from "node:util";
-import path from "node:path";
-import os from "node:os";
 import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { parseArgs } from "node:util";
 import { wrestlerCreateSchema } from "@/lib/api/schemas";
 import { ocrPdf } from "./won1986/ocr";
 import { type ParsedEntry, parseCorpus } from "./won1986/parser";
@@ -51,7 +52,10 @@ const { values } = parseArgs({
 
 const PDF_PATH =
   values.pdf ?? path.join(os.homedir(), "Downloads/WON Who_s Who In Pro Wrestling (1986).pdf");
-const BASE_URL = (values["base-url"] ?? "http://wrestling-researcher.local:5150").replace(/\/$/, "");
+const BASE_URL = (values["base-url"] ?? "http://wrestling-researcher.local:5150").replace(
+  /\/$/,
+  "",
+);
 const FIRST_PAGE = Number.parseInt(values["first-page"] ?? "13", 10);
 const LAST_PAGE = Number.parseInt(values["last-page"] ?? "146", 10);
 const LIMIT = values.limit ? Number.parseInt(values.limit, 10) : Number.POSITIVE_INFINITY;
@@ -70,23 +74,31 @@ const WARN_LOG = path.join(OUT_DIR, "won_1986_warnings.log");
 
 type Json = Record<string, unknown> | unknown[] | null;
 
-async function http(
+type IdBody = { id: number };
+
+async function http<T = unknown>(
   method: string,
   url: string,
   body?: Json,
-): Promise<{ status: number; data: any }> {
+): Promise<{ status: number; data: T | null }> {
   const res = await fetch(url, {
     method,
     headers: body ? { "content-type": "application/json" } : undefined,
     body: body ? JSON.stringify(body) : undefined,
   });
-  let data: any = null;
+  let data: T | null = null;
   try {
-    data = await res.json();
+    data = (await res.json()) as T;
   } catch {
     /* empty body is fine for some 4xx */
   }
   return { status: res.status, data };
+}
+
+/** Every endpoint used here answers a success with `{ id }`. Anything else is a bug, so stop. */
+function requireId(res: { status: number; data: IdBody | null }, what: string): number {
+  if (!res.data) throw new Error(`${what} returned ${res.status} with no JSON body`);
+  return res.data.id;
 }
 
 async function findOrCreateBook(): Promise<number> {
@@ -94,30 +106,34 @@ async function findOrCreateBook(): Promise<number> {
     title: "The Wrestling Observer's Who's Who in Pro Wrestling",
     year: "1986",
   });
-  const found = await http("GET", `${BASE_URL}/api/books?${params}`);
-  if (found.status === 200) return found.data.id;
-  const created = await http("POST", `${BASE_URL}/api/books`, {
+  const found = await http<IdBody>("GET", `${BASE_URL}/api/books?${params}`);
+  if (found.status === 200) return requireId(found, "GET /api/books");
+  const created = await http<IdBody>("POST", `${BASE_URL}/api/books`, {
     title: "The Wrestling Observer's Who's Who in Pro Wrestling",
     category_code: "reference",
     publisher: "Wrestling Observer Newsletter",
     year_published: 1986,
     country: "USA",
     language: "English",
-    synopsis:
-      "Annual reference book by Dave Meltzer profiling active pro wrestlers as of 11/1/86.",
+    synopsis: "Annual reference book by Dave Meltzer profiling active pro wrestlers as of 11/1/86.",
     source_url: null,
   });
   if (created.status >= 400) {
-    throw new Error(`Failed to create WON 1986 book: ${created.status} ${JSON.stringify(created.data)}`);
+    throw new Error(
+      `Failed to create WON 1986 book: ${created.status} ${JSON.stringify(created.data)}`,
+    );
   }
-  return created.data.id;
+  return requireId(created, "POST /api/books");
 }
 
 const territoryCache = new Map<string, number | null>();
 async function lookupTerritory(name: string): Promise<number | null> {
   if (territoryCache.has(name)) return territoryCache.get(name) ?? null;
-  const res = await http("GET", `${BASE_URL}/api/territories?name=${encodeURIComponent(name)}`);
-  const id = res.status === 200 ? (res.data.id as number) : null;
+  const res = await http<IdBody>(
+    "GET",
+    `${BASE_URL}/api/territories?name=${encodeURIComponent(name)}`,
+  );
+  const id = res.status === 200 ? (res.data?.id ?? null) : null;
   territoryCache.set(name, id);
   return id;
 }
@@ -127,19 +143,25 @@ async function findOrCreateWrestler(payload: Record<string, unknown>): Promise<{
   created: boolean;
 }> {
   const ringName = payload.primary_ring_name as string;
-  const found = await http("GET", `${BASE_URL}/api/wrestlers?ring_name=${encodeURIComponent(ringName)}`);
+  const found = await http<IdBody>(
+    "GET",
+    `${BASE_URL}/api/wrestlers?ring_name=${encodeURIComponent(ringName)}`,
+  );
   if (found.status === 200) {
+    const id = requireId(found, `GET /api/wrestlers?ring_name=${ringName}`);
     const patchBody = { ...payload };
     delete (patchBody as Record<string, unknown>).primary_ring_name;
     delete (patchBody as Record<string, unknown>).midcard_files_status;
-    await http("PATCH", `${BASE_URL}/api/wrestlers/${found.data.id}`, patchBody);
-    return { id: found.data.id, created: false };
+    await http("PATCH", `${BASE_URL}/api/wrestlers/${id}`, patchBody);
+    return { id, created: false };
   }
-  const created = await http("POST", `${BASE_URL}/api/wrestlers`, payload);
+  const created = await http<IdBody>("POST", `${BASE_URL}/api/wrestlers`, payload);
   if (created.status >= 400) {
-    throw new Error(`Failed to create wrestler ${ringName}: ${created.status} ${JSON.stringify(created.data)}`);
+    throw new Error(
+      `Failed to create wrestler ${ringName}: ${created.status} ${JSON.stringify(created.data)}`,
+    );
   }
-  return { id: created.data.id, created: true };
+  return { id: requireId(created, "POST /api/wrestlers"), created: true };
 }
 
 // ---------------------------------------------------------------------------
@@ -170,7 +192,11 @@ function buildPayload(entry: ParsedEntry, role: "wrestler" | "manager" | "valet"
 // Concurrency-limited map
 // ---------------------------------------------------------------------------
 
-async function pMap<T, R>(items: T[], n: number, fn: (item: T, i: number) => Promise<R>): Promise<R[]> {
+async function pMap<T, R>(
+  items: T[],
+  n: number,
+  fn: (item: T, i: number) => Promise<R>,
+): Promise<R[]> {
   const out: R[] = new Array(items.length);
   let cursor = 0;
   const workers = Array.from({ length: Math.min(n, items.length) }, async () => {
@@ -216,7 +242,7 @@ async function main() {
   if (Number.isFinite(LIMIT)) entries = entries.slice(0, LIMIT);
 
   // 3. Write JSONL + warnings (always)
-  const jsonl = entries.map((e) => JSON.stringify(e)).join("\n") + "\n";
+  const jsonl = `${entries.map((e) => JSON.stringify(e)).join("\n")}\n`;
   await fs.writeFile(PARSED_JSONL, jsonl, "utf8");
 
   const warnings: string[] = [];
@@ -225,7 +251,7 @@ async function main() {
       warnings.push(`p${e.source_page} ${e.primary_ring_name}: ${w}`);
     }
   }
-  await fs.writeFile(WARN_LOG, warnings.join("\n") + "\n", "utf8");
+  await fs.writeFile(WARN_LOG, `${warnings.join("\n")}\n`, "utf8");
   console.log(`[won-1986] Wrote ${PARSED_JSONL}`);
   console.log(`[won-1986] Wrote ${WARN_LOG} (${warnings.length} warnings)`);
 
@@ -244,9 +270,12 @@ async function main() {
   await pMap(entries, CONCURRENCY, async (entry, i) => {
     try {
       // Heuristic: anything found on page ≥ 140 is a manager/valet.
-      const role: "wrestler" | "manager" | "valet" = entry.source_page >= 140 ? "manager" : "wrestler";
+      const role: "wrestler" | "manager" | "valet" =
+        entry.source_page >= 140 ? "manager" : "wrestler";
       const payload = buildPayload(entry, role);
-      const { id, created } = await findOrCreateWrestler(payload as unknown as Record<string, unknown>);
+      const { id, created } = await findOrCreateWrestler(
+        payload as unknown as Record<string, unknown>,
+      );
       if (created) stats.created++;
       else stats.updated++;
 
@@ -298,7 +327,7 @@ async function main() {
   });
 
   // Re-write warnings (we appended during the run)
-  await fs.writeFile(WARN_LOG, warnings.join("\n") + "\n", "utf8");
+  await fs.writeFile(WARN_LOG, `${warnings.join("\n")}\n`, "utf8");
 
   console.log(`[won-1986] Done.`);
   console.log(

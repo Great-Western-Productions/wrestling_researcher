@@ -25,6 +25,7 @@ import {
 import { fuzzy, normalizeName } from "@/lib/dedup";
 
 type Db = PostgresJsDatabase<typeof schema>;
+// biome-ignore lint/suspicious/noExplicitAny: the registry below holds methods with unrelated parameter lists; `unknown[]` is checked contravariantly and rejects every one of them
 type Method = (db: Db, ...args: any[]) => Promise<unknown>;
 
 async function recentAudit(db: Db, limit = 20): Promise<unknown> {
@@ -81,4 +82,4 @@ export const REGISTRY: Record<string, Method> = {
     opts.table ? recent(db, opts.table, opts.limit) : recentAudit(db, opts.limit),
 };
 
-export const NAMESPACES = Array.from(new Set(Object.keys(REGISTRY).map((m) => m.split(".")[0]!)));
+export const NAMESPACES = Array.from(new Set(Object.keys(REGISTRY).map((m) => m.split(".")[0])));

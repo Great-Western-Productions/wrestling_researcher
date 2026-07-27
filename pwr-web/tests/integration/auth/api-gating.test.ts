@@ -1,7 +1,23 @@
+import { like } from "drizzle-orm";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { closeTestDb } from "../../helpers/db";
+import { wrestlers } from "@/lib/db/schema";
+import { closeTestDb, getTestDb } from "../../helpers/db";
 
-afterAll(closeTestDb);
+/** Every ring name this file writes starts with this, so cleanup can find them. */
+const RING_NAME_PREFIX = "Auth Gate";
+
+/**
+ * The 201 case goes through the real route handler, which writes with the app's
+ * own connection (`@/lib/db/client`) and commits, so `withTx` can't roll it back.
+ * Delete those rows here: `fileParallelism: false` means later integration files
+ * share this database, and several of them assert against an empty one.
+ */
+afterAll(async () => {
+  await getTestDb()
+    .delete(wrestlers)
+    .where(like(wrestlers.primary_ring_name, `${RING_NAME_PREFIX}%`));
+  await closeTestDb();
+});
 
 let currentSession: { user: { id: string; email: string } } | null = null;
 
@@ -28,7 +44,7 @@ async function postWrestler(body: unknown) {
 }
 
 const validWrestlerBody = {
-  primary_ring_name: "Auth Gate Test Wrestler",
+  primary_ring_name: `${RING_NAME_PREFIX} Test Wrestler`,
   legal_name: null,
   other_ring_names: null,
   born_date: null,
@@ -65,7 +81,7 @@ describe("POST /api/wrestlers gating", () => {
     currentSession = { user: { id: "u1", email: "u1@local.dev" } };
     const res = await postWrestler({
       ...validWrestlerBody,
-      primary_ring_name: `Auth Gate ${Date.now()}`,
+      primary_ring_name: `${RING_NAME_PREFIX} ${Date.now()}`,
     });
     expect(res.status).toBe(201);
   });

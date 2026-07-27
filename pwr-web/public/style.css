@@ -1,26 +1,31 @@
 /* Pro Wrestling Researcher — WFIA-style aged-paper / burgundy theme */
 
 :root {
-  --paper:         #f8f4e6;
-  --paper-soft:    #fefdf9;
-  --paper-warm:    #f1ebd6;
-  --ink:           #1a1a1a;
-  --ink-soft:      #3a3a3a;
-  --muted:         #666;
-  --burgundy:      #5a1f2e;
-  --burgundy-dk:   #4a1926;
-  --burgundy-lt:   #7a2a3e;
-  --border:        #d1cdc0;
-  --border-mid:    #b8b3a3;
+  --paper: #f8f4e6;
+  --paper-soft: #fefdf9;
+  --paper-warm: #f1ebd6;
+  --ink: #1a1a1a;
+  --ink-soft: #3a3a3a;
+  --muted: #666;
+  --burgundy: #5a1f2e;
+  --burgundy-dk: #4a1926;
+  --burgundy-lt: #7a2a3e;
+  --border: #d1cdc0;
+  --border-mid: #b8b3a3;
 
-  --rye:   "Rye", cursive;
-  --lora:  "Lora", Georgia, "Times New Roman", serif;
+  --rye: "Rye", cursive;
+  --lora: "Lora", Georgia, "Times New Roman", serif;
   --inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono:  ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
-* { box-sizing: border-box; }
-html, body { margin: 0; }
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+}
 
 body {
   font-family: var(--lora);
@@ -31,8 +36,15 @@ body {
   min-height: 100vh;
 }
 
-a { color: var(--burgundy); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
-a:hover { color: var(--burgundy-lt); }
+a {
+  color: var(--burgundy);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+a:hover {
+  color: var(--burgundy-lt);
+}
 
 main {
   max-width: 1200px;
@@ -60,13 +72,13 @@ main {
 .brand {
   display: flex;
   align-items: baseline;
-  gap: .9rem;
+  gap: 0.9rem;
   flex-shrink: 0;
 }
 .brand-mark {
   font-family: var(--rye);
   font-size: 2.6rem;
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
   line-height: 1;
   color: var(--ink);
 }
@@ -74,7 +86,7 @@ main {
   font-family: var(--lora);
   font-weight: 500;
   font-size: 1.05rem;
-  letter-spacing: .02em;
+  letter-spacing: 0.02em;
   color: var(--ink);
 }
 
@@ -93,7 +105,9 @@ main {
   text-decoration: none;
   padding-bottom: 1px;
 }
-.topnav a:hover { color: #000; }
+.topnav a:hover {
+  color: #000;
+}
 .topnav a.active {
   color: var(--burgundy);
   border-bottom: 2px solid var(--burgundy);
@@ -103,16 +117,21 @@ main {
 .topnav a.add-link {
   color: var(--burgundy);
 }
-.topnav a.add-link.active { padding-bottom: 14px; margin-bottom: -16px; }
-.topnav .signin-link { color: var(--burgundy); }
+.topnav a.add-link.active {
+  padding-bottom: 14px;
+  margin-bottom: -16px;
+}
+.topnav .signin-link {
+  color: var(--burgundy);
+}
 .topnav .signout-form {
   display: inline-flex;
   align-items: baseline;
-  gap: .55rem;
+  gap: 0.55rem;
 }
 .topnav .signed-in-as {
   font-weight: 500;
-  font-size: .9rem;
+  font-size: 0.9rem;
   color: #555;
   max-width: 14ch;
   overflow: hidden;
@@ -129,7 +148,9 @@ main {
   cursor: pointer;
   text-decoration: none;
 }
-.topnav .signout-btn:hover { color: #000; }
+.topnav .signout-btn:hover {
+  color: #000;
+}
 
 /* Decorative flourish + dot caps on the rule */
 .rule-flourish {
@@ -138,7 +159,7 @@ main {
   left: 50%;
   transform: translateX(-50%);
   background: var(--paper);
-  padding: 0 .6rem;
+  padding: 0 0.6rem;
   line-height: 0;
 }
 .rule-dot {
@@ -149,8 +170,12 @@ main {
   border-radius: 50%;
   background: var(--ink);
 }
-.rule-dot-l { left: 0; }
-.rule-dot-r { right: 0; }
+.rule-dot-l {
+  left: 0;
+}
+.rule-dot-r {
+  right: 0;
+}
 
 /* ============================================================
    PAGE TITLES — Rye with burgundy underline bar
@@ -160,7 +185,7 @@ h1 {
   font-weight: 400;
   color: var(--ink);
   font-size: clamp(2.5rem, 5vw, 4rem);
-  letter-spacing: .04em;
+  letter-spacing: 0.04em;
   line-height: 1.05;
   margin: 0 0 2rem;
   position: relative;
@@ -177,7 +202,10 @@ h1::after {
 }
 
 /* When h1 is inside a smaller context (book detail, etc), shrink it */
-.book-detail h1, .add-form h1 { font-size: clamp(1.85rem, 3.5vw, 2.6rem); }
+.book-detail h1,
+.add-form h1 {
+  font-size: clamp(1.85rem, 3.5vw, 2.6rem);
+}
 
 h2 {
   font-family: var(--lora);
@@ -185,11 +213,13 @@ h2 {
   font-size: 1.5rem;
   color: var(--ink);
   margin: 2rem 0 1rem;
-  padding-bottom: .35rem;
+  padding-bottom: 0.35rem;
   border-bottom: 2px solid var(--ink);
-  letter-spacing: .01em;
+  letter-spacing: 0.01em;
 }
-.col h2 { margin-top: 0; }
+.col h2 {
+  margin-top: 0;
+}
 
 /* ============================================================
    HERO (index intro)
@@ -197,7 +227,9 @@ h2 {
 .hero {
   margin-bottom: 2.5rem;
 }
-.hero h1 { margin-bottom: 1.25rem; }
+.hero h1 {
+  margin-bottom: 1.25rem;
+}
 .hero .subtitle {
   font-family: var(--lora);
   font-style: italic;
@@ -224,7 +256,9 @@ h2 {
   text-align: left;
   color: var(--ink);
   text-decoration: none;
-  transition: transform .12s ease, box-shadow .12s ease;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
   position: relative;
 }
 .card:hover {
@@ -237,62 +271,109 @@ h2 {
   font-size: 2.5rem;
   font-weight: 400;
   color: var(--burgundy);
-  letter-spacing: .02em;
+  letter-spacing: 0.02em;
   line-height: 1;
 }
 .card-label {
   font-family: var(--inter);
   text-transform: uppercase;
-  letter-spacing: .12em;
-  font-size: .82rem;
+  letter-spacing: 0.12em;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--ink);
-  margin-top: .55rem;
+  margin-top: 0.55rem;
 }
 
-.card.alt  { background: var(--paper-warm); }
-.card.terr { background: var(--paper-soft); border-left: 6px solid var(--burgundy); }
-.card.wr   { background: var(--paper-soft); border-left: 6px solid var(--ink); }
+.card.alt {
+  background: var(--paper-warm);
+}
+.card.terr {
+  background: var(--paper-soft);
+  border-left: 6px solid var(--burgundy);
+}
+.card.wr {
+  background: var(--paper-soft);
+  border-left: 6px solid var(--ink);
+}
 
-.card.mini { padding: 1rem 1.1rem; }
-.card.mini .card-count { font-size: 1.6rem; }
-.card-count.small { font-size: 1.6rem; }
-.subcards { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-bottom: 2rem; }
+.card.mini {
+  padding: 1rem 1.1rem;
+}
+.card.mini .card-count {
+  font-size: 1.6rem;
+}
+.card-count.small {
+  font-size: 1.6rem;
+}
+.subcards {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  margin-bottom: 2rem;
+}
 
 /* ============================================================
    COLUMNS / PANELS
    ============================================================ */
-section { margin-bottom: 2rem; }
+section {
+  margin-bottom: 2rem;
+}
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
   margin-bottom: 2rem;
 }
-@media (max-width: 720px) { .row { grid-template-columns: 1fr; } }
+@media (max-width: 720px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
 
 .col {
   background: transparent;
   border: 0;
   padding: 0;
 }
-.col + .col { /* nothing */ }
+.col + .col {
+  /* nothing */
+}
 
 /* ============================================================
    LISTS
    ============================================================ */
-.terr-list { list-style: none; padding: 0; margin: 0; }
+.terr-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 .terr-list li {
-  padding: .65rem 0;
+  padding: 0.65rem 0;
   border-bottom: 1px solid var(--border);
 }
-.terr-list li:last-child { border-bottom: 0; }
+.terr-list li:last-child {
+  border-bottom: 0;
+}
 
-.author-list { list-style: none; padding: 0; column-count: 2; column-gap: 2rem; }
-.author-list li { padding: .25rem 0; break-inside: avoid; }
-.author-list.compact { column-count: 1; }
-.author-list.compact li { padding: .3rem 0; }
-@media (max-width: 720px) { .author-list { column-count: 1; } }
+.author-list {
+  list-style: none;
+  padding: 0;
+  column-count: 2;
+  column-gap: 2rem;
+}
+.author-list li {
+  padding: 0.25rem 0;
+  break-inside: avoid;
+}
+.author-list.compact {
+  column-count: 1;
+}
+.author-list.compact li {
+  padding: 0.3rem 0;
+}
+@media (max-width: 720px) {
+  .author-list {
+    column-count: 1;
+  }
+}
 
 /* ============================================================
    FILTERS — inline aligned-end row
@@ -317,22 +398,27 @@ form.filters > label,
 form.filters > .check {
   display: flex;
   flex-direction: column;
-  gap: .35rem;
-  font-size: .92rem;
+  gap: 0.35rem;
+  font-size: 0.92rem;
   font-weight: 600;
   color: var(--ink);
   flex: 0 1 auto;
 }
-form.filters input[type=text] { flex: 1; min-width: 240px; }
-form.filters input[type=number] { width: 110px; }
+form.filters input[type="text"] {
+  flex: 1;
+  min-width: 240px;
+}
+form.filters input[type="number"] {
+  width: 110px;
+}
 form.filters input,
 form.filters select {
-  padding: .55rem .75rem;
+  padding: 0.55rem 0.75rem;
   border: 1px solid #888;
   border-radius: 2px;
   background: var(--paper-soft);
   color: var(--ink);
-  font-size: .95rem;
+  font-size: 0.95rem;
   font-weight: 400;
   height: 42px;
 }
@@ -340,7 +426,7 @@ form.filters input:focus,
 form.filters select:focus {
   outline: 0;
   border-color: var(--burgundy);
-  box-shadow: 0 0 0 2px rgba(90, 31, 46, .2);
+  box-shadow: 0 0 0 2px rgba(90, 31, 46, 0.2);
 }
 form.filters button {
   padding: 0 1.6rem;
@@ -351,50 +437,58 @@ form.filters button {
   border-radius: 2px;
   font-family: var(--inter);
   font-weight: 600;
-  font-size: .95rem;
+  font-size: 0.95rem;
   cursor: pointer;
-  letter-spacing: .03em;
+  letter-spacing: 0.03em;
   align-self: flex-end;
 }
-form.filters button:hover { background: var(--burgundy-dk); }
+form.filters button:hover {
+  background: var(--burgundy-dk);
+}
 form.filters .clear {
   align-self: flex-end;
-  padding: 0 .5rem;
+  padding: 0 0.5rem;
   height: 42px;
   display: inline-flex;
   align-items: center;
-  font-size: .9rem;
+  font-size: 0.9rem;
   color: var(--muted);
   text-decoration: underline;
 }
 .check {
   display: inline-flex;
   align-items: center;
-  gap: .45rem;
+  gap: 0.45rem;
   height: 42px;
-  font-size: .92rem;
+  font-size: 0.92rem;
   font-weight: 600;
 }
-.check input { width: auto; height: auto; }
+.check input {
+  width: auto;
+  height: auto;
+}
 
 .result-count {
   color: var(--ink-soft);
-  margin: .5rem 0 1.25rem;
+  margin: 0.5rem 0 1.25rem;
   font-style: italic;
-  font-size: .98rem;
+  font-size: 0.98rem;
   font-family: var(--lora);
 }
 
 /* ============================================================
    TABLES — newspaper rule, burgundy underlined links
    ============================================================ */
-table.mini, table.meta-table {
+table.mini,
+table.meta-table {
   width: 100%;
   border-collapse: collapse;
 }
-table.mini td, table.mini th,
-table.meta-table td, table.meta-table th {
-  padding: .5rem .65rem;
+table.mini td,
+table.mini th,
+table.meta-table td,
+table.meta-table th {
+  padding: 0.5rem 0.65rem;
   vertical-align: top;
   font-family: var(--lora);
 }
@@ -402,15 +496,19 @@ table.meta-table th {
   width: 170px;
   text-align: left;
   font-family: var(--inter);
-  font-size: .82rem;
+  font-size: 0.82rem;
   text-transform: uppercase;
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
   color: var(--muted);
   font-weight: 700;
 }
-table.meta-table tr { border-bottom: 1px solid var(--border); }
+table.meta-table tr {
+  border-bottom: 1px solid var(--border);
+}
 
-table.books, table.periodicals, table.territories-table {
+table.books,
+table.periodicals,
+table.territories-table {
   width: 100%;
   border-collapse: collapse;
   background: transparent;
@@ -426,7 +524,7 @@ table.territories-table thead tr {
 table.books th,
 table.periodicals th,
 table.territories-table th {
-  padding: .8rem .55rem;
+  padding: 0.8rem 0.55rem;
   text-align: left;
   font-family: var(--lora);
   font-weight: 700;
@@ -439,7 +537,7 @@ table.territories-table th {
 table.books td,
 table.periodicals td,
 table.territories-table td {
-  padding: 1rem .55rem;
+  padding: 1rem 0.55rem;
   text-align: left;
   vertical-align: top;
   border-bottom: 1px solid var(--ink);
@@ -448,80 +546,141 @@ table.territories-table td {
 table.books tbody tr:hover,
 table.periodicals tbody tr:hover,
 table.territories-table tbody tr:hover {
-  background: rgba(90, 31, 46, .04);
+  background: rgba(90, 31, 46, 0.04);
 }
-table.books td.title, table.territories-table td.title { max-width: 420px; }
-table.books a, table.periodicals a, table.territories-table a {
+table.books td.title,
+table.territories-table td.title {
+  max-width: 420px;
+}
+table.books a,
+table.periodicals a,
+table.territories-table a {
   color: var(--burgundy);
   text-decoration: underline;
 }
-table.books a:hover, table.periodicals a:hover, table.territories-table a:hover {
+table.books a:hover,
+table.periodicals a:hover,
+table.territories-table a:hover {
   color: var(--burgundy-lt);
 }
 
-.merge-cell { min-width: 260px; }
+.merge-cell {
+  min-width: 260px;
+}
 .inline-merge {
   display: flex;
-  gap: .45rem;
+  gap: 0.45rem;
   align-items: center;
   font-family: var(--inter);
 }
 .inline-merge select {
   max-width: 180px;
   height: 34px;
-  padding: .35rem .5rem;
+  padding: 0.35rem 0.5rem;
   border: 1px solid #888;
   border-radius: 2px;
   background: var(--paper-soft);
   color: var(--ink);
   font-family: var(--inter);
-  font-size: .82rem;
+  font-size: 0.82rem;
 }
 .inline-merge button {
   height: 34px;
-  padding: 0 .75rem;
+  padding: 0 0.75rem;
   border: 1px solid var(--burgundy);
   border-radius: 2px;
   background: var(--burgundy);
   color: #fff;
   font-family: var(--inter);
-  font-size: .78rem;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
 }
-.inline-merge button:hover { background: var(--burgundy-dk); }
+.inline-merge button:hover {
+  background: var(--burgundy-dk);
+}
 
 /* ============================================================
    TAGS / BADGES — small, lora, low-weight pills
    ============================================================ */
-.cat-tag, .conf, .tag {
+.cat-tag,
+.conf,
+.tag {
   display: inline-block;
   font-family: var(--inter);
-  font-size: .7rem;
-  padding: .2rem .55rem;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 2px;
   font-weight: 600;
-  letter-spacing: .06em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   border: 1px solid transparent;
   vertical-align: 2px;
 }
-.cat-tag.about_wrestling { background: var(--paper-soft); color: var(--ink);     border-color: var(--ink); }
-.cat-tag.about_wrestler  { background: var(--paper-soft); color: var(--burgundy); border-color: var(--burgundy); }
-.cat-tag.by_wrestler     { background: var(--burgundy);   color: #fff;            border-color: var(--burgundy); }
-.cat-tag.fiction         { background: var(--paper-warm); color: var(--ink);     border-color: var(--border-mid); }
+.cat-tag.about_wrestling {
+  background: var(--paper-soft);
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.cat-tag.about_wrestler {
+  background: var(--paper-soft);
+  color: var(--burgundy);
+  border-color: var(--burgundy);
+}
+.cat-tag.by_wrestler {
+  background: var(--burgundy);
+  color: #fff;
+  border-color: var(--burgundy);
+}
+.cat-tag.fiction {
+  background: var(--paper-warm);
+  color: var(--ink);
+  border-color: var(--border-mid);
+}
 
-.conf.high          { background: var(--burgundy);   color: #fff;            border-color: var(--burgundy); }
-.conf.medium        { background: var(--paper-soft); color: var(--ink);     border-color: var(--ink); }
-.conf.medium_search { background: var(--paper-warm); color: var(--ink-soft); border-color: var(--border-mid); }
-.conf.low           { background: var(--paper-soft); color: var(--burgundy); border-color: var(--burgundy); }
-.conf.low_searched  { background: var(--paper-warm); color: var(--muted);   border-color: var(--border-mid); }
+.conf.high {
+  background: var(--burgundy);
+  color: #fff;
+  border-color: var(--burgundy);
+}
+.conf.medium {
+  background: var(--paper-soft);
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.conf.medium_search {
+  background: var(--paper-warm);
+  color: var(--ink-soft);
+  border-color: var(--border-mid);
+}
+.conf.low {
+  background: var(--paper-soft);
+  color: var(--burgundy);
+  border-color: var(--burgundy);
+}
+.conf.low_searched {
+  background: var(--paper-warm);
+  color: var(--muted);
+  border-color: var(--border-mid);
+}
 
-.tag.wr      { background: var(--burgundy); color: #fff; border-color: var(--burgundy); }
-.tag.archive { background: var(--ink); color: #fff; border-color: var(--ink); }
+.tag.wr {
+  background: var(--burgundy);
+  color: #fff;
+  border-color: var(--burgundy);
+}
+.tag.archive {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
 
-.dim { color: var(--muted); }
-.small { font-size: .85rem; }
+.dim {
+  color: var(--muted);
+}
+.small {
+  font-size: 0.85rem;
+}
 
 /* ============================================================
    PAGINATION — small square buttons, burgundy active
@@ -530,26 +689,31 @@ table.books a:hover, table.periodicals a:hover, table.territories-table a:hover 
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: .55rem;
+  gap: 0.55rem;
   margin: 2rem 0 1rem;
   font-family: var(--inter);
 }
-.pagination a, .pagination span {
+.pagination a,
+.pagination span {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 32px;
   height: 32px;
-  padding: 0 .5rem;
+  padding: 0 0.5rem;
   border: 1px solid #aaa;
   border-radius: 2px;
   background: transparent;
   color: var(--ink);
   text-decoration: none;
-  font-size: .9rem;
+  font-size: 0.9rem;
   font-weight: 500;
 }
-.pagination a:hover { background: rgba(90, 31, 46, .08); border-color: var(--burgundy); color: var(--burgundy); }
+.pagination a:hover {
+  background: rgba(90, 31, 46, 0.08);
+  border-color: var(--burgundy);
+  color: var(--burgundy);
+}
 .pagination .current,
 .pagination strong {
   background: var(--burgundy);
@@ -567,16 +731,23 @@ table.books a:hover, table.periodicals a:hover, table.territories-table a:hover 
 /* ============================================================
    DECADE BARS
    ============================================================ */
-.bars { display: flex; flex-direction: column; gap: .35rem; }
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
 .bar-row {
   display: grid;
   grid-template-columns: 60px 1fr 50px;
   align-items: center;
-  gap: .65rem;
-  font-size: .92rem;
+  gap: 0.65rem;
+  font-size: 0.92rem;
   font-family: var(--inter);
 }
-.bar-label { color: var(--ink-soft); font-weight: 600; }
+.bar-label {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
 .bar {
   height: 14px;
   background: var(--paper-warm);
@@ -588,7 +759,10 @@ table.books a:hover, table.periodicals a:hover, table.territories-table a:hover 
   height: 100%;
   background: var(--burgundy);
 }
-.bar-n { text-align: right; color: var(--muted); }
+.bar-n {
+  text-align: right;
+  color: var(--muted);
+}
 
 /* ============================================================
    BOOK / DETAIL PAGES
@@ -599,7 +773,9 @@ table.books a:hover, table.periodicals a:hover, table.territories-table a:hover 
   padding: 1.85rem 2rem;
   box-shadow: 4px 4px 0 var(--ink);
 }
-.book-detail h1 { margin-top: 0; }
+.book-detail h1 {
+  margin-top: 0;
+}
 .book-detail .book-cover {
   float: right;
   max-width: 220px;
@@ -610,48 +786,73 @@ table.books a:hover, table.periodicals a:hover, table.territories-table a:hover 
   background: var(--paper);
   padding: 6px;
 }
-.book-detail .badges { margin: .5rem 0 1rem; display: flex; gap: .5rem; }
-.book-detail .authors { margin: .75rem 0 1rem; font-size: 1.08rem; }
-.book-detail .synopsis { margin-top: 1.5rem; }
+.book-detail .badges {
+  margin: 0.5rem 0 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+.book-detail .authors {
+  margin: 0.75rem 0 1rem;
+  font-size: 1.08rem;
+}
+.book-detail .synopsis {
+  margin-top: 1.5rem;
+}
 .book-detail .lookup {
   background: var(--paper-warm);
-  padding: .75rem 1.1rem;
+  padding: 0.75rem 1.1rem;
   border-left: 4px solid var(--burgundy);
   font-family: var(--inter);
-  font-size: .92rem;
+  font-size: 0.92rem;
 }
 
 .breadcrumbs {
   margin-bottom: 1.25rem;
   font-family: var(--inter);
-  font-size: .88rem;
+  font-size: 0.88rem;
   color: var(--muted);
 }
-.breadcrumbs a { color: var(--burgundy); }
+.breadcrumbs a {
+  color: var(--burgundy);
+}
 
 .meta {
   color: var(--muted);
   margin-top: 2.5rem;
   text-align: center;
   font-style: italic;
-  font-size: .92rem;
+  font-size: 0.92rem;
   font-family: var(--lora);
 }
 
 /* ============================================================
    FLASH MESSAGES
    ============================================================ */
-.flash-stack { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: .4rem; }
+.flash-stack {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
 .flash {
-  padding: .75rem 1.1rem;
+  padding: 0.75rem 1.1rem;
   border-radius: 2px;
-  font-size: .95rem;
+  font-size: 0.95rem;
   border: 1px solid var(--ink);
   background: var(--paper-soft);
   font-family: var(--lora);
 }
-.flash-success { background: var(--paper-soft); border-left: 4px solid var(--burgundy); border-color: var(--ink); }
-.flash-error   { background: #fbeae5; border-left: 4px solid var(--burgundy); border-color: var(--burgundy); color: var(--burgundy-dk); }
+.flash-success {
+  background: var(--paper-soft);
+  border-left: 4px solid var(--burgundy);
+  border-color: var(--ink);
+}
+.flash-error {
+  background: #fbeae5;
+  border-left: 4px solid var(--burgundy);
+  border-color: var(--burgundy);
+  color: var(--burgundy-dk);
+}
 
 /* ============================================================
    ADD FORMS
@@ -669,24 +870,26 @@ table.books a:hover, table.periodicals a:hover, table.territories-table a:hover 
 .add-form label {
   display: flex;
   flex-direction: column;
-  gap: .35rem;
-  font-size: .9rem;
+  gap: 0.35rem;
+  font-size: 0.9rem;
   color: var(--ink);
   flex: 1;
   font-weight: 600;
 }
-.add-form label.grow { flex: 2; }
-.add-form input[type=text],
-.add-form input[type=number],
-.add-form input[type=url],
+.add-form label.grow {
+  flex: 2;
+}
+.add-form input[type="text"],
+.add-form input[type="number"],
+.add-form input[type="url"],
 .add-form select,
 .add-form textarea {
-  padding: .55rem .7rem;
+  padding: 0.55rem 0.7rem;
   border: 1px solid #888;
   border-radius: 2px;
   background: var(--paper-soft);
   font-family: var(--inter);
-  font-size: .98rem;
+  font-size: 0.98rem;
   color: var(--ink);
   font-weight: 400;
 }
@@ -695,50 +898,72 @@ table.books a:hover, table.periodicals a:hover, table.territories-table a:hover 
 .add-form textarea:focus {
   outline: 0;
   border-color: var(--burgundy);
-  box-shadow: 0 0 0 2px rgba(90, 31, 46, .2);
+  box-shadow: 0 0 0 2px rgba(90, 31, 46, 0.2);
 }
-.add-form textarea { resize: vertical; min-height: 110px; font-family: var(--lora); }
-.add-form .form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
-.add-form .form-row > label { min-width: 140px; }
+.add-form textarea {
+  resize: vertical;
+  min-height: 110px;
+  font-family: var(--lora);
+}
+.add-form .form-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.add-form .form-row > label {
+  min-width: 140px;
+}
 .add-form label.check {
   flex-direction: row;
   align-items: center;
-  gap: .5rem;
-  font-size: .92rem;
+  gap: 0.5rem;
+  font-size: 0.92rem;
   font-weight: 500;
 }
-.add-form .req { color: var(--burgundy); }
-.add-form .form-actions { display: flex; gap: 1rem; align-items: center; margin-top: .5rem; }
+.add-form .req {
+  color: var(--burgundy);
+}
+.add-form .form-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
 .add-form button {
-  padding: .65rem 1.75rem;
+  padding: 0.65rem 1.75rem;
   background: var(--burgundy);
   color: #fff;
   border: 0;
   border-radius: 2px;
   font-family: var(--inter);
   font-weight: 600;
-  font-size: .98rem;
+  font-size: 0.98rem;
   cursor: pointer;
-  letter-spacing: .02em;
+  letter-spacing: 0.02em;
 }
-.add-form button:hover { background: var(--burgundy-dk); }
+.add-form button:hover {
+  background: var(--burgundy-dk);
+}
 
 /* Inline burgundy pill button */
 .btn-inline {
   display: inline-block;
-  padding: .3rem .8rem;
+  padding: 0.3rem 0.8rem;
   background: var(--burgundy);
   color: #fff;
   border: 1px solid var(--burgundy);
   border-radius: 2px;
   font-family: var(--inter);
-  font-size: .78rem;
+  font-size: 0.78rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: .06em;
+  letter-spacing: 0.06em;
   text-decoration: none;
 }
-.btn-inline:hover { background: var(--burgundy-dk); text-decoration: none; }
+.btn-inline:hover {
+  background: var(--burgundy-dk);
+  text-decoration: none;
+}
 
 /* ============================================================
    FOOTER
@@ -750,7 +975,7 @@ footer {
   color: var(--muted);
   padding: 1.75rem 1.5rem 2.5rem;
   font-family: var(--inter);
-  font-size: .85rem;
+  font-size: 0.85rem;
   border-top: 1px solid var(--border);
 }
 
@@ -760,6 +985,9 @@ pre {
   padding: 1rem;
   overflow-x: auto;
   font-family: var(--mono);
-  font-size: .88rem;
+  font-size: 0.88rem;
 }
-code { font-family: var(--mono); font-size: .92em; }
+code {
+  font-family: var(--mono);
+  font-size: 0.92em;
+}

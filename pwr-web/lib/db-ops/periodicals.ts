@@ -62,5 +62,5 @@ export async function insertPeriodical(db: Db, input: PeriodicalInput): Promise<
             ${input.archive_in_collection}, ${input.source_url}, ${input.confidence})
     RETURNING id
   `);
-  return rows[0]!.id;
+  return rows[0].id;
 }

@@ -86,6 +86,7 @@ export type PendingDetail = PendingRow & {
     notes: string | null;
   };
   samples: Array<{
+    entry_id: number;
     publication_date: string | null;
     issue_number: string | null;
     list_label: string;
@@ -116,18 +117,10 @@ export async function getPendingDetail(db: Db, pid: number): Promise<PendingDeta
     normalized_name: string | null;
     notes: string | null;
   }>(sql`SELECT id, normalized_name, notes FROM pending_wrestlers WHERE id = ${pid}`);
-  const raw = rawRows[0]!;
+  const raw = rawRows[0];
 
-  const samples = await db.execute<{
-    publication_date: string | null;
-    issue_number: string | null;
-    list_label: string;
-    list_scope: string;
-    rank: number;
-    entry_name: string;
-    source_url: string | null;
-  }>(sql`
-    SELECT pi.publication_date, pi.issue_number, rl.list_label,
+  const samples = await db.execute<PendingDetail["samples"][number]>(sql`
+    SELECT re.id AS entry_id, pi.publication_date, pi.issue_number, rl.list_label,
            rl.list_scope, re.rank, re.entry_name, rl.source_url
       FROM ranking_entries re
       JOIN ranking_lists rl ON re.ranking_list_id = rl.id

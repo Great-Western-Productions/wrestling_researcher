@@ -1,5 +1,5 @@
-import type { BookRow } from "@/lib/queries/books";
 import { CATEGORIES } from "@/lib/format";
+import type { BookRow } from "@/lib/queries/books";
 
 type Props = {
   action: (formData: FormData) => Promise<void>;
@@ -34,6 +34,7 @@ export function BookForm({
       <div className="form-row">
         <label>
           Title <span className="req">*</span>
+          {/* biome-ignore lint/a11y/noAutofocus: this form is the whole point of the page that renders it, so focusing its first field is the expected landing behavior */}
           <input type="text" name="title" required autoFocus defaultValue={v("title")} />
         </label>
         <label>

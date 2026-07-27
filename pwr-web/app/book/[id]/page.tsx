@@ -31,6 +31,7 @@ export default async function BookDetail({ params }: Props) {
       </p>
 
       <article className="book-detail">
+        {/* biome-ignore lint/performance/noImgElement: covers stream out of the database via a route handler, so their intrinsic size is unknown at render time and next/image has nothing to optimize */}
         <img
           className="book-cover"
           src={`/book/${book.id}/cover`}

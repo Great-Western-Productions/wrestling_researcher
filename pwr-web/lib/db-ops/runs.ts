@@ -50,7 +50,7 @@ export async function insertRun(db: Db, input: RunInput): Promise<number> {
             ${input.notes})
     RETURNING id
   `);
-  return rows[0]!.id;
+  return rows[0].id;
 }
 
 export async function getRunFormOptions(db: Db): Promise<{
