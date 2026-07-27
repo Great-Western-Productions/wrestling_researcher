@@ -45,6 +45,13 @@
       "breakpoints": true
     },
     {
+      "idx": 6,
+      "version": "7",
+      "when": 1785110400000,
+      "tag": "0006_territory_markets",
+      "breakpoints": true
+    },
+    {
       "idx": 7,
       "version": "7",
       "when": 1785196800000,
