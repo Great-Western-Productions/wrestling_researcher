@@ -1,0 +1,420 @@
+/* Chrome for the map island: overlay panels, legend, controls, markers.
+   The map canvas itself is painted by MapLibre from lib/theme.ts. */
+
+.tm-root {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border-mid, #b8b3a3);
+  border-radius: 6px;
+  background: var(--paper, #f8f4e6);
+  font-family: var(--lora, Georgia, serif);
+  /* Room the year controls claim at the bottom edge, which the detail panel
+     docks above. Kept here so it stays in step with the control sizes below. */
+  --tm-bottom-inset: 14px;
+}
+.tm-root--has-controls {
+  /* 14px offset + a 46px control bar + a gap. */
+  --tm-bottom-inset: 68px;
+}
+
+.tm-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-overlay {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+}
+.tm-overlay > * {
+  pointer-events: auto;
+}
+.tm-overlay--top-right {
+  top: 12px;
+  right: 12px;
+  /* Cap the expanded legend at half the map's height; it scrolls past that.
+     A peak year lists ~20 promotions, and at full height the panel curtained
+     most of the map's right side. Compact mode (pill) still governs narrow or
+     short embeds via LEGEND_COMPACT_WIDTH/HEIGHT in TerritoryMap. */
+  max-height: 50%;
+  overflow: auto;
+}
+.tm-overlay--bottom {
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+}
+
+/* Legend */
+.tm-legend {
+  background: rgba(239, 231, 211, 0.92);
+  border: 1px solid #b8ac8c;
+  border-radius: 5px;
+  padding: 8px 10px;
+  box-shadow: 0 1px 4px rgba(42, 34, 19, 0.18);
+  min-width: 150px;
+  backdrop-filter: blur(1px);
+}
+.tm-legend-title {
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--ink, #1a1a1a);
+  margin-bottom: 6px;
+}
+.tm-legend-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.tm-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 3px 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--ink, #1a1a1a);
+  text-align: left;
+}
+.tm-legend-item:hover,
+.tm-legend-item.is-active {
+  background: rgba(122, 92, 47, 0.16);
+}
+.tm-swatch {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  border: 1px solid rgba(42, 34, 19, 0.55);
+  flex: none;
+}
+
+/* Collapsed legend. On a narrow or short map the full list would cover the
+   geography it labels, so it shrinks to a pill and the reader opens it. */
+.tm-legend--compact {
+  padding: 0;
+  min-width: 0;
+}
+.tm-legend-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  /* Comfortable for a thumb, and tall enough to read as a control. */
+  min-height: 44px;
+  padding: 0 12px;
+  cursor: pointer;
+  color: var(--ink, #1a1a1a);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  /* Drop the disclosure triangle; .tm-legend-caret replaces it. */
+  list-style: none;
+}
+.tm-legend-toggle::-webkit-details-marker {
+  display: none;
+}
+.tm-legend-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 11.5px;
+  color: #4a3d24;
+  background: rgba(122, 92, 47, 0.16);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+.tm-legend-caret {
+  width: 0;
+  height: 0;
+  margin-left: auto;
+  border-left: 4.5px solid transparent;
+  border-right: 4.5px solid transparent;
+  border-top: 5px solid var(--muted, #666);
+  transition: transform 120ms ease;
+}
+.tm-legend--compact[open] .tm-legend-caret {
+  transform: rotate(180deg);
+}
+.tm-legend--compact[open] .tm-legend-toggle {
+  border-bottom: 1px solid var(--border-mid, #b8b3a3);
+}
+.tm-legend--compact .tm-legend-list {
+  padding: 6px 10px 8px;
+}
+/* The same rows, given a thumb-sized target now that they are tapped, not
+   moused. */
+.tm-legend--compact .tm-legend-item {
+  min-height: 36px;
+  font-size: 13.5px;
+}
+
+/* Year controls */
+.tm-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(239, 231, 211, 0.94);
+  border: 1px solid #b8ac8c;
+  border-radius: 999px;
+  padding: 7px 14px;
+  box-shadow: 0 2px 8px rgba(42, 34, 19, 0.22);
+}
+.tm-play {
+  background: var(--ink, #1a1a1a);
+  color: var(--paper, #f8f4e6);
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  flex: none;
+}
+.tm-play:hover {
+  background: #4a3d24;
+}
+.tm-slider {
+  width: min(46vw, 420px);
+  accent-color: #7a5c2f;
+}
+.tm-year-readout {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 16px;
+  min-width: 3.2ch;
+  text-align: center;
+  color: var(--ink, #1a1a1a);
+}
+.tm-controls--snapshots {
+  gap: 4px;
+  border-radius: 6px;
+  padding: 5px 6px;
+}
+.tm-snap {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font: inherit;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  color: #4a3d24;
+}
+.tm-snap:hover {
+  background: rgba(122, 92, 47, 0.14);
+}
+.tm-snap.is-active {
+  background: var(--ink, #1a1a1a);
+  color: var(--paper, #f8f4e6);
+}
+
+/* Markers */
+.tm-marker {
+  line-height: 0;
+  filter: drop-shadow(0 1px 1px rgba(42, 34, 19, 0.35));
+}
+.tm-marker-svg {
+  display: block;
+}
+
+/* Detail panel */
+.tm-detail {
+  position: absolute;
+  z-index: 6;
+  left: 12px;
+  bottom: var(--tm-bottom-inset, 14px);
+  max-width: 280px;
+  /* Never taller than the room between the legend and the year controls. The
+     body scrolls inside this; the close button sits outside the scroll. */
+  max-height: calc(100% - var(--tm-bottom-inset, 14px) - 72px);
+  display: flex;
+  flex-direction: column;
+  background: rgba(239, 231, 211, 0.96);
+  border: 1px solid #b8ac8c;
+  border-radius: 6px;
+  padding: 12px 14px 14px;
+  box-shadow: 0 2px 10px rgba(42, 34, 19, 0.25);
+}
+.tm-detail-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* Clear of the close button, which overlaps the first line otherwise. */
+  padding-right: 18px;
+  margin-right: -18px;
+}
+.tm-detail-close {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--muted, #666);
+}
+.tm-detail-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-size: 16px;
+  color: var(--ink, #1a1a1a);
+}
+.tm-detail-years {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  color: var(--muted, #666);
+}
+.tm-detail-owners {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink, #1a1a1a);
+}
+.tm-detail-meta {
+  margin: 0;
+  display: grid;
+  gap: 5px;
+}
+.tm-detail-meta > div {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 6px;
+  font-size: 12.5px;
+}
+.tm-detail-meta dt {
+  color: var(--muted, #666);
+  text-transform: capitalize;
+}
+.tm-detail-meta dd {
+  margin: 0;
+  color: var(--ink, #1a1a1a);
+}
+
+/* On a small map the panel spans the full width and docks above the year
+   controls. At 280px over a 358px map it covered 52% of the geography, sat on
+   the slider, and in landscape ran 427px tall inside a 296px box, so
+   `overflow: hidden` clipped the close button out of reach entirely. */
+.tm-root--compact .tm-detail {
+  left: 8px;
+  right: 8px;
+  max-width: none;
+  max-height: calc(100% - var(--tm-bottom-inset, 14px) - 66px);
+}
+.tm-root--compact .tm-detail-close {
+  /* A thumb target, and far enough in from the corner radius to look placed. */
+  top: 2px;
+  right: 2px;
+  width: 40px;
+  height: 40px;
+  font-size: 24px;
+}
+.tm-root--compact .tm-detail-body {
+  padding-right: 34px;
+  margin-right: -34px;
+}
+.tm-root--compact .tm-detail-meta > div {
+  /* 92px of label column leaves too little for the value at phone width. */
+  grid-template-columns: 78px 1fr;
+}
+
+/* Loading state. The county GeoJSON keeps parsing well past MapLibre's `load`,
+   so without this the reader watches an empty parchment box with a year slider
+   under it and reads the map as broken. */
+.tm-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  background: var(--paper, #f8f4e6);
+  color: var(--muted, #666);
+  font-size: 14px;
+  letter-spacing: 0.03em;
+}
+.tm-loading-label::after {
+  /* Three dots that fill in, so the wait reads as progress. */
+  content: '.';
+  animation: tm-ellipsis 1.4s steps(1, end) infinite;
+}
+@keyframes tm-ellipsis {
+  0% {
+    content: '.';
+  }
+  33% {
+    content: '..';
+  }
+  66% {
+    content: '...';
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tm-loading-label::after {
+    content: '...';
+    animation: none;
+  }
+}
+
+/* Tap targets. Only on touch, where a fingertip covers roughly 44px and a
+   mouse is not there to be precise. Markers are 15px (secondary) and 19px
+   (primary), and they are what a reader actually aims at. Growing the padding
+   is enough: MapLibre anchors these with a percentage translate, so the disc
+   stays on its town. Safe alongside cooperative gestures, because panning is a
+   two-finger gesture now and these boxes only intercept taps. */
+@media (pointer: coarse) {
+  /* The thumb-sized play button and slider make the control bar ~56px, so the
+     detail panel has to dock higher to stay clear of it. */
+  .tm-root--has-controls {
+    --tm-bottom-inset: 82px;
+  }
+  .tm-marker {
+    padding: 11px;
+  }
+  .tm-play {
+    width: 40px;
+    height: 40px;
+    font-size: 15px;
+  }
+  .tm-snap {
+    min-height: 44px;
+    padding: 4px 14px;
+  }
+  .tm-slider {
+    /* Fatter track and thumb, so the year is draggable without a fingernail. */
+    height: 28px;
+  }
+}
+
+/* MapLibre chrome tweaks to fit the atlas look */
+.tm-root .maplibregl-ctrl-group {
+  background: rgba(239, 231, 211, 0.92);
+  border: 1px solid #b8ac8c;
+}
+/* The cooperative-gesture hint ships as a dark scrim with white text. Bring it
+   onto the parchment so a blocked one-finger swipe does not flash black. */
+.tm-root .maplibregl-cooperative-gesture-screen {
+  background: rgba(42, 34, 19, 0.42);
+  font-family: inherit;
+}
+.tm-root .maplibregl-cooperative-gesture-screen .maplibregl-desktop-message,
+.tm-root .maplibregl-cooperative-gesture-screen .maplibregl-mobile-message {
+  background: rgba(239, 231, 211, 0.96);
+  color: var(--ink, #1a1a1a);
+  border: 1px solid #b8ac8c;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  box-shadow: 0 2px 10px rgba(42, 34, 19, 0.25);
+}

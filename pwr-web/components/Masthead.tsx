@@ -17,6 +17,7 @@ const NAV: Array<{ href: string; label: string; activeWhen: (p: string) => boole
     label: "Territories",
     activeWhen: (p) => p === "/territories" || p.startsWith("/territory/"),
   },
+  { href: "/map", label: "Map", activeWhen: (p) => p === "/map" },
   {
     href: "/wrestlers",
     label: "Wrestlers",
