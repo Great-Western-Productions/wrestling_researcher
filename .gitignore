@@ -27,3 +27,6 @@ venv/
 
 # generated dumps
 bibliography/wrestling_bibliography_postgres.sql
+
+# scratch space for db backups and working files
+tmp/
