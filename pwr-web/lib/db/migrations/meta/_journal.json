@@ -57,6 +57,13 @@
       "when": 1785196800000,
       "tag": "0007_restore_mcp_audit_log",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1785283200000,
+      "tag": "0008_territory_lineage_key",
+      "breakpoints": true
     }
   ]
 }

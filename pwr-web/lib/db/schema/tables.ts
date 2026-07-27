@@ -335,10 +335,15 @@ CASE
     ELSE NULL::text
 END`),
     map_color: text(),
+    // The turf a promotion held, shared by every promotion that held it in
+    // turn, so continuity across a handover survives as data rather than only
+    // as a hand-matched map_color.
+    lineage_key: text(),
   },
   (table) => [
     index("idx_territories_cm").using("btree", table.cagematch_id.asc().nullsLast()),
     index("idx_territories_country").using("btree", table.country.asc().nullsLast()),
+    index("idx_territories_lineage").using("btree", table.lineage_key.asc().nullsLast()),
     index("idx_territories_region").using("btree", table.region.asc().nullsLast()),
     uniqueIndex("territories_name_key").using("btree", table.name.asc().nullsLast()),
   ],
