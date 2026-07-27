@@ -5,7 +5,15 @@ import * as schema from "@/lib/db/schema";
 let cachedSql: ReturnType<typeof postgres> | undefined;
 let cachedDb: PostgresJsDatabase<typeof schema> | undefined;
 
-function getDb() {
+/**
+ * A committing handle on the shared Testcontainers database.
+ *
+ * Prefer `withTx`, which rolls back and keeps tests isolated from each other.
+ * Reach for this only when a test exercises code that opens its own connection
+ * (a route handler using `@/lib/db/client`, say) and therefore has to clean up
+ * its committed rows afterwards.
+ */
+export function getTestDb() {
   if (!cachedDb) {
     const url = process.env.PWR_TEST_DATABASE_URL ?? process.env.DATABASE_URL;
     if (!url) throw new Error("Test DATABASE_URL not set (global-setup did not run?)");
@@ -28,7 +36,7 @@ const ROLLBACK = new _Rollback("rollback");
 export async function withTx<T>(
   fn: (tx: PostgresJsDatabase<typeof schema>) => Promise<T>,
 ): Promise<T> {
-  const db = getDb();
+  const db = getTestDb();
   let result: T | undefined;
   try {
     await db.transaction(async (tx) => {
