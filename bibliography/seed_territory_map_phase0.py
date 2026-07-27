@@ -278,6 +278,30 @@ NEW_TERRITORIES: list[tuple] = [
      "First show 29 Jan 1975. Lucha Libre Internacional was the company; UWA was the "
      "storyline sanctioning body it was known by outside Mexico. Not to be confused with "
      "Bill Watts's Universal Wrestling Federation (territories.id 26)."),
+
+    # Quebec is three rows rather than one row with three eras. Josh's call on
+    # 2026-07-27, against the brief's section 4: these were three unrelated
+    # companies with real gaps between them, not one office changing hands.
+    # They share lineage_key 'quebec' and one map_color, so the map still reads
+    # as continuous ground.
+    ("Canadian Athletic Promotions", "Quinn (Montreal)", "Canada", "Montreal", "QC", "CA",
+     1939, 1965, "Eddie Quinn", True, "Montreal Athletic Commission office; Eddie Quinn Promotions",
+     "The Montreal Athletic Commission granted Quinn the rights to promote the Forum on "
+     "27 Jul 1939. He ran Quebec and into New England and died in December 1965. "
+     "nwa_member is set true for the office overall; the era rows carry the sourced answer."),
+
+    ("Grand Prix Wrestling (Montreal)", "Grand Prix", "Canada", "Montreal", "QC", "CA",
+     1971, 1975, "Maurice and Paul Vachon", False, "Les Grands Prix de la Lutte",
+     "Debut card 1 Jun 1971, launched in direct competition with Johnny Rougeau's "
+     "established All-Star Wrestling. Ran as far as Newfoundland and British Columbia at "
+     "its peak and drew 29,000 to Jarry Park in July 1973. Distinct from Emile Dupree's "
+     "Atlantic Grand Prix in the Maritimes."),
+
+    ("Lutte Internationale", "International (Montreal)", "Canada", "Montreal", "QC", "CA",
+     1980, 1987, "Frank Valois, Andre the Giant, Gino Brito", False,
+     "International Wrestling; Promotions Varoussac",
+     "Traded as Promotions Varoussac 1980-1984, then International Wrestling. Closed "
+     "June 1987."),
 ]
 
 
@@ -325,6 +349,47 @@ MAP_COLORS: dict[int, tuple[str, str]] = {
     12:  ("#1f5546", "wwf / capitol"),
     224: ("#6a5fa0", "indianapolis"),
     383: ("#4f9fb0", "wwa"),
+
+    # Ruled in on 2026-07-27, after the brief left them open. Neither is one of
+    # the 27 the map draws today, so these hues are new rather than inherited.
+    # Both are islands, so nothing constrains them but each other.
+    11:  ("#b8523f", "puerto rico, World Wrestling Council 1973-"),
+    201: ("#8a7f4f", "hawaii, Mid-Pacific 1936-1979"),
+    231: ("#8a7f4f", "hawaii, NWA Polynesian 1979-1988, straight succession so it shares the hue"),
+}
+
+
+# ---------------------------------------------------------------------------
+# lineage_key: the turf, as opposed to the promotion that held it. Two rows
+# share a key when they held the same ground, whether they took turns (Tulsa,
+# Dallas, Hawaii) or contested it at the same time (Arizona, the Intermountain
+# West). Overlapping holders are expected and are not an error.
+#
+# Only groups that are defensible right now are filled. Memphis and Central
+# States almost certainly have lineages too, and belong to the sessions that
+# research those eras.
+# ---------------------------------------------------------------------------
+LINEAGE_KEYS: dict[str, list[int]] = {
+    # Avey's Tulsa office -> McGuirk's Tri-State -> Watts's Mid-South
+    "tulsa":         [297, 2],
+    "dallas":        [4, 3],
+    "los-angeles":   [226, 223],
+    "san-francisco": [233, 70],
+    "arizona":       [79, 375],
+    # Two offices holding different halves of one region at the same time:
+    # Reynolds in Utah, Tex Hager in Idaho.
+    "intermountain": [296, 339],
+    "detroit":       [90],
+    "hawaii":        [201, 231],
+}
+
+# Rows this script inserts, keyed by name because their ids are assigned on
+# insert.
+NEW_LINEAGE: dict[str, str] = {
+    "NWA Tri-State":                   "tulsa",
+    "Canadian Athletic Promotions":    "quebec",
+    "Grand Prix Wrestling (Montreal)": "quebec",
+    "Lutte Internationale":            "quebec",
 }
 
 # Colours for the rows this script inserts, keyed by name because the ids are
@@ -338,6 +403,11 @@ NEW_COLORS: dict[str, str] = {
     "Atlantic Grand Prix Wrestling":   "#8a4f7a",
     "Empresa Mexicana de Lucha Libre": "#a33b2f",
     "Universal Wrestling Association": "#2f7d5c",
+    # One hue across all three Quebec offices, chosen against the neighbours
+    # Montreal actually touches: Toronto, the Maritimes and the WWF's New England.
+    "Canadian Athletic Promotions":    "#3f6a8a",
+    "Grand Prix Wrestling (Montreal)": "#3f6a8a",
+    "Lutte Internationale":            "#3f6a8a",
 }
 
 
@@ -393,21 +463,48 @@ def seed_territories(cur) -> tuple[int, int]:
     added = skipped = 0
     for (name, short_name, region, city, state, country, founded, closed,
          lineage, nwa, aliases, notes) in NEW_TERRITORIES:
-        cur.execute("SELECT id FROM territories WHERE name = %s", (name,))
-        if cur.fetchone():
+        cur.execute("SELECT id, map_color, lineage_key FROM territories WHERE name = %s",
+                    (name,))
+        existing = cur.fetchone()
+        if existing:
+            # Already inserted by an earlier run. Still reconcile the two fields
+            # a later run may have introduced, so re-running repairs rather
+            # than silently leaving the row half-filled.
+            tid, colour, lin = existing
+            want_colour, want_lin = NEW_COLORS.get(name), NEW_LINEAGE.get(name)
+            if colour != want_colour or lin != want_lin:
+                cur.execute(
+                    "UPDATE territories SET map_color = %s, lineage_key = %s WHERE id = %s",
+                    (want_colour, want_lin, tid))
             skipped += 1
             continue
         cur.execute(
             """INSERT INTO territories
                  (name, short_name, region, headquarters_city, headquarters_state,
                   country, year_founded, year_closed, promoter_lineage, nwa_member,
-                  aliases, notes, map_color)
-               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                  aliases, notes, map_color, lineage_key)
+               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
             (name, short_name, region, city, state, country, founded, closed,
-             lineage, nwa, aliases, notes, NEW_COLORS.get(name)),
+             lineage, nwa, aliases, notes, NEW_COLORS.get(name), NEW_LINEAGE.get(name)),
         )
         added += 1
     return added, skipped
+
+
+def apply_lineage(cur) -> tuple[int, list[int]]:
+    changed, missing = 0, []
+    for key, ids in LINEAGE_KEYS.items():
+        for tid in ids:
+            cur.execute("SELECT lineage_key FROM territories WHERE id = %s", (tid,))
+            row = cur.fetchone()
+            if row is None:
+                missing.append(tid)
+                continue
+            if row[0] != key:
+                cur.execute("UPDATE territories SET lineage_key = %s WHERE id = %s",
+                            (key, tid))
+                changed += 1
+    return changed, missing
 
 
 def apply_colors(cur) -> tuple[int, list[int]]:
@@ -440,6 +537,9 @@ def report(cur) -> None:
     terrs = cur.fetchone()[0]
     cur.execute("SELECT count(*) FROM territories WHERE map_color IS NOT NULL")
     coloured = cur.fetchone()[0]
+    cur.execute("""SELECT lineage_key, count(*) FROM territories
+                    WHERE lineage_key IS NOT NULL GROUP BY 1 ORDER BY 1""")
+    lineages = cur.fetchall()
 
     print()
     print(f"  research_sources        {sources}")
@@ -447,6 +547,9 @@ def report(cur) -> None:
     print(f"    by country            {', '.join(f'{c}={n}' for c, n in by_country)}")
     print(f"  territories             {terrs}")
     print(f"  territories.map_color   {coloured}")
+    print(f"  territories.lineage_key {sum(n for _, n in lineages)} rows across "
+          f"{len(lineages)} turfs")
+    print(f"    {', '.join(f'{k}={n}' for k, n in lineages)}")
 
     # The four rows that must never be drawn: sanctioning bodies and buckets.
     cur.execute("""SELECT id, name FROM territories
@@ -468,13 +571,17 @@ def main() -> None:
             n_mkt = seed_markets(cur)
             n_terr, n_skip = seed_territories(cur)
             n_col, missing = apply_colors(cur)
+            n_lin, lin_missing = apply_lineage(cur)
 
             print(f"research_sources  +{n_src}")
             print(f"markets           +{n_mkt}")
             print(f"territories       +{n_terr}  ({n_skip} already present)")
             print(f"map_color         {n_col} set or changed")
+            print(f"lineage_key       {n_lin} set or changed")
             if missing:
                 print(f"  territory ids in MAP_COLORS with no row: {missing}")
+            if lin_missing:
+                print(f"  territory ids in LINEAGE_KEYS with no row: {lin_missing}")
 
             report(cur)
 
