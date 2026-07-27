@@ -57,6 +57,13 @@
       "when": 1785196800000,
       "tag": "0007_restore_mcp_audit_log",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1785369600000,
+      "tag": "0009_categories_code_key_constraint",
+      "breakpoints": true
     }
   ]
 }
