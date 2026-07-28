@@ -11,15 +11,11 @@ import type {
   MarketTier,
   Territory,
   TerritoryMapData,
-} from './config';
+} from "./config";
 
-const inSpan = (year: number, from: number, to: number): boolean =>
-  year >= from && year <= to;
+const inSpan = (year: number, from: number, to: number): boolean => year >= from && year <= to;
 
-export function territoriesActiveIn(
-  year: number,
-  territories: Territory[],
-): Territory[] {
+export function territoriesActiveIn(year: number, territories: Territory[]): Territory[] {
   return territories.filter((t) => inSpan(year, t.startYear, t.endYear));
 }
 
@@ -57,9 +53,7 @@ export function marketsActiveIn(
   territories: Territory[],
   tenures?: MarketTenure[],
 ): Market[] {
-  const liveTerritoryIds = new Set(
-    territoriesActiveIn(year, territories).map((t) => t.id),
-  );
+  const liveTerritoryIds = new Set(territoriesActiveIn(year, territories).map((t) => t.id));
 
   // marketId -> { owners, tier } as of this year, plus the set of markets that
   // have any tenure row at all (those opt out of the static fallback).
@@ -75,7 +69,7 @@ export function marketsActiveIn(
     const entry = owners.get(t.marketId) ?? { ids: [], tier: undefined };
     if (!entry.ids.includes(t.territoryId)) entry.ids.push(t.territoryId);
     // Primary anywhere that year sizes the marker as primary.
-    if (t.tier === 'Primary' || entry.tier == null) entry.tier = t.tier;
+    if (t.tier === "Primary" || entry.tier == null) entry.tier = t.tier;
     owners.set(t.marketId, entry);
   }
 
@@ -96,10 +90,7 @@ export function marketsActiveIn(
 }
 
 /** Tier 3: contested overlays active in `year`. */
-export function contestedActiveIn(
-  year: number,
-  contested: ContestedZone[] = [],
-): ContestedZone[] {
+export function contestedActiveIn(year: number, contested: ContestedZone[] = []): ContestedZone[] {
   return contested.filter((z) => inSpan(year, z.fromYear, z.toYear));
 }
 

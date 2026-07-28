@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
 /**
  * Year control. A range spec renders a scrub slider with play/pause; a
  * snapshot array renders a segmented selector. Controlled: the parent owns
  * `year` and receives changes via `onChange`.
  */
-import { useEffect, useRef, useState } from 'react';
-import type { YearSpec } from '@/lib/map/config';
-import { isYearRange, yearExtent, yearList } from '@/lib/map/config';
+import { useEffect, useRef, useState } from "react";
+import type { YearSpec } from "@/lib/map/config";
+import { isYearRange, yearExtent, yearList } from "@/lib/map/config";
 
 export interface YearControlsProps {
   years: YearSpec;
@@ -17,12 +17,7 @@ export interface YearControlsProps {
   stepMs?: number;
 }
 
-export default function YearControls({
-  years,
-  year,
-  onChange,
-  stepMs = 750,
-}: YearControlsProps) {
+export default function YearControls({ years, year, onChange, stepMs = 750 }: YearControlsProps) {
   const [playing, setPlaying] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const yearRef = useRef(year);
@@ -49,12 +44,13 @@ export default function YearControls({
   if (!range) {
     const snapshots = yearList(years);
     return (
+      // biome-ignore lint/a11y/useSemanticElements: a fieldset brings layout the overlay must undo
       <div className="tm-controls tm-controls--snapshots" role="group" aria-label="Snapshot year">
         {snapshots.map((y) => (
           <button
             key={y}
             type="button"
-            className={`tm-snap${y === year ? ' is-active' : ''}`}
+            className={`tm-snap${y === year ? " is-active" : ""}`}
             aria-pressed={y === year}
             onClick={() => onChange(y)}
           >
@@ -71,13 +67,13 @@ export default function YearControls({
       <button
         type="button"
         className="tm-play"
-        aria-label={playing ? 'Pause' : 'Play'}
+        aria-label={playing ? "Pause" : "Play"}
         onClick={() => {
           if (atEnd && !playing) onChange(start);
           setPlaying((p) => !p);
         }}
       >
-        {playing ? '❚❚' : '▶'}
+        {playing ? "❚❚" : "▶"}
       </button>
       <input
         type="range"

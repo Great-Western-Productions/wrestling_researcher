@@ -1,5 +1,7 @@
-'use client';
+"use client";
 
+import type { Map as MlMap } from "maplibre-gl";
+import maplibregl from "maplibre-gl";
 /**
  * The one config-driven MapLibre renderer. Takes (config, data) and a year,
  * and paints:
@@ -12,29 +14,21 @@
  * snapshot, a year range = the interactive slider, and the headless video
  * exporter drives it through window.__setYear.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
-import maplibregl from 'maplibre-gl';
-import type { Map as MlMap } from 'maplibre-gl';
-import 'maplibre-gl/dist/maplibre-gl.css';
-import './territory-map.css';
+import { useEffect, useMemo, useRef, useState } from "react";
+import "maplibre-gl/dist/maplibre-gl.css";
+import "./territory-map.css";
 
-import type { MapConfig, Market, Territory, TerritoryMapData } from '@/lib/map/config';
-import { isYearRange, yearExtent, yearList } from '@/lib/map/config';
-import { frameFor } from '@/lib/map/timeFilter';
-import { resolveTheme } from '@/lib/map/theme';
-import {
-  LYR,
-  SRC,
-  buildBaseStyle,
-  countyFillColor,
-  hatchPattern,
-} from '@/lib/map/mapStyle';
-import MarkerLayer from './MarkerLayer';
-import MapLegend from './MapLegend';
-import YearControls from './YearControls';
+import type { MapConfig, Market, Territory, TerritoryMapData } from "@/lib/map/config";
+import { isYearRange, yearExtent, yearList } from "@/lib/map/config";
+import { buildBaseStyle, countyFillColor, hatchPattern, LYR, SRC } from "@/lib/map/mapStyle";
+import { resolveTheme } from "@/lib/map/theme";
+import { frameFor } from "@/lib/map/timeFilter";
+import MapLegend from "./MapLegend";
+import MarkerLayer from "./MarkerLayer";
+import YearControls from "./YearControls";
 
-const HATCH_IMAGE = 'tm-hatch';
-const CONTESTED_LAYER = 'contested-fill';
+const HATCH_IMAGE = "tm-hatch";
+const CONTESTED_LAYER = "contested-fill";
 /** Breathing room around `config.bounds`, in px, on every fit. */
 const FIT_PADDING = 24;
 
@@ -57,8 +51,8 @@ const PAINT_TIMEOUT_MS = 12_000;
  * does not.
  */
 function prefersCooperativeGestures(): boolean {
-  if (typeof window === 'undefined' || !window.matchMedia) return false;
-  return window.matchMedia('(pointer: coarse)').matches;
+  if (typeof window === "undefined" || !window.matchMedia) return false;
+  return window.matchMedia("(pointer: coarse)").matches;
 }
 
 export interface TerritoryMapProps {
@@ -72,6 +66,13 @@ export interface TerritoryMapProps {
    * standalone map when nothing is passed.
    */
   hrefFor?: (territoryId: string) => string;
+  /**
+   * Focus a single promotion, greying out everyone else. Overrides
+   * `?highlight=`, so an embedded map does not need the query string.
+   */
+  highlightId?: string | null;
+  /** Hide the legend and year control, as `?bare=1` does for an iframe. */
+  bare?: boolean;
 }
 
 function initialYearFor(config: MapConfig, initialYear?: number): number {
@@ -87,8 +88,8 @@ function initialYearFor(config: MapConfig, initialYear?: number): number {
     return yearList(config.years).includes(y);
   };
 
-  if (typeof window !== 'undefined') {
-    const p = new URLSearchParams(window.location.search).get('year');
+  if (typeof window !== "undefined") {
+    const p = new URLSearchParams(window.location.search).get("year");
     if (p) {
       const y = Number(p);
       if (displayable(y)) return y;
@@ -102,8 +103,10 @@ export default function TerritoryMap({
   config,
   data,
   initialYear,
-  height = '70vh',
+  height = "70vh",
   hrefFor,
+  highlightId: highlightProp,
+  bare: bareProp,
 }: TerritoryMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MlMap | null>(null);
@@ -119,31 +122,37 @@ export default function TerritoryMap({
 
   const theme = useMemo(() => resolveTheme(config.theme), [config.theme]);
   const frame = useMemo(() => frameFor(year, data), [year, data]);
-  const showMarkers = config.overlays?.includes('markets') ?? false;
-  const showContested = config.overlays?.includes('contested') ?? false;
+  const showMarkers = config.overlays?.includes("markets") ?? false;
+  const showContested = config.overlays?.includes("contested") ?? false;
   // Optional single-territory focus (drives the "one territory's growth" video
   // and a shareable ?highlight=<id> deep link). Read once on mount.
-  const [highlightId] = useState<string | null>(() => {
-    if (typeof window === 'undefined') return null;
-    return new URLSearchParams(window.location.search).get('highlight');
+  const [urlHighlight] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return new URLSearchParams(window.location.search).get("highlight");
   });
+  const highlightId = highlightProp !== undefined ? highlightProp : urlHighlight;
 
   // Chrome toggles for embedding. `?bare=1` is shorthand for hiding both the
   // legend and the year control, leaving nothing but the map itself.
-  const [chrome] = useState(() => {
-    if (typeof window === 'undefined') return { legend: true, controls: true };
+  const [urlChrome] = useState(() => {
+    if (typeof window === "undefined") return { legend: true, controls: true };
     const q = new URLSearchParams(window.location.search);
-    const off = (v: string | null) => v === '0' || v === 'false';
-    const bare = q.get('bare') === '1' || q.get('bare') === 'true';
+    const off = (v: string | null) => v === "0" || v === "false";
+    const bare = q.get("bare") === "1" || q.get("bare") === "true";
     return {
-      legend: !bare && !off(q.get('legend')),
-      controls: !bare && !off(q.get('controls')),
+      legend: !bare && !off(q.get("legend")),
+      controls: !bare && !off(q.get("controls")),
     };
   });
+  const chrome = bareProp ? { legend: false, controls: false } : urlChrome;
 
   // --- map init (once). Canonical MapLibre-in-React lifecycle: build the map,
   // keep the ref immediately, resize on container changes, and do all
   // style-dependent setup inside the one-shot `load` handler. ---
+  // The map is built once and mutated in place by the effects below. Listing
+  // config and theme here would tear MapLibre down and rebuild it on every
+  // render, losing the reader's camera and re-parsing the county geometry.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: built once on purpose
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -172,10 +181,10 @@ export default function TerritoryMap({
       cooperativeGestures: prefersCooperativeGestures(),
     });
     mapRef.current = m;
-    m.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-left');
-    m.on('error', (e) => {
+    m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-left");
+    m.on("error", (e) => {
       // eslint-disable-next-line no-console
-      console.error('[TerritoryMap] map error:', (e as { error?: unknown }).error ?? e);
+      console.error("[TerritoryMap] map error:", (e as { error?: unknown }).error ?? e);
     });
 
     // Keep the camera framing `config.bounds` at whatever size the container
@@ -195,7 +204,7 @@ export default function TerritoryMap({
     // A drag, the wheel, or a pinch reaches us as a camera event carrying the
     // DOM event behind it; our own fits never carry one. That tells the two
     // apart without any bookkeeping around our own calls.
-    m.on('movestart', (e) => {
+    m.on("movestart", (e) => {
       if ((e as { originalEvent?: Event }).originalEvent) readerDrivesCamera = true;
     });
 
@@ -203,9 +212,9 @@ export default function TerritoryMap({
     // event on the camera side to catch. Take the click instead.
     const onPointerDown = (e: Event) => {
       const target = e.target as HTMLElement | null;
-      if (target?.closest('.maplibregl-ctrl-group')) readerDrivesCamera = true;
+      if (target?.closest(".maplibregl-ctrl-group")) readerDrivesCamera = true;
     };
-    container.addEventListener('pointerdown', onPointerDown, {
+    container.addEventListener("pointerdown", onPointerDown, {
       capture: true,
       passive: true,
     });
@@ -222,21 +231,21 @@ export default function TerritoryMap({
     });
     ro.observe(container);
 
-    m.once('load', () => {
+    m.once("load", () => {
       m.resize();
       fitToBounds();
 
       const hatch = hatchPattern(theme.territoryOutline);
       if (hatch && !m.hasImage(HATCH_IMAGE)) m.addImage(HATCH_IMAGE, hatch);
       m.addSource(SRC.contested, {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: [] },
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
       });
       m.addLayer({
         id: CONTESTED_LAYER,
-        type: 'fill',
+        type: "fill",
         source: SRC.contested,
-        paint: { 'fill-pattern': HATCH_IMAGE, 'fill-opacity': 0.9 },
+        paint: { "fill-pattern": HATCH_IMAGE, "fill-opacity": 0.9 },
       });
 
       setMap(m);
@@ -255,19 +264,36 @@ export default function TerritoryMap({
       setPainted(true);
       (window as unknown as Record<string, unknown>).__tmPainted = true;
     };
-    m.once('idle', reveal);
+    m.once("idle", reveal);
     const paintFloor = setTimeout(reveal, PAINT_TIMEOUT_MS);
 
     return () => {
       clearTimeout(paintFloor);
       ro.disconnect();
-      container.removeEventListener('pointerdown', onPointerDown, { capture: true });
+      container.removeEventListener("pointerdown", onPointerDown, { capture: true });
       m.remove();
       mapRef.current = null;
       setMap(null);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // --- keep ?year= in step with the slider ---
+  // A reader who scrubs to 1963 and copies the URL should get 1963 back. Done
+  // with replaceState rather than a router push for two reasons: the renderer
+  // stays free of any router import, so it still drops into a plain page; and a
+  // drag across forty years would otherwise leave forty history entries between
+  // the reader and the page they came from.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    const [start] = yearExtent(config.years);
+    if (year === start) url.searchParams.delete("year");
+    else url.searchParams.set("year", String(year));
+    if (url.href !== window.location.href) {
+      window.history.replaceState(window.history.state, "", url.href);
+    }
+  }, [year, config.years]);
 
   // --- expose year control for the video exporter ---
   useEffect(() => {
@@ -285,26 +311,24 @@ export default function TerritoryMap({
     if (!map) return;
     map.setPaintProperty(
       LYR.countyFill,
-      'fill-color',
+      "fill-color",
       countyFillColor(frame.ownership, data.territories, theme, highlightId),
     );
     if (showContested) {
       const src = map.getSource(SRC.contested) as maplibregl.GeoJSONSource | undefined;
       src?.setData({
-        type: 'FeatureCollection',
+        type: "FeatureCollection",
         features: frame.contested.map((z) => ({
-          type: 'Feature' as const,
+          type: "Feature" as const,
           geometry: z.geometry,
-          properties: { id: z.id, label: z.label ?? '' },
+          properties: { id: z.id, label: z.label ?? "" },
         })),
       });
     }
   }, [map, frame, data.territories, theme, showContested, highlightId]);
 
   const selectedTerritory =
-    selected && 'startYear' in selected && 'color' in selected
-      ? (selected as Territory)
-      : null;
+    selected && "startYear" in selected && "color" in selected ? (selected as Territory) : null;
 
   // Collapse the legend when the map is too small to give up the room. Both
   // dimensions matter: a portrait phone is narrow enough that the legend covers
@@ -312,29 +336,24 @@ export default function TerritoryMap({
   // full height. Before the first measurement, assume there is room, so the
   // desktop render is never briefly a pill.
   const legendCompact =
-    box.width > 0 &&
-    (box.width < LEGEND_COMPACT_WIDTH || box.height < LEGEND_COMPACT_HEIGHT);
+    box.width > 0 && (box.width < LEGEND_COMPACT_WIDTH || box.height < LEGEND_COMPACT_HEIGHT);
 
   return (
     <div
       className={[
-        'tm-root',
-        legendCompact ? 'tm-root--compact' : '',
+        "tm-root",
+        legendCompact ? "tm-root--compact" : "",
         // Tells the stylesheet whether the bottom of the map is spoken for, so
         // the detail panel can dock above the year controls instead of on top
         // of them. How much room they need is a CSS question (it changes with
         // the touch tap targets), so the number lives beside those rules.
-        chrome.controls ? 'tm-root--has-controls' : '',
+        chrome.controls ? "tm-root--has-controls" : "",
       ]
         .filter(Boolean)
-        .join(' ')}
-      style={{ height, position: 'relative' }}
+        .join(" ")}
+      style={{ height, position: "relative" }}
     >
-      <div
-        ref={containerRef}
-        className="tm-canvas"
-        style={{ position: 'absolute', inset: 0 }}
-      />
+      <div ref={containerRef} className="tm-canvas" style={{ position: "absolute", inset: 0 }} />
 
       {chrome.legend && (
         <div className="tm-overlay tm-overlay--top-right">
@@ -380,6 +399,7 @@ export default function TerritoryMap({
           territories={data.territories}
           onClose={() => setSelected(null)}
           hrefFor={hrefFor}
+          year={year}
         />
       )}
     </div>
@@ -391,13 +411,15 @@ function DetailPanel({
   territories,
   onClose,
   hrefFor,
+  year,
 }: {
   selected: Territory | Market;
   territories: Territory[];
   onClose: () => void;
   hrefFor?: (territoryId: string) => string;
+  year: number;
 }) {
-  const isTerritory = 'color' in selected && 'startYear' in selected && !('lat' in selected);
+  const isTerritory = "color" in selected && "startYear" in selected && !("lat" in selected);
   // The close button hangs off the panel and the content scrolls inside it.
   // Keeping them separate is what makes the panel safe to clamp: a territory's
   // meta runs to 427px, and a landscape map has 296px of height in total, so
@@ -409,7 +431,7 @@ function DetailPanel({
       </button>
       <div className="tm-detail-body">
         {isTerritory ? (
-          <TerritoryDetail t={selected as Territory} hrefFor={hrefFor} />
+          <TerritoryDetail t={selected as Territory} hrefFor={hrefFor} year={year} />
         ) : (
           <MarketDetail m={selected as Market} territories={territories} />
         )}
@@ -421,11 +443,17 @@ function DetailPanel({
 function TerritoryDetail({
   t,
   hrefFor,
+  year,
 }: {
   t: Territory;
   hrefFor?: (territoryId: string) => string;
+  year: number;
 }) {
   const href = hrefFor?.(t.id);
+  // The era covering the year on the slider, so Detroit under Harry Light and
+  // Detroit under The Sheik do not read identically. Falls back to the summary
+  // when a dataset carries no eras.
+  const era = t.eras?.find((e) => year >= e.fromYear && year <= e.toYear);
   return (
     <div>
       <h3 className="tm-detail-title">
@@ -441,10 +469,33 @@ function TerritoryDetail({
       <p className="tm-detail-years">
         {t.startYear}–{t.endYear}
       </p>
+      {era && (
+        <dl className="tm-detail-meta tm-detail-era">
+          <div>
+            <dt>In {year}</dt>
+            <dd>
+              {era.promotionName ?? t.name}
+              {era.promoter ? ` · ${era.promoter}` : ""}
+            </dd>
+          </div>
+          {era.states?.length ? (
+            <div>
+              <dt>Footprint</dt>
+              <dd>{era.states.join(", ")}</dd>
+            </div>
+          ) : null}
+          {era.nwaMember != null ? (
+            <div>
+              <dt>Alliance</dt>
+              <dd>{era.nwaMember ? "NWA member" : "Outside the NWA"}</dd>
+            </div>
+          ) : null}
+        </dl>
+      )}
       {t.meta && (
         <dl className="tm-detail-meta">
           {Object.entries(t.meta)
-            .filter(([, v]) => v != null && v !== '')
+            .filter(([, v]) => v != null && v !== "")
             .map(([k, v]) => (
               <div key={k}>
                 <dt>{k}</dt>
@@ -458,14 +509,12 @@ function TerritoryDetail({
 }
 
 function MarketDetail({ m, territories }: { m: Market; territories: Territory[] }) {
-  const owners = m.territoryIds.map(
-    (id) => territories.find((t) => t.id === id)?.name ?? id,
-  );
+  const owners = m.territoryIds.map((id) => territories.find((t) => t.id === id)?.name ?? id);
   return (
     <div>
       <h3 className="tm-detail-title">{m.name}</h3>
       {m.tier && <p className="tm-detail-years">{m.tier} market</p>}
-      <p className="tm-detail-owners">Run by: {owners.join(', ')}</p>
+      <p className="tm-detail-owners">Run by: {owners.join(", ")}</p>
     </div>
   );
 }

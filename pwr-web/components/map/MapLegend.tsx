@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Territory legend for the active year. Swatch + name, and (optionally) the
@@ -9,8 +9,8 @@
  * where the territories it names are drawn, so the caller decides when the map
  * no longer has room for it and the reader opens it on demand.
  */
-import type { MouseEvent } from 'react';
-import type { Territory } from '@/lib/map/config';
+import type { MouseEvent } from "react";
+import type { Territory } from "@/lib/map/config";
 
 export interface MapLegendProps {
   territories: Territory[];
@@ -25,7 +25,7 @@ export default function MapLegend({
   territories,
   selectedId,
   onSelect,
-  title = 'Territories',
+  title = "Territories",
   compact = false,
 }: MapLegendProps) {
   if (territories.length === 0) return null;
@@ -36,7 +36,7 @@ export default function MapLegend({
   // map that has room for neither, so the list gets out of the way.
   const collapseAfterSelect = (e: MouseEvent<HTMLButtonElement>) => {
     if (!compact) return;
-    e.currentTarget.closest('details')?.removeAttribute('open');
+    e.currentTarget.closest("details")?.removeAttribute("open");
   };
 
   const list = (
@@ -47,18 +47,14 @@ export default function MapLegend({
           <li key={t.id}>
             <button
               type="button"
-              className={`tm-legend-item${active ? ' is-active' : ''}`}
+              className={`tm-legend-item${active ? " is-active" : ""}`}
               onClick={(e) => {
                 onSelect?.(t);
                 collapseAfterSelect(e);
               }}
               aria-pressed={active}
             >
-              <span
-                className="tm-swatch"
-                style={{ backgroundColor: t.color }}
-                aria-hidden="true"
-              />
+              <span className="tm-swatch" style={{ backgroundColor: t.color }} aria-hidden="true" />
               <span className="tm-legend-name">{t.name}</span>
             </button>
           </li>

@@ -346,23 +346,23 @@
 }
 .tm-loading-label::after {
   /* Three dots that fill in, so the wait reads as progress. */
-  content: '.';
+  content: ".";
   animation: tm-ellipsis 1.4s steps(1, end) infinite;
 }
 @keyframes tm-ellipsis {
   0% {
-    content: '.';
+    content: ".";
   }
   33% {
-    content: '..';
+    content: "..";
   }
   66% {
-    content: '...';
+    content: "...";
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .tm-loading-label::after {
-    content: '...';
+    content: "...";
     animation: none;
   }
 }
@@ -417,4 +417,20 @@
   padding: 10px 14px;
   font-size: 13.5px;
   box-shadow: 0 2px 10px rgba(42, 34, 19, 0.25);
+}
+
+/* The year-aware block in the detail panel, set off from the free-form meta
+   below it so "who held this in 1963" reads as the answer to the slider. */
+.tm-detail-era {
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border, #d1cdc0);
+}
+.tm-detail-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.tm-detail-link:hover {
+  color: var(--burgundy, #5a1f2e);
 }

@@ -12,7 +12,7 @@ export interface SplitMarkerOptions {
 
 const DEFAULTS: Required<SplitMarkerOptions> = {
   radius: 7,
-  stroke: '#2a2213',
+  stroke: "#2a2213",
   strokeWidth: 1,
 };
 
@@ -25,16 +25,13 @@ function pointOnCircle(cx: number, cy: number, r: number, angle: number) {
 }
 
 /** An SVG string sized to fit `radius` (+ stroke) with a transparent bg. */
-export function splitMarkerSvg(
-  colors: string[],
-  options: SplitMarkerOptions = {},
-): string {
+export function splitMarkerSvg(colors: string[], options: SplitMarkerOptions = {}): string {
   const { radius, stroke, strokeWidth } = { ...DEFAULTS, ...options };
   const pad = strokeWidth + 1;
   const size = (radius + pad) * 2;
   const cx = size / 2;
   const cy = size / 2;
-  const slices = colors.length > 0 ? colors : ['#999999'];
+  const slices = colors.length > 0 ? colors : ["#999999"];
 
   let inner: string;
   if (slices.length === 1) {
@@ -52,11 +49,11 @@ export function splitMarkerSvg(
           `M ${cx} ${cy}`,
           `L ${p0.x.toFixed(2)} ${p0.y.toFixed(2)}`,
           `A ${radius} ${radius} 0 ${large} 1 ${p1.x.toFixed(2)} ${p1.y.toFixed(2)}`,
-          'Z',
-        ].join(' ');
+          "Z",
+        ].join(" ");
         return `<path d="${d}" fill="${color}" />`;
       })
-      .join('');
+      .join("");
     inner += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" />`;
   }
 
@@ -66,11 +63,11 @@ export function splitMarkerSvg(
 /** Marker radius by market tier. Trimmed ~15% so dense clusters stay readable. */
 export function radiusForTier(tier?: string): number {
   switch (tier) {
-    case 'Primary':
+    case "Primary":
       return 7.6;
-    case 'Secondary':
+    case "Secondary":
       return 5.5;
-    case 'Tertiary':
+    case "Tertiary":
       return 3.8;
     default:
       return 5.1;

@@ -34,3 +34,12 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Territory map
+
+`/map` draws the North American wrestling territories year by year, 1925 to
+1995, from the live database. County ownership is derived rather than authored:
+each county goes to the active promotion that claims its state and has the
+nearest town, inside a 320 km cap, so ground nobody ran near stays blank.
+
+See `lib/map/README.md` for how it is put together and how to verify a change.

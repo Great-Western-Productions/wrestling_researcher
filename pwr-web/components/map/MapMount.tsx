@@ -29,6 +29,11 @@ export function MapMount({
   config: MapConfig;
   data: TerritoryMapData;
   height?: string;
+  initialYear?: number;
+  /** Focus one promotion and grey out the rest. */
+  highlightId?: string | null;
+  /** Drop the legend and year control, for an illustration rather than a tool. */
+  bare?: boolean;
   /**
    * Prefix for a promotion's own page, e.g. "/territory/". A string rather than
    * a callback because props from a Server Component have to be serialisable,
@@ -36,9 +41,7 @@ export function MapMount({
    */
   hrefBase?: string;
 }) {
-  return (
-    <TerritoryMap {...props} hrefFor={hrefBase ? (id) => `${hrefBase}${id}` : undefined} />
-  );
+  return <TerritoryMap {...props} hrefFor={hrefBase ? (id) => `${hrefBase}${id}` : undefined} />;
 }
 
 export default MapMount;

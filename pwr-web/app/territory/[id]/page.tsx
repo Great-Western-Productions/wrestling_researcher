@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { TerritoryFootprint } from "@/components/map/TerritoryFootprint";
 import { db } from "@/lib/db/client";
 import { ifnull } from "@/lib/format";
 import {
@@ -37,6 +38,8 @@ export default async function TerritoryDetail({ params }: Props) {
           {t.nwa_member ? <span className="tag archive"> NWA</span> : null}
         </h1>
         {t.short_name && <p className="subtitle">{t.short_name}</p>}
+
+        <TerritoryFootprint territoryId={tid} name={t.name} />
 
         <table className="meta-table">
           <tbody>

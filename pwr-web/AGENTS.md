@@ -28,3 +28,27 @@ by hand.
 and a migration already recorded can never re-run. Repair schema drift with a new forward
 migration using `CREATE TABLE IF NOT EXISTS`. Check `.claude/worktrees/*` for migration files
 another branch has not merged yet before choosing the next number.
+
+# The territory map
+
+`/map` and the footprint block on `/territory/[id]` are drawn from the live
+database rather than from a committed JSON artifact. Full notes in
+`lib/map/README.md`; the three things that bite are:
+
+**`ssr: false` only works inside a Client Component** in this version of Next,
+so the `dynamic()` call lives in `components/map/MapMount.tsx`. Moving it into
+the page builds and then fails at runtime.
+
+**Props crossing into the map must be serialisable.** The page passes
+`hrefBase="/territory/"` and `MapMount` builds the callback. Passing a function
+straight from the Server Component throws.
+
+**The map will not render in Claude's in-app browser.** MapLibre's worker never
+starts there, so the canvas stays blank while the legend and year control draw
+normally. The published map at maps.gwawrestling.com fails identically in it, so
+it is the sandbox and not the code. Verify in a real browser, or headlessly with
+`tests/integration/queries/map.test.ts`, which drives the whole pipeline against
+a Testcontainers Postgres.
+
+Anything that writes a territory, era, market or run has to invalidate
+`MAP_CACHE_TAG`, or the change will not reach the map until the cache expires.

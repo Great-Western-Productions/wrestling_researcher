@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MapMount } from "@/components/map/MapMount";
-import type { MapConfig } from "@/lib/map/config";
 import { buildMapData, MAP_END_YEAR, MAP_START_YEAR } from "@/lib/map/build";
+import type { MapConfig } from "@/lib/map/config";
 
 // Reads live rows, same as the other pages. The expensive part (the geometry
 // parse and the assignment sweep) is held by unstable_cache, not by the route.
@@ -42,14 +42,14 @@ export default async function MapPage() {
       <h1>Territory map</h1>
       <p className="subtitle">
         The North American territories year by year, {MAP_START_YEAR} to {MAP_END_YEAR}. Every
-        border here is a consequence of which towns are on record, so the map moves as the
-        archive fills in.
+        border here is a consequence of which towns are on record, so the map moves as the archive
+        fills in.
       </p>
 
       {drawable === 0 ? (
         <p className="empty-note">
-          No promotion has an era and a colour yet, so there is nothing to draw. Add a territory
-          era and a few market runs and this page will show them.
+          No promotion has an era and a colour yet, so there is nothing to draw. Add a territory era
+          and a few market runs and this page will show them.
         </p>
       ) : (
         <MapMount config={CONFIG} data={data} height="72vh" hrefBase="/territory/" />
@@ -63,9 +63,9 @@ export default async function MapPage() {
       </p>
 
       <p className="map-accuracy">
-        <strong>A note on accuracy:</strong> these borders are derived from the towns each
-        promotion is recorded as running, so some are certainly wrong or incomplete. Corrections
-        belong in the record itself.
+        <strong>A note on accuracy:</strong> these borders are derived from the towns each promotion
+        is recorded as running, so some are certainly wrong or incomplete. Corrections belong in the
+        record itself.
       </p>
     </>
   );

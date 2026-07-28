@@ -9,7 +9,24 @@
  * (territories + assignments + markets [+ contested]) plus a page that
  * instantiates <TerritoryMap config={...} data={...} />.
  */
-import type { MultiPolygon, Polygon } from 'geojson';
+import type { MultiPolygon, Polygon } from "geojson";
+
+/**
+ * A stretch during which a promotion held one identity and one footprint.
+ *
+ * A promotion is rarely one thing for its whole life: it changes hands, it is
+ * renamed, it gains or loses a state. Carrying the eras lets the detail panel
+ * answer "who held this in 1963" rather than showing the same summary at every
+ * point on the slider.
+ */
+export interface TerritoryEra {
+  fromYear: number;
+  toYear: number;
+  promotionName?: string;
+  promoter?: string;
+  states?: string[];
+  nwaMember?: boolean;
+}
 
 /** A promotion / territory. `color` drives the Tier-1 county fill. */
 export interface Territory {
@@ -19,6 +36,8 @@ export interface Territory {
   color: string;
   startYear: number;
   endYear: number;
+  /** Optional, ordered. The panel shows the one covering the current year. */
+  eras?: TerritoryEra[];
   /** Free-form: company, hub city, style, booking philosophy, links, etc. */
   meta?: Record<string, unknown>;
 }
@@ -37,7 +56,7 @@ export interface CountyAssignment {
   toYear: number;
 }
 
-export type MarketTier = 'Primary' | 'Secondary' | 'Tertiary';
+export type MarketTier = "Primary" | "Secondary" | "Tertiary";
 
 /**
  * Tier 2 — shared markets. Rendered as point markers. When `territoryIds`
@@ -103,12 +122,12 @@ export interface TerritoryMapData {
  * and Mexican municipios, so cross-border territories get a real fill.
  * `na-states` is the country/province outline drawn behind both.
  */
-export type BaseGeography = 'us-counties' | 'na-admin2' | 'na-states';
+export type BaseGeography = "us-counties" | "na-admin2" | "na-states";
 
 /** `{start,end}` ⇒ interactive slider; `number[]` ⇒ fixed snapshots. */
 export type YearSpec = { start: number; end: number } | number[];
 
-export type OverlayKind = 'markets' | 'contested';
+export type OverlayKind = "markets" | "contested";
 
 export interface MapConfig {
   id: string;
@@ -128,9 +147,7 @@ export interface MapConfig {
 }
 
 /** True when the config drives an interactive year slider. */
-export function isYearRange(
-  years: YearSpec,
-): years is { start: number; end: number } {
+export function isYearRange(years: YearSpec): years is { start: number; end: number } {
   return !Array.isArray(years);
 }
 

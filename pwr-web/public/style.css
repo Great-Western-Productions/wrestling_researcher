@@ -991,3 +991,48 @@ code {
   font-family: var(--mono);
   font-size: 0.92em;
 }
+
+/* ---- Territory map -------------------------------------------------- */
+
+/* Stand-in while the renderer's chunk loads. Matches the map's own box so the
+   page does not jump when it arrives. */
+.map-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42vh;
+  border: 1px solid var(--border-mid);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* The coverage line under the map. Deliberately plain: it is a statement about
+   how much of the corpus is filled in, not a headline. */
+.map-coverage,
+.map-accuracy {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.map-accuracy {
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--border-mid);
+}
+
+.empty-note {
+  padding: 1.25rem;
+  border: 1px dashed var(--border-mid);
+  border-radius: 6px;
+  background: var(--paper-warm);
+  color: var(--ink-soft);
+}
+
+/* One promotion's turf on its own record page. */
+.territory-footprint {
+  margin: 1.5rem 0;
+}
+.territory-footprint h2 {
+  margin-bottom: 0.25rem;
+}

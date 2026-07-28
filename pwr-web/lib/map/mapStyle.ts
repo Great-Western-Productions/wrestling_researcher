@@ -12,31 +12,31 @@ import type {
   FillLayerSpecification,
   LineLayerSpecification,
   StyleSpecification,
-} from 'maplibre-gl';
-import type { BaseGeography, MapConfig, Territory } from './config';
-import type { MapTheme } from './theme';
+} from "maplibre-gl";
+import type { BaseGeography, MapConfig, Territory } from "./config";
+import type { MapTheme } from "./theme";
 
 export const SRC = {
-  counties: 'counties',
-  states: 'states',
-  contested: 'contested',
+  counties: "counties",
+  states: "states",
+  contested: "contested",
 } as const;
 
 export const LYR = {
-  background: 'bg',
-  countyFill: 'county-fill',
-  countyLine: 'county-line',
-  stateLine: 'state-line',
-  contestedFill: 'contested-fill',
+  background: "bg",
+  countyFill: "county-fill",
+  countyLine: "county-line",
+  stateLine: "state-line",
+  contestedFill: "contested-fill",
 } as const;
 
 /** Property name carrying the zero-padded 5-char county FIPS. */
-export const FIPS_PROP = 'fips';
+export const FIPS_PROP = "fips";
 
 const DEFAULT_GEO_URLS: Record<BaseGeography, string> = {
-  'us-counties': '/geo/us-counties.geojson',
-  'na-admin2': '/geo/na-admin2.geojson',
-  'na-states': '/geo/na-states.geojson',
+  "us-counties": "/geo/us-counties.geojson",
+  "na-admin2": "/geo/na-admin2.geojson",
+  "na-states": "/geo/na-states.geojson",
 };
 
 export function geoUrl(config: MapConfig, geo: BaseGeography): string {
@@ -59,78 +59,72 @@ export function countyFillColor(
   for (const [fips, territoryId] of ownership) {
     // Highlight mode: everyone but the focused territory greys out.
     const color =
-      highlightId && territoryId !== highlightId
-        ? theme.dimFill
-        : colorOf.get(territoryId);
+      highlightId && territoryId !== highlightId ? theme.dimFill : colorOf.get(territoryId);
     if (color) pairs.push(fips, color);
   }
   if (pairs.length === 0) return theme.unassignedFill;
   return [
-    'match',
-    ['get', FIPS_PROP],
+    "match",
+    ["get", FIPS_PROP],
     ...pairs,
     theme.unassignedFill,
   ] as unknown as ExpressionSpecification;
 }
 
 /** The base style: paper background + empty-until-loaded county/state sources. */
-export function buildBaseStyle(
-  config: MapConfig,
-  theme: MapTheme,
-): StyleSpecification {
+export function buildBaseStyle(config: MapConfig, theme: MapTheme): StyleSpecification {
   const countyFill: FillLayerSpecification = {
     id: LYR.countyFill,
-    type: 'fill',
+    type: "fill",
     source: SRC.counties,
     paint: {
-      'fill-color': theme.unassignedFill,
-      'fill-opacity': theme.fillOpacity,
+      "fill-color": theme.unassignedFill,
+      "fill-opacity": theme.fillOpacity,
       // Crossfade ownership changes when the year advances.
-      'fill-color-transition': { duration: 350, delay: 0 },
+      "fill-color-transition": { duration: 350, delay: 0 },
     },
   };
 
   const countyLine: LineLayerSpecification = {
     id: LYR.countyLine,
-    type: 'line',
+    type: "line",
     source: SRC.counties,
     paint: {
-      'line-color': theme.countyOutline,
-      'line-width': theme.countyOutlineWidth,
+      "line-color": theme.countyOutline,
+      "line-width": theme.countyOutlineWidth,
     },
   };
 
   const stateLine: LineLayerSpecification = {
     id: LYR.stateLine,
-    type: 'line',
+    type: "line",
     source: SRC.states,
     paint: {
-      'line-color': theme.stateOutline,
-      'line-width': theme.stateOutlineWidth,
+      "line-color": theme.stateOutline,
+      "line-width": theme.stateOutlineWidth,
     },
   };
 
   // The fill layer draws whichever admin-2 geography the config asked for.
-  const admin2: BaseGeography =
-    config.baseGeography === 'na-admin2' ? 'na-admin2' : 'us-counties';
+  const admin2: BaseGeography = config.baseGeography === "na-admin2" ? "na-admin2" : "us-counties";
 
-  const sources: StyleSpecification['sources'] = {
+  const sources: StyleSpecification["sources"] = {
     [SRC.counties]: {
-      type: 'geojson',
+      type: "geojson",
       data: geoUrl(config, admin2),
       promoteId: FIPS_PROP,
     },
     [SRC.states]: {
-      type: 'geojson',
-      data: geoUrl(config, 'na-states'),
+      type: "geojson",
+      data: geoUrl(config, "na-states"),
     },
   };
 
-  const layers: StyleSpecification['layers'] = [
+  const layers: StyleSpecification["layers"] = [
     {
       id: LYR.background,
-      type: 'background',
-      paint: { 'background-color': theme.paper },
+      type: "background",
+      paint: { "background-color": theme.paper },
     },
   ];
 
@@ -156,11 +150,11 @@ export function hatchPattern(
   color: string,
   size = 8,
 ): { width: number; height: number; data: Uint8ClampedArray } | null {
-  if (typeof document === 'undefined') return null;
-  const canvas = document.createElement('canvas');
+  if (typeof document === "undefined") return null;
+  const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
   if (!ctx) return null;
   ctx.clearRect(0, 0, size, size);
   ctx.strokeStyle = color;

@@ -9,13 +9,20 @@
 import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db/client";
 import {
+  type MapTerritoryRow,
   marketRunsForMap,
   marketsForMap,
-  type MapTerritoryRow,
   territoriesForMap,
 } from "@/lib/queries/map";
 import { assignCounties, DEFAULT_CAP_KM, loadUnits } from "./assign";
-import type { BaseGeography, Market, MarketTenure, Territory, TerritoryMapData } from "./config";
+import type {
+  BaseGeography,
+  Market,
+  MarketTenure,
+  Territory,
+  TerritoryEra,
+  TerritoryMapData,
+} from "./config";
 
 /** The closed window this map covers. Nothing about it moves. */
 export const MAP_START_YEAR = 1925;
@@ -23,21 +30,33 @@ export const MAP_END_YEAR = 1995;
 
 export const MAP_CACHE_TAG = "map-data";
 
-/** Renders a promotion's eras into one line for the detail panel. */
-function describeEras(t: MapTerritoryRow): string {
+/**
+ * The eras a promotion held, in the renderer's shape, so the detail panel can
+ * show the one covering the year on the slider rather than the same summary at
+ * every point.
+ */
+function erasFor(t: MapTerritoryRow): TerritoryEra[] {
   return t.eras
-    .map((e) => {
-      const to = e.to_year ?? MAP_END_YEAR;
-      const who = e.promoter ?? e.promotion_name ?? "";
-      const span = e.from_year === to ? `${e.from_year}` : `${e.from_year}–${to}`;
-      return who ? `${span} ${who}` : span;
-    })
-    .join(" · ");
+    .filter((e) => e.from_year != null)
+    .map((e) => ({
+      fromYear: e.from_year,
+      toYear: e.to_year ?? MAP_END_YEAR,
+      promotionName: e.promotion_name ?? undefined,
+      promoter: e.promoter ?? undefined,
+      states: e.states ?? undefined,
+      nwaMember: e.nwa_member ?? undefined,
+    }))
+    .sort((a, b) => a.fromYear - b.fromYear);
 }
 
-async function build(): Promise<TerritoryMapData> {
-  // module-scope client, same as the other pages
+type Db = Parameters<typeof territoriesForMap>[0];
 
+/**
+ * The whole pipeline against an explicit handle, so an integration test can
+ * drive it inside a rolled-back transaction. `buildMapData` below is this with
+ * the app's connection and the cache wrapped around it.
+ */
+export async function buildMapDataWith(db: Db): Promise<TerritoryMapData> {
   const [terrRows, marketRows, runRows] = await Promise.all([
     territoriesForMap(db, MAP_END_YEAR),
     marketsForMap(db),
@@ -50,11 +69,10 @@ async function build(): Promise<TerritoryMapData> {
     color: t.map_color,
     startYear: t.start_year,
     endYear: t.end_year,
+    eras: erasFor(t),
     meta: {
-      promotion: t.eras.at(-1)?.promotion_name ?? t.name,
       hub: [t.headquarters_city, t.headquarters_state].filter(Boolean).join(", ") || undefined,
       region: t.region ?? undefined,
-      eras: describeEras(t),
       lineage: t.lineage_key ?? undefined,
     },
   }));
@@ -102,9 +120,7 @@ async function build(): Promise<TerritoryMapData> {
       territoryIds: owners,
       tier,
       startYear: runs.length ? Math.min(...runs.map((r) => r.from_year)) : MAP_START_YEAR,
-      endYear: runs.length
-        ? Math.max(...runs.map((r) => r.to_year ?? MAP_END_YEAR))
-        : MAP_END_YEAR,
+      endYear: runs.length ? Math.max(...runs.map((r) => r.to_year ?? MAP_END_YEAR)) : MAP_END_YEAR,
       meta: { state: m.state, country: m.country },
     };
   });
@@ -145,6 +161,6 @@ async function build(): Promise<TerritoryMapData> {
  * corpus scale. Warm is a memory read. Revalidate MAP_CACHE_TAG from anything
  * that writes a territory, era, market or run.
  */
-export const buildMapData = unstable_cache(build, ["territory-map-data"], {
+export const buildMapData = unstable_cache(() => buildMapDataWith(db), ["territory-map-data"], {
   tags: [MAP_CACHE_TAG],
 });
