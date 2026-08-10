@@ -201,11 +201,19 @@ export async function resolvePublication(
 // ---------------------------------------------------------------------------
 
 const ARCHIVE_PAGE = 50;
+/** Offsets past this stop the walk, so a misbehaving archive cannot loop forever. */
+const MAX_ARCHIVE_OFFSET = 10_000;
 
 /**
- * Walk `/api/v1/archive` newest-first until the publication runs out of posts
- * or `limit` is reached. Paging stops on a short page; Substack returns fewer
- * than `limit` items only at the end of the archive.
+ * Walk `/api/v1/archive` newest-first until the archive runs out, `limit` is
+ * reached, or a post older than `since` appears (the listing is date-sorted, so
+ * the first one older than the cutoff ends the walk).
+ *
+ * Paging is by index, and a short page does NOT mean the end: Substack returns
+ * fewer rows than asked for at arbitrary offsets — the first page of a
+ * ~700-post publication came back with 23 — so the walk advances by a fixed
+ * stride and stops only on an empty page. Overlapping offsets are possible, so
+ * posts are de-duplicated by slug on the way through.
  */
 export async function fetchArchive(
   origin: string,
@@ -213,32 +221,34 @@ export async function fetchArchive(
 ): Promise<ArchivePost[]> {
   const limit = opts.limit ?? Number.POSITIVE_INFINITY;
   const collected: ArchivePost[] = [];
+  const seen = new Set<string>();
   let offset = 0;
 
-  while (collected.length < limit) {
-    const pageSize = Math.min(ARCHIVE_PAGE, limit - collected.length);
-    const url = `${origin}/api/v1/archive?sort=new&search=&offset=${offset}&limit=${pageSize}`;
+  while (collected.length < limit && offset < MAX_ARCHIVE_OFFSET) {
+    const url = `${origin}/api/v1/archive?sort=new&search=&offset=${offset}&limit=${ARCHIVE_PAGE}`;
     const payload = await getJson(url, opts);
     if (!Array.isArray(payload)) {
       throw new SubstackError(`Archive at ${url} was not a list`);
     }
-    const page = payload.flatMap((entry) => {
-      const parsed = archivePostSchema.safeParse(entry);
-      return parsed.success ? [parsed.data] : [];
-    });
-    if (page.length === 0) break;
+    if (payload.length === 0) break;
 
     let reachedCutoff = false;
-    for (const post of page) {
+    for (const entry of payload) {
+      const parsed = archivePostSchema.safeParse(entry);
+      if (!parsed.success) continue;
+      const post = parsed.data;
       if (opts.since && post.post_date && new Date(post.post_date) < opts.since) {
         reachedCutoff = true;
         break;
       }
+      if (seen.has(post.slug)) continue;
+      seen.add(post.slug);
       collected.push(post);
+      if (collected.length >= limit) break;
     }
-    if (reachedCutoff || payload.length < pageSize) break;
+    if (reachedCutoff) break;
 
-    offset += payload.length;
+    offset += ARCHIVE_PAGE;
     await sleep(opts.sleepMs ?? 1200);
   }
 

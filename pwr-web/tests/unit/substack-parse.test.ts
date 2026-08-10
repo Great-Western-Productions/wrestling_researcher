@@ -171,6 +171,21 @@ describe("normalizePost", () => {
     expect(post.body_truncated).toBe(true);
   });
 
+  it("does not flag a public post that carries a truncated_body_text excerpt", () => {
+    // Substack sets truncated_body_text on fully public posts as a listing
+    // excerpt. Reading it as a paywall marker flagged whole publications.
+    const post = normalizePost(
+      {
+        ...base,
+        audience: "everyone",
+        wordcount: 8,
+        truncated_body_text: "Two hundred words of sourcing…",
+      },
+      opts,
+    );
+    expect(post.body_truncated).toBe(false);
+  });
+
   it("joins multiple bylines", () => {
     const post = normalizePost(
       { ...base, publishedBylines: [{ name: "One" }, { name: "Two" }] },

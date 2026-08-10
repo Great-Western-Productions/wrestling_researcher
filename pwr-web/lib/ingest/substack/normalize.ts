@@ -32,16 +32,19 @@ const clean = (value: string | null | undefined): string | null => {
 };
 
 /**
- * A post is treated as truncated when the body we hold is not the whole
- * article. Two signals: the post is gated to paying subscribers, or Substack's
- * own word count is well above what came back in the HTML — which is what a
- * free teaser of a paid post looks like even when `audience` says otherwise.
+ * A post is treated as truncated when the body held is not the whole article.
+ * Two signals: the post is gated to paying subscribers, or Substack's own word
+ * count is well above what came back in the HTML — which is what the free
+ * teaser of a paid post looks like even when `audience` says otherwise.
+ *
+ * `truncated_body_text` is NOT one of the signals, despite the name. Substack
+ * populates it on fully public posts as a listing excerpt, so reading it as a
+ * paywall marker flags an entire publication as teaser-only.
  */
 function isTruncated(post: ArchivePost, extractedWords: number): boolean {
   if (!post.body_html) return true;
   const audience = clean(post.audience);
   if (audience && audience !== "everyone") return true;
-  if (post.truncated_body_text) return true;
   const claimed = post.wordcount ?? 0;
   return claimed > 0 && extractedWords < claimed * 0.6;
 }
