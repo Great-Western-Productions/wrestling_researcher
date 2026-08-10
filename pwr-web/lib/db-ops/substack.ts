@@ -197,6 +197,81 @@ export async function linkPostSources(
 // Reads
 // ---------------------------------------------------------------------------
 
+export type StoredPostBody = {
+  id: number;
+  slug: string;
+  canonical_url: string;
+  body_html: string | null;
+};
+
+/**
+ * Stored posts with their HTML, for re-extracting links after a parser change.
+ * The bodies are already on disk, so a fix ships without re-fetching the
+ * publication.
+ */
+export async function postsWithBodies(db: Db, publicationId: number): Promise<StoredPostBody[]> {
+  return db.execute<StoredPostBody>(sql`
+    SELECT id, slug, canonical_url, body_html
+      FROM substack_posts
+     WHERE publication_id = ${publicationId} AND body_html IS NOT NULL
+     ORDER BY id
+  `);
+}
+
+/**
+ * Replace a post's citations with a freshly extracted set.
+ *
+ * Clearing first is what lets a parser fix retract a link it should never have
+ * recorded; `linkPostSources` alone only ever adds. The `research_sources` rows
+ * themselves are left alone — another table may reference one, and a URL that
+ * stops being cited is still a URL that was consulted.
+ */
+export async function relinkPost(
+  db: Db,
+  postId: number,
+  links: ExtractedLink[],
+  opts: { kinds?: ExtractedLink["kind"][] } = {},
+): Promise<LinkSourcesResult & { removed: number; removedUrls: string[] }> {
+  return db.transaction(async (tx) => {
+    const before = await tx.execute<{ id: number; url: string }>(sql`
+      SELECT rs.id, rs.url FROM substack_post_sources ps
+        JOIN research_sources rs ON rs.id = ps.source_id
+       WHERE ps.post_id = ${postId}
+    `);
+    await tx.execute(sql`DELETE FROM substack_post_sources WHERE post_id = ${postId}`);
+    const result = await linkPostSources(tx, postId, links, opts);
+
+    const kept = new Set(links.map((link) => link.url));
+    const removedUrls = before.filter((row) => !kept.has(row.url)).map((row) => row.url);
+    return { ...result, removed: removedUrls.length, removedUrls };
+  });
+}
+
+/**
+ * Of the given URLs, the ones no `substack_posts` row cites any more and no
+ * other table references either.
+ *
+ * Scoped to a caller-supplied list on purpose. An unscoped version returns every
+ * unreferenced `research_sources` row, which includes the hand-curated ones that
+ * were never meant to be attached to anything — reading that list as deletable
+ * would throw away curated research.
+ */
+export async function uncitedSources(
+  db: Db,
+  urls: string[],
+): Promise<{ id: number; url: string }[]> {
+  if (urls.length === 0) return [];
+  return db.execute<{ id: number; url: string }>(sql`
+    SELECT rs.id, rs.url
+      FROM research_sources rs
+     WHERE rs.url = ANY(${sql.param(urls)}::text[])
+       AND NOT EXISTS (SELECT 1 FROM substack_post_sources ps WHERE ps.source_id = rs.id)
+       AND NOT EXISTS (SELECT 1 FROM territory_eras te WHERE te.source_id = rs.id)
+       AND NOT EXISTS (SELECT 1 FROM territory_market_runs tr WHERE tr.source_id = rs.id)
+     ORDER BY rs.id
+  `);
+}
+
 /**
  * Slug → what's already stored, so an incremental run can skip re-fetching a
  * post whose body it already holds in full.

@@ -88,6 +88,29 @@ describe("classifyLink", () => {
       "external",
     );
   });
+
+  it("treats a reader-domain link to the publication's own post as a self-link", () => {
+    expect(
+      classifyLink("https://open.substack.com/pub/memphis/p/the-belt", "memphis.substack.com"),
+    ).toBe("self");
+    expect(
+      classifyLink("https://open.substack.com/pub/someoneelse/p/theirs", "memphis.substack.com"),
+    ).toBe("substack");
+  });
+});
+
+describe("Substack interface links", () => {
+  it("drops the app, subscribe, and sign-in chrome the editor injects", () => {
+    expect(normalizeUrl("https://substack.com/app/app-store-redirect")).toBeNull();
+    expect(normalizeUrl("https://memphis.substack.com/subscribe?utm_source=x")).toBeNull();
+    expect(normalizeUrl("https://substack.com/sign-in")).toBeNull();
+  });
+
+  it("keeps a real post URL on the same host", () => {
+    expect(normalizeUrl("https://memphis.substack.com/p/the-belt")).toBe(
+      "https://memphis.substack.com/p/the-belt",
+    );
+  });
 });
 
 describe("extractLinks", () => {

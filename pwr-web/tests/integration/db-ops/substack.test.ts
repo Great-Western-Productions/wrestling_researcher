@@ -5,8 +5,11 @@ import {
   linkPostSources,
   listCitedSources,
   listPublications,
+  postsWithBodies,
   refreshPublicationStats,
+  relinkPost,
   searchPosts,
+  uncitedSources,
   upsertPost,
   upsertPublication,
 } from "@/lib/db-ops/substack";
@@ -231,6 +234,65 @@ describe("linkPostSources", () => {
         sql`SELECT COUNT(*)::int AS n FROM substack_post_sources WHERE post_id = ${stored.id}`,
       );
       expect(rows[0]?.n).toBe(2);
+    });
+  });
+
+  it("retracts a citation on relink when the parser stops recognising it", async () => {
+    await withTx(async (tx) => {
+      const { stored } = await seed(tx);
+
+      // A parser change that no longer treats the board thread as a citation.
+      const kept = normalize().links.filter((link) => !link.url.includes("wrestlingclassics"));
+      const result = await relinkPost(tx, stored.id, kept);
+
+      expect(result.linked).toBe(1);
+      expect(result.removed).toBe(1);
+
+      const rows = await tx.execute<{ url: string }>(sql`
+        SELECT rs.url FROM substack_post_sources ps
+          JOIN research_sources rs ON rs.id = ps.source_id
+         WHERE ps.post_id = ${stored.id}
+      `);
+      expect(rows.map((r) => r.url)).toEqual(["https://www.cagematch.net/?id=5&nr=70"]);
+    });
+  });
+
+  it("reports a no-longer-cited source without deleting it", async () => {
+    await withTx(async (tx) => {
+      const { stored } = await seed(tx);
+      const result = await relinkPost(tx, stored.id, []);
+
+      const orphans = await uncitedSources(tx, result.removedUrls);
+      expect(orphans.map((o) => o.url)).toContain("https://wrestlingclassics.com/thread/41");
+
+      const still = await tx.execute<{ n: number }>(
+        sql`SELECT COUNT(*)::int AS n FROM research_sources WHERE url LIKE '%wrestlingclassics%'`,
+      );
+      expect(still[0]?.n).toBe(1);
+    });
+  });
+
+  it("never reports a hand-curated source that was simply never cited", async () => {
+    await withTx(async (tx) => {
+      await tx.execute(sql`
+        INSERT INTO research_sources (url, description)
+        VALUES ('https://chroniclingamerica.loc.gov/', 'Curated: newspaper archive')
+      `);
+      const { stored } = await seed(tx);
+      const result = await relinkPost(tx, stored.id, []);
+
+      const orphans = await uncitedSources(tx, result.removedUrls);
+      expect(orphans.map((o) => o.url)).not.toContain("https://chroniclingamerica.loc.gov/");
+    });
+  });
+
+  it("hands back stored bodies so a relink needs no re-fetch", async () => {
+    await withTx(async (tx) => {
+      const { pub, stored } = await seed(tx);
+      const rows = await postsWithBodies(tx, pub.id);
+      expect(rows).toHaveLength(1);
+      expect(rows[0]?.id).toBe(stored.id);
+      expect(rows[0]?.body_html).toContain("Mid-South Coliseum");
     });
   });
 

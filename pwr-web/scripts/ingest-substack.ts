@@ -40,6 +40,9 @@
  *   --list                List stored publications and exit.
  *   --search <query>      Full-text search the stored corpus and exit.
  *   --sources             List the most-cited URLs and exit.
+ *   --relink              Re-extract citations from post bodies already stored,
+ *                         without re-fetching. Use after a parser change; it can
+ *                         retract a link that should never have been recorded.
  */
 
 import fs from "node:fs/promises";
@@ -53,8 +56,11 @@ import {
   linkPostSources,
   listCitedSources,
   listPublications,
+  postsWithBodies,
   refreshPublicationStats,
+  relinkPost,
   searchPosts,
+  uncitedSources,
   upsertPost,
   upsertPublication,
 } from "@/lib/db-ops/substack";
@@ -69,7 +75,7 @@ import {
   sleep,
 } from "@/lib/ingest/substack/client";
 import { normalizePost } from "@/lib/ingest/substack/normalize";
-import type { ExtractedLink } from "@/lib/ingest/substack/parse";
+import { type ExtractedLink, extractLinks } from "@/lib/ingest/substack/parse";
 
 // ---------------------------------------------------------------------------
 // CLI
@@ -91,6 +97,7 @@ const { values } = parseArgs({
     list: { type: "boolean" },
     search: { type: "string" },
     sources: { type: "boolean" },
+    relink: { type: "boolean" },
   },
   strict: true,
 });
@@ -332,6 +339,43 @@ async function runSearch(db: Db, query: string): Promise<void> {
   }
 }
 
+/**
+ * Replay link extraction over stored bodies. The point of keeping `body_html`
+ * is that a parser fix does not cost another walk of the publication.
+ */
+async function runRelink(db: Db): Promise<void> {
+  const pubs = await listPublications(db);
+  const retracted = new Set<string>();
+
+  for (const pub of pubs) {
+    const posts = await postsWithBodies(db, pub.id);
+    let linked = 0;
+    let removed = 0;
+    for (const post of posts) {
+      const links = extractLinks(post.body_html, {
+        baseUrl: post.canonical_url,
+        publicationHost: pub.host,
+      });
+      const result = await relinkPost(db, post.id, links, { kinds: LINK_KINDS });
+      linked += result.linked;
+      removed += result.removed;
+      for (const url of result.removedUrls) retracted.add(url);
+    }
+    console.log(
+      `${pub.name}: ${posts.length} post(s) re-scanned, ${linked} citation(s), ${removed} retracted`,
+    );
+  }
+
+  // Only URLs this run stopped citing, never the whole unreferenced table --
+  // most of that is hand-curated research that was never tied to a post.
+  const stranded = await uncitedSources(db, [...retracted]);
+  if (stranded.length > 0) {
+    console.log(`\n${stranded.length} retracted URL(s) now cited by nothing:`);
+    for (const row of stranded) console.log(`  #${row.id}  ${row.url}`);
+    console.log("Left in place. Delete by hand if they were only ever ingest noise.");
+  }
+}
+
 async function runSources(db: Db): Promise<void> {
   const rows = await listCitedSources(db, { limit: LIMIT ?? 50 });
   if (rows.length === 0) {
@@ -365,6 +409,7 @@ async function main(): Promise<void> {
     if (values.list) return await runList(db);
     if (values.search) return await runSearch(db, values.search);
     if (values.sources) return await runSources(db);
+    if (values.relink) return await runRelink(db);
 
     let targets = inputs;
     if (values.all) {
@@ -373,7 +418,7 @@ async function main(): Promise<void> {
     }
     if (targets.length === 0) {
       console.error(
-        "Nothing to do. Pass --publication <host>, --all, --list, --search, or --sources.",
+        "Nothing to do. Pass --publication <host>, --all, --list, --search, --sources, or --relink.",
       );
       process.exit(1);
     }

@@ -64,6 +64,21 @@ const ASSET_HOSTS = new Set([
   "bucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com",
 ]);
 
+/**
+ * Substack's own interface, which the editor injects into post bodies: the
+ * "Get the app" button, subscribe and sign-in prompts, comment and share
+ * widgets. These are chrome, not anything the author cited.
+ */
+const SUBSTACK_UI_PATHS = [
+  /^\/app\//i,
+  /^\/sign-in/i,
+  /^\/subscribe/i,
+  /^\/account/i,
+  /^\/settings/i,
+  /^\/refer/i,
+  /^\/leaderboard/i,
+];
+
 /** Query parameters that identify a referral, not a document. */
 const TRACKING_PARAMS = [
   /^utm_/i,
@@ -169,12 +184,16 @@ export function normalizeUrl(href: string, baseUrl?: string): string | null {
   const host = url.hostname.replace(/^www\./, "");
   if (ASSET_HOSTS.has(host)) return null;
 
-  if (host === "substack.com" && url.pathname.startsWith("/redirect/")) {
+  const isSubstackHost = host === "substack.com" || host.endsWith(".substack.com");
+  if (isSubstackHost && url.pathname.startsWith("/redirect/")) {
     const target = url.searchParams.get("u") ?? url.searchParams.get("url");
     if (target) {
       const unwrapped = normalizeUrl(target);
       if (unwrapped) return unwrapped;
     }
+  }
+  if (isSubstackHost && SUBSTACK_UI_PATHS.some((pattern) => pattern.test(url.pathname))) {
+    return null;
   }
 
   for (const key of [...url.searchParams.keys()]) {
@@ -188,16 +207,32 @@ export function normalizeUrl(href: string, baseUrl?: string): string | null {
   return url.toString();
 }
 
+/**
+ * A publication also reaches its own posts through Substack's reader domains —
+ * `open.substack.com/pub/<handle>/p/<slug>` is the same article as
+ * `<handle>.substack.com/p/<slug>`. Matching only on host would file those as
+ * citations of another Substack, so the handle is checked too.
+ *
+ * Only derivable for a `*.substack.com` publication. One on a custom domain
+ * has no handle in its host, so a reader-domain link to its own post is filed
+ * as `substack` rather than `self`: over-captured, never lost.
+ */
 export function classifyLink(url: string, publicationHost: string): LinkKind {
-  let host: string;
+  let parsed: URL;
   try {
-    host = new URL(url).hostname.replace(/^www\./, "").toLowerCase();
+    parsed = new URL(url);
   } catch {
     return "external";
   }
+  const host = parsed.hostname.replace(/^www\./, "").toLowerCase();
   const pub = publicationHost.replace(/^www\./, "").toLowerCase();
   if (host === pub) return "self";
-  if (host === "substack.com" || host.endsWith(".substack.com")) return "substack";
+
+  if (host === "substack.com" || host.endsWith(".substack.com")) {
+    const handle = pub.endsWith(".substack.com") ? pub.slice(0, -".substack.com".length) : null;
+    if (handle && parsed.pathname.toLowerCase().startsWith(`/pub/${handle}/`)) return "self";
+    return "substack";
+  }
   return "external";
 }
 
