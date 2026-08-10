@@ -17,6 +17,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "ingest:won-1986": "tsx scripts/ingest-won-whos-who-1986.ts",
+    "ingest:substack": "tsx scripts/ingest-substack.ts",
     "mcp:dev": "tsx mcp/server.ts",
     "mcp:start": "tsx mcp/server.ts"
   },

@@ -1304,3 +1304,134 @@ export const v_territory_year_markets = pgView("v_territory_year_markets", {
 }).as(
   sql`SELECT r.territory_id, t.name AS territory_name, g.year, r.market_id, m.name AS market_name, m.state, m.country, m.lat, m.lon, r.tier, r.confidence FROM territory_market_runs r JOIN territories t ON t.id = r.territory_id JOIN markets m ON m.id = r.market_id CROSS JOIN LATERAL generate_series(r.from_year, COALESCE(r.to_year, EXTRACT(YEAR FROM CURRENT_DATE)::integer)) AS g(year)`,
 );
+
+// ---------------------------------------------------------------------------
+// Substack ingest (migration 0010_substack)
+//
+// A publication is one newsletter, keyed by the host it finally resolves to --
+// Substack 301s subdomain.substack.com to a custom domain when the author has
+// one, so the effective host is the stable identity, not the URL we started at.
+// ---------------------------------------------------------------------------
+
+export const substack_publications = pgTable(
+  "substack_publications",
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity({
+      name: "substack_publications_id_seq",
+      startWith: 1,
+      increment: 1,
+      minValue: 1,
+      maxValue: 2147483647,
+      cache: 1,
+    }),
+    name: text().notNull(),
+    host: text().notNull(),
+    url: text().notNull(),
+    author: text(),
+    description: text(),
+    language: text().default("English"),
+    focus: text(),
+    active: boolean().default(true).notNull(),
+    first_post_at: timestamp({ withTimezone: true }),
+    last_post_at: timestamp({ withTimezone: true }),
+    last_fetched_at: timestamp({ withTimezone: true }),
+    notes: text(),
+    created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+    updated_at: timestamp({ withTimezone: true }),
+  },
+  (table) => [unique("substack_publications_host_key").on(table.host)],
+);
+
+export const substack_posts = pgTable(
+  "substack_posts",
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity({
+      name: "substack_posts_id_seq",
+      startWith: 1,
+      increment: 1,
+      minValue: 1,
+      maxValue: 2147483647,
+      cache: 1,
+    }),
+    publication_id: integer().notNull(),
+    substack_post_id: integer(),
+    slug: text().notNull(),
+    title: text().notNull(),
+    subtitle: text(),
+    author: text(),
+    published_at: timestamp({ withTimezone: true }),
+    canonical_url: text().notNull(),
+    post_type: text(),
+    audience: text(),
+    body_truncated: boolean().default(false).notNull(),
+    description: text(),
+    cover_image_url: text(),
+    podcast_url: text(),
+    body_html: text(),
+    body_text: text(),
+    word_count: integer(),
+    fetched_at: timestamp({ withTimezone: true }),
+    raw: jsonb(),
+    notes: text(),
+    created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+    updated_at: timestamp({ withTimezone: true }),
+  },
+  (table) => [
+    index("idx_substack_posts_publication_date").using(
+      "btree",
+      table.publication_id.asc().nullsLast(),
+      table.published_at.asc().nullsLast(),
+    ),
+    index("idx_substack_posts_published").using("btree", table.published_at.asc().nullsLast()),
+    index("idx_substack_posts_fts").using(
+      "gin",
+      sql`to_tsvector('english', coalesce("title", '') || ' ' || coalesce("subtitle", '') || ' ' || coalesce("body_text", ''))`,
+    ),
+    unique("substack_posts_publication_id_slug_key").on(table.publication_id, table.slug),
+    unique("substack_posts_publication_id_substack_post_id_key").on(
+      table.publication_id,
+      table.substack_post_id,
+    ),
+    foreignKey({
+      columns: [table.publication_id],
+      foreignColumns: [substack_publications.id],
+      name: "substack_posts_fk_0",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const substack_post_sources = pgTable(
+  "substack_post_sources",
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity({
+      name: "substack_post_sources_id_seq",
+      startWith: 1,
+      increment: 1,
+      minValue: 1,
+      maxValue: 2147483647,
+      cache: 1,
+    }),
+    post_id: integer().notNull(),
+    source_id: integer().notNull(),
+    anchor_text: text(),
+    context: text(),
+    link_kind: text(),
+    first_position: integer(),
+    occurrence_count: integer().default(1).notNull(),
+    created_at: timestamp({ withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => [
+    index("idx_substack_post_sources_source").using("btree", table.source_id.asc().nullsLast()),
+    unique("substack_post_sources_post_id_source_id_key").on(table.post_id, table.source_id),
+    foreignKey({
+      columns: [table.post_id],
+      foreignColumns: [substack_posts.id],
+      name: "substack_post_sources_fk_0",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.source_id],
+      foreignColumns: [research_sources.id],
+      name: "substack_post_sources_fk_1",
+    }).onDelete("cascade"),
+  ],
+);

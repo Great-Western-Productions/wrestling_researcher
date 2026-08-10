@@ -59,6 +59,30 @@ See [pwr-web/README.md](pwr-web/README.md) for the full Next.js/Drizzle/Vitest
 stack notes, including how to run the test suite (Testcontainers + real
 Postgres).
 
+## Substack ingest
+
+Archives pro-wrestling-history newsletters and the URLs their posts cite.
+Citations land in `research_sources`, the same table that carries hand-curated
+sources, so a link a blogger used and one added by hand are one row.
+
+```bash
+cd pwr-web
+pnpm ingest:substack --publication somebody.substack.com --dry-run   # parse only
+pnpm ingest:substack --publication somebody.substack.com --limit 25
+pnpm ingest:substack --all                                           # refresh all
+pnpm ingest:substack --search "Jerry Jarrett booking"
+pnpm ingest:substack --sources --limit 30                            # most-cited URLs
+```
+
+Substack publishes no supported API for post content, so this reads the
+undocumented JSON its own web app calls (`/api/v1/archive`,
+`/api/v1/posts/{slug}`), with RSS as the fallback. Expect it to break at some
+point without notice. Paywalled posts return only their free teaser; those
+rows are kept and flagged `body_truncated`, and a re-run replaces a stored
+teaser with the full text if the post later opens up. `--dry-run` fetches and
+parses without touching the database, which is the way to check a publication
+before its first ingest.
+
 ## Other tools
 
 Each subfolder has its own README with usage notes:

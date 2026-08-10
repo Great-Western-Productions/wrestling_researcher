@@ -16,6 +16,9 @@ import {
   reign_participants,
   reigns,
   research_sources,
+  substack_post_sources,
+  substack_posts,
+  substack_publications,
   territories,
   territory_eras,
   territory_market_runs,
@@ -249,6 +252,29 @@ export const territory_market_runsRelations = relations(territory_market_runs, (
   }),
   source: one(research_sources, {
     fields: [territory_market_runs.source_id],
+    references: [research_sources.id],
+  }),
+}));
+
+export const substack_publicationsRelations = relations(substack_publications, ({ many }) => ({
+  posts: many(substack_posts),
+}));
+
+export const substack_postsRelations = relations(substack_posts, ({ one, many }) => ({
+  publication: one(substack_publications, {
+    fields: [substack_posts.publication_id],
+    references: [substack_publications.id],
+  }),
+  sources: many(substack_post_sources),
+}));
+
+export const substack_post_sourcesRelations = relations(substack_post_sources, ({ one }) => ({
+  post: one(substack_posts, {
+    fields: [substack_post_sources.post_id],
+    references: [substack_posts.id],
+  }),
+  source: one(research_sources, {
+    fields: [substack_post_sources.source_id],
     references: [research_sources.id],
   }),
 }));
